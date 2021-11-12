@@ -1,0 +1,8 @@
+.component {
+    background-color: green;
+    color: white;
+    height: 60px;
+    max-width: 300px;
+    padding: 20px;
+    text-align: center;
+}
