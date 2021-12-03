@@ -1,0 +1,80 @@
+/*
+ * Usual - Mainly used for body type
+ * 300: Light
+ * 400: Book
+ * 500: Medium
+ * 700: Bold
+ * 800: ExtraBold
+ * 
+ */
+
+@font-face {
+    font-family: 'usual';
+    src: url('Usual-Light.WOFF') format('woff');
+    font-weight: 300;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'usual';
+    src: url('Usual-Light-Italic.WOFF') format('woff');
+    font-weight: 300;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'usual';
+    src: url('Usual-Book.WOFF') format('woff');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'usual';
+    src: url('Usual-Book-Italic.WOFF') format('woff');
+    font-weight: 400;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'usual';
+    src: url('Usual-Medium.WOFF') format('woff');
+    font-weight: 500;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'usual';
+    src: url('Usual-Medium-Italic.WOFF') format('woff');
+    font-weight: 500;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'usual';
+    src: url('Usual-Bold.WOFF') format('woff');
+    font-weight: 700;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'usual';
+    src: url('Usual-Bold-Italic.WOFF') format('woff');
+    font-weight: 700;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'usual';
+    src: url('Usual-ExtraBold.WOFF') format('woff');
+    font-weight: 800;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'usual';
+    src: url('Usual-ExtraBold-Italic.WOFF') format('woff');
+    font-weight: 800;
+    font-style: italic;
+}
+

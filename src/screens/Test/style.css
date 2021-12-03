@@ -1,0 +1,50 @@
+@import url('../../assets/fonts/transandina/');
+@import url('../../assets/fonts/usual/');
+@import url('../../assets/fonts/industry/');
+
+body, p {
+    font-family: 'usual';
+}
+
+p {
+    font-size: 11pt;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'transandina';
+}
+
+h1 {
+    font-size: 40pt;
+}
+
+h2 {
+    font-size: 29pt;
+    font-weight: 600;
+}
+
+h3 {
+    font-size: 21pt;
+    font-weight: 500;
+}
+
+h4 {
+    font-size: 17pt;
+    font-weight: 500;
+}
+
+h5 {
+    font-size: 14pt;
+    font-weight: 400;
+}
+
+h6 {
+    font-size: 14pt;
+    font-weight: 300;
+}
+
+.number {
+    font-family: 'industry';
+    font-size: 48pt;
+    font-weight: 700;
+}

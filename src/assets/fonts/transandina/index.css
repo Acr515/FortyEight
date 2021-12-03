@@ -1,0 +1,124 @@
+/* 
+ * Transandina - Mainly used for headings 
+ * 100: Thin
+ * 200: ExtraLight
+ * 300: Light
+ * 400: Book
+ * 500: Regular
+ * 600: Medium
+ * 700: Bold
+ * 900: Black
+ * 
+ */
+
+@font-face {
+    font-family: 'transandina';
+    src: url('Transandina-Thin.WOFF') format('woff');
+    font-weight: 100;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'transandina';
+    src: url('Transandina-Thin-Italic.WOFF') format('woff');
+    font-weight: 100;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'transandina';
+    src: url('Transandina-ExtraLight.WOFF') format('woff');
+    font-weight: 200;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'transandina';
+    src: url('Transandina-ExtraLight-Italic.WOFF') format('woff');
+    font-weight: 200;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'transandina';
+    src: url('Transandina-Light.WOFF') format('woff');
+    font-weight: 300;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'transandina';
+    src: url('Transandina-Light-Italic.WOFF') format('woff');
+    font-weight: 300;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'transandina';
+    src: url('Transandina-Book.WOFF') format('woff');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'transandina';
+    src: url('Transandina-Book-Italic.WOFF') format('woff');
+    font-weight: 400;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'transandina';
+    src: url('Transandina-Regular.WOFF') format('woff');
+    font-weight: 500;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'transandina';
+    src: url('Transandina-Regular-Italic.WOFF') format('woff');
+    font-weight: 500;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'transandina';
+    src: url('Transandina-Medium.WOFF') format('woff');
+    font-weight: 600;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'transandina';
+    src: url('Transandina-Medium-Italic.WOFF') format('woff');
+    font-weight: 600;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'transandina';
+    src: url('Transandina-Bold.WOFF') format('woff');
+    font-weight: 700;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'transandina';
+    src: url('Transandina-Bold-Italic.WOFF') format('woff');
+    font-weight: 700;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'transandina';
+    src: url('Transandina-Black.WOFF') format('woff');
+    font-weight: 900;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'transandina';
+    src: url('Transandina-Black-Italic.WOFF') format('woff');
+    font-weight: 900;
+    font-style: italic;
+}

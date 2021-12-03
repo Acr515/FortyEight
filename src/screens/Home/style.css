@@ -1,0 +1,9 @@
+@import url('../../assets/fonts/transandina/');
+@import url('../../assets/fonts/usual/');
+
+.usual {
+    font-family: 'usual';
+}
+.transandina {
+    font-family: 'transandina';
+}

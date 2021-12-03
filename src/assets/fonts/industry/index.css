@@ -1,0 +1,125 @@
+/*
+ * Industry - Mainly used for numbers and exaggerated stuff. Very graphic typeface
+ * 100: Light
+ * 300: Light
+ * 400: Book
+ * 500: Medium
+ * 600: Demi
+ * 700: Bold
+ * 800: Black
+ * 900: Ultra
+ * 
+ */
+
+ @font-face {
+    font-family: 'industry';
+    src: url('Industry-Thin.WOFF') format('woff');
+    font-weight: 100;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'industry';
+    src: url('Industry-Thin-Italic.WOFF') format('woff');
+    font-weight: 100;
+    font-style: italic;
+}
+
+ @font-face {
+    font-family: 'industry';
+    src: url('Industry-Light.WOFF') format('woff');
+    font-weight: 300;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'industry';
+    src: url('Industry-Light-Italic.WOFF') format('woff');
+    font-weight: 300;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'industry';
+    src: url('Industry-Book.WOFF') format('woff');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'industry';
+    src: url('Industry-Book-Italic.WOFF') format('woff');
+    font-weight: 400;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'industry';
+    src: url('Industry-Medium.WOFF') format('woff');
+    font-weight: 500;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'industry';
+    src: url('Industry-Medium-Italic.WOFF') format('woff');
+    font-weight: 500;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'industry';
+    src: url('Industry-Demi.WOFF') format('woff');
+    font-weight: 600;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'industry';
+    src: url('Industry-Demi-Italic.WOFF') format('woff');
+    font-weight: 600;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'industry';
+    src: url('Industry-Bold.WOFF') format('woff');
+    font-weight: 700;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'industry';
+    src: url('Industry-Bold-Italic.WOFF') format('woff');
+    font-weight: 700;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'industry';
+    src: url('Industry-Black.WOFF') format('woff');
+    font-weight: 800;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'industry';
+    src: url('Industry-Black-Italic.WOFF') format('woff');
+    font-weight: 800;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'industry';
+    src: url('Industry-Ultra.WOFF') format('woff');
+    font-weight: 900;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'industry';
+    src: url('Industry-Ultra-Italic.WOFF') format('woff');
+    font-weight: 900;
+    font-style: italic;
+}
+
