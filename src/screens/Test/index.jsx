@@ -1,12 +1,12 @@
 import React from 'react';
-import './style.css';
+import './style.scss';
 
 /**
  * Used mainly for testing different aesthetic and typographic presentations. Isolated from global style rules.
  */
 export default function Test() {
     return (
-        <div>
+        <div className="container">
             <div>
                 <h1>Header 1</h1>
                 <h2>Header 2</h2>

@@ -4,7 +4,7 @@ import Home from './screens/Home'
 import Form from './screens/Form'
 import Test from './screens/Test'
 import FRAME from './screens/FRAME';
-import './style.css';
+import './GlobalStyle.css';
 
 
 export default function App() {
