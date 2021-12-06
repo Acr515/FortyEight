@@ -1,0 +1,34 @@
+@import url('../../assets/fonts/transandina/');
+@import url('../../assets/fonts/usual/');
+
+#app-container {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+}
+#content-container {
+    width: 100%;
+    flex-grow: 1;
+}
+#navigation-bar {
+    background: #4941B1;
+    color: #FFF;
+    width: 100%;
+    max-width: 220px;
+    height: 100%;
+    padding: 100px 0 80px;
+
+    .navigation-link {
+        padding: 30px 40px;
+        font-weight: 400;
+        font-size: 18px;
+        color: #FFF;
+        text-decoration: none;
+        display: block;
+    }
+    .navigation-link.active {
+        background-color: #7670CA;
+        font-weight: 700;
+    }
+}

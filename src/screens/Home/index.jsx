@@ -5,8 +5,7 @@ import './style.css';
 export default function Home() {
     return (
         <div>
-            <p>This is the home route showing. Below the link is a thing that shows the current route</p>
-            <p>This is the home route showing. Below the link is a thing that shows the current route</p>
+            <p>This is a test of the index route</p>
             <Link to="/form">New Form</Link>
         </div>
     );
