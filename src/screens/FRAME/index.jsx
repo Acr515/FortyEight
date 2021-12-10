@@ -1,23 +1,22 @@
-import React from 'react';
-import { Link, Outlet } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Link, Outlet, useLocation } from 'react-router-dom';
 import './style.scss';
 
 export default function FRAME() {
+    const location = useLocation();
+
     return (
         <div id="app-container">
             <div id="navigation-bar">
                 <NavigationLink
                     link="/teams"
                     text="Teams"
-                    active={true}
+                    location={location}
                 />
                 <NavigationLink
-                    link="/"
+                    link="/test"
                     text="Data"
-                />
-                <NavigationLink
-                    link="/"
-                    text="Export"
+                    location={location}
                 />
             </div>
             <Outlet id="content-container"/>
@@ -25,9 +24,9 @@ export default function FRAME() {
     );
 }
 
-function NavigationLink({link, text, active}) {
+function NavigationLink({link, text, location}) {
     return (
-        <Link to={link} className={active ? "navigation-link active" : "navigation-link"}>
+        <Link to={link} className={location.pathname.includes(link) ? "navigation-link active" : "navigation-link"}>
             {text}
         </Link>
     )

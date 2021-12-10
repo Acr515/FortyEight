@@ -26,7 +26,13 @@
         color: #FFF;
         text-decoration: none;
         display: block;
+        transition: background-color .15s;
     }
+
+    .navigation-link:hover:not(.active) {
+        background-color: #6155BA;
+    }
+
     .navigation-link.active {
         background-color: #7670CA;
         font-weight: 700;
