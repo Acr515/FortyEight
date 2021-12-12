@@ -1,0 +1,26 @@
+@import url('../../assets/fonts/usual');
+
+._Button {
+    padding: 12px;
+    border-radius: 32px;
+    background-color: #4941B1;
+    cursor: pointer;
+    transition: background-color .1s;
+
+    .button-label {
+        color: white;
+        font-family: 'usual';
+        font-weight: 600;
+        display: block;
+        text-align: center;
+        user-select: none;
+    }
+}
+
+._Button:hover {
+    background-color: #7069C7;
+}
+
+._Button:active {
+    background-color: #5C54C5;
+}

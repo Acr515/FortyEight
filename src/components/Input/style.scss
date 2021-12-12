@@ -1,0 +1,41 @@
+@import url('../../assets/fonts/usual');
+
+._Input {
+    width: 100%;
+    display: flex;
+    margin-bottom: 18px;
+
+    label {
+        width: 100%;
+        flex-grow: .6;
+    }
+
+    .input-area {
+        display: flex;
+        width: 100%;
+        flex-grow: .4;
+
+        .text-box {
+            width: 100%;
+            padding: 3px;
+            border-radius: 8px;
+            border-style: solid;
+            border-color: #888;
+            border-width: 2px;
+            transition: border-color .15s, background-color .15s;
+            outline: none;
+            font-family: 'usual';
+            font-weight: 500;
+            font-size: 14px;
+        }
+        .text-box:focus {
+            border-color: #4941B1;
+            background-color: #F2F1FF;
+        }
+        .control-area {
+            width: 14px;
+            flex-shrink: 0;
+            flex-grow: 0;
+        }
+    }
+}

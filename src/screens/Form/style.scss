@@ -1,0 +1,28 @@
+@import url('../../assets/fonts/usual/');
+@import url('../../assets/fonts/transandina/');
+
+._Form {
+    display: flex;
+
+    .constant-area {
+        width: 100%;
+        max-width: 400px;
+        flex-grow: 1;
+        .constant-control-container {
+            padding: 28px 20px;
+            background-color: #D0CDFC;
+            border-radius: 16px;
+            margin: 0 24px;
+        }
+    }
+    .form-area {
+        width: 100%;
+        overflow-y: scroll;
+    }
+    .team-name {
+        display: block;
+        font-size: 12px;
+        margin-bottom: 18px;
+        font-weight: 500;
+    }
+}

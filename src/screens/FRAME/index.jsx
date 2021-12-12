@@ -14,8 +14,8 @@ export default function FRAME() {
                     location={location}
                 />
                 <NavigationLink
-                    link="/test"
-                    text="Data"
+                    link="/form"
+                    text="Create"
                     location={location}
                 />
             </div>
