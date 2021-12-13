@@ -12,7 +12,7 @@ import Chevron from '../../assets/images/chevron.png';
  * @param marginBottom Defaults to 18. Pixel margin to add to bottom of container element
  * @param alignLabel Where to align the label of the textbox. Accepts a string "top", "middle", or "bottom"
  */
-export default function Input({label, prefill, id, isCheckbox, isNumerical, marginBottom, alignLabel = "middle"}) {
+export default function Input({label, prefill, id, onInput, isCheckbox, isNumerical, marginBottom, alignLabel = "middle"}) {
     
     const [value, setValue] = useState(
         typeof prefill !== "undefined" ? prefill :
@@ -21,6 +21,8 @@ export default function Input({label, prefill, id, isCheckbox, isNumerical, marg
     );
 
     const updateValue = e => {
+        if (typeof onInput !== "undefined") onInput(e);
+
         let val = e.target.value;
         if (isNumerical && (/^\d+$/.test(val) || val === "")) {
             setValue(val);

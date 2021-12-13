@@ -1,7 +1,10 @@
+import getTeamName from './getTeamName';
+
 /**
  * A mutable array that holds every team object
  */
-export default TeamData = [];
+var TeamData = [];
+export default TeamData;
 
 /**
  * Acts as an enumerator for different endgame possibilities
@@ -16,7 +19,7 @@ export const EndgameResult = { CLIMB: "CLIMB", PARK: "PARK", NONE: "NONE" };
 export const createTeamObject = (num) => {
     return {
         number: num,
-        name: "Placeholder Team Name",
+        name: getTeamName(num),
         ranking: -1,
         wins: -1,
         losses: -1,
@@ -31,11 +34,11 @@ export const createTeamObject = (num) => {
 export const createFormObject = () => {
     return {
         name: "",
-        teamNumber: "",
+        teamNumber: -1,
         eventCode: "",
-        matchNumber: 0,
+        matchNumber: -1,
         performance: {
-            pieces: 0,
+            pieces: -1,
             endgame: EndgameResult.NONE
         }
     }
