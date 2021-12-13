@@ -30,7 +30,9 @@ export const createTeamObject = (num) => {
  */
 export const createFormObject = () => {
     return {
-        eventCode: "2022test",
+        name: "",
+        teamNumber: "",
+        eventCode: "",
         matchNumber: 0,
         performance: {
             pieces: 0,
