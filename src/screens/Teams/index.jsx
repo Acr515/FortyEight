@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import PageHeader from '../../components/PageHeader';
+import calculateRPI from '../../data/game_specific/calculateRPI/202X';
+import TeamData from '../../data/TeamData';
 import './style.scss';
 
 export default function Teams() {
@@ -8,14 +10,17 @@ export default function Teams() {
         <div className="SCREEN _Teams">
             <PageHeader text="Teams" />
             <div className="team-list">
-                <Team number={4855}/>
-                <Team number={1254}/>
+                {
+                    TeamData.map(team => {
+                        return (<Team team={team} />)
+                    })
+                }
             </div>
         </div>
     );
 }
 
-function Team({number}) {
+function Team({team}) {
     const [openTab, setOpenTab] = useState(false);
 
     const toggleTab = () => {
@@ -31,15 +36,15 @@ function Team({number}) {
             ></div>
             <div className="module-container">
                 <Link className="item-module" to="/">
-                    <span className="number team">{number}</span>
-                    <span className="label">Team Name</span>
+                    <span className="number team">{team.number}</span>
+                    <span className="label">{team.name}</span>
                 </Link>
                 <div className="item-module short">
-                    <span className="number">10.0</span>
+                    <span className="number">{calculateRPI(team)}</span>
                     <span className="label">RPI</span>
                 </div>
                 <div className="item-module short">
-                    <span className="number">5</span>
+                    <span className="number">{team.data.length}</span>
                     <span className="label">Forms</span>
                 </div>
             </div>

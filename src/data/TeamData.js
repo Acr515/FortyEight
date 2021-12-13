@@ -18,7 +18,7 @@ export const EndgameResult = { CLIMB: "CLIMB", PARK: "PARK", NONE: "NONE" };
  */
 export const createTeamObject = (num) => {
     return {
-        number: num,
+        number: Number(num),
         name: getTeamName(num),
         ranking: -1,
         wins: -1,
