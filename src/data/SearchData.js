@@ -8,11 +8,11 @@ import TeamData from "./TeamData";
  * @returns {boolean} True if team exists, false if not
  */
 export function teamExists(num) {
-    return getTeamData(num) != undefined;
+    return getTeamData(num) != null;
 }
 
 export function getTeamData(num) {
-    let returnTeam = undefined;
+    let returnTeam = null;
     TeamData.forEach(team => { if (team.number == num) { returnTeam = team; return; } });
     return returnTeam;
 }

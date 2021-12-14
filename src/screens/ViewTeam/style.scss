@@ -1,0 +1,64 @@
+@import url('../../assets/fonts/transandina/');
+@import url('../../assets/fonts/industry/');
+@import url('../../assets/fonts/usual/');
+
+._ViewTeam {
+    padding: 32px 32px 16px;
+    box-sizing: border-box;
+    overflow-y: scroll;
+    
+    h1.team-number {
+        font-family: 'industry';
+        margin: 0;
+        font-size: 64px;
+    }
+    h2 {
+        font-size: 26px;
+        font-weight: 600;
+        margin-top: 4px;
+    }
+    .text-row .value.rpi-number {
+        text-align: right;
+        font-family: 'industry';
+        margin: 0;
+        font-size: 36px;
+        font-weight: 500;
+    }
+
+    .column-area {
+        width: 100%;
+        display: flex;
+
+        .column-section {
+            width: 50%;
+            .chart-container {
+                position: relative;
+                width: 100%;
+                height: 280px;
+            }
+        }
+    }
+    .non-chart-area {
+        margin: 10px 10px 0 18px;
+    }
+
+    .text-row {
+        display: flex;
+        min-height: 30px;
+        .label, .value {
+            width: 50%;
+            margin: auto 0;
+            font-size: 18px;
+        }
+        .label {
+            font-family: 'trasandina';
+            font-weight: 300;
+        }
+        .value {
+            text-align: right;
+            margin-right: auto;
+            font-family: 'trasandina';
+            font-weight: 600;
+        }
+    }
+}
