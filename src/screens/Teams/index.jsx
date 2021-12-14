@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import PageHeader from '../../components/PageHeader';
 import calculateRPI from '../../data/game_specific/calculateRPI/202X';
@@ -12,7 +12,7 @@ export default function Teams() {
             <div className="team-list">
                 {
                     TeamData.map(team => {
-                        return (<Team team={team} />)
+                        return (<Team team={team} key={team.number} />)
                     })
                 }
             </div>

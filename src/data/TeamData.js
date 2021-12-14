@@ -1,3 +1,4 @@
+import { VERSION_NUMBER } from '../config';
 import getTeamName from './getTeamName';
 
 /**
@@ -33,6 +34,7 @@ export const createTeamObject = (num) => {
  */
 export const createFormObject = () => {
     return {
+        version: VERSION_NUMBER,
         name: "",
         teamNumber: -1,
         eventCode: "",

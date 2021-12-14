@@ -10,6 +10,7 @@ import './style.scss';
 import { getTeamData, teamExists } from '../../data/SearchData';
 import getTeamName from '../../data/getTeamName';
 import FeedbackModalContext from '../../context/FeedbackModalContext';
+import { saveData } from '../../data/saveLoadData';
 
 
 export default function Form() {
@@ -44,6 +45,7 @@ export default function Form() {
         getTeamData(teamNumber).data.push(form);
 
         modalFunctions.setModal("Your data was successfully submitted!", false);
+        saveData();
         navigate("/teams");
     }
 
