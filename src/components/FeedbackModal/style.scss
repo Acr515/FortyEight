@@ -1,0 +1,52 @@
+@import url('../../assets/fonts/usual');
+
+._FeedbackModal {
+    position: absolute;
+    z-index: 5;
+    top: 16px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: calc(100% - 60px);
+    max-width: 900px;
+    min-height: 48px;
+    padding: 16px;
+    box-sizing: border-box;
+    border-radius: 16px;
+    background-color: #4941B1;
+    display: flex;
+    transition: top .2s;
+    box-shadow: black 0px 3px 12px;
+
+    .modal-text {
+        font-size: 13px;
+        color: white;
+        font-family: 'usual';
+        font-weight: 700;
+        text-align: center;
+        display: block;
+        width: 100%;
+    }
+    .x-button {
+        background-size: contain;
+        background-position: center center;
+        background-repeat: no-repeat;
+        background-color: transparent;
+        cursor: pointer;
+        flex-grow: 0;
+        flex-shrink: 0;
+        width: 18px;
+        height: 18px;
+        margin: auto 8px auto 0;
+        filter: invert(100%);
+    }
+}
+
+._FeedbackModal.error {
+    background-color: white;
+    border: 3px solid #B14141;
+
+    .modal-text {
+        color: #B14141;
+    }
+}

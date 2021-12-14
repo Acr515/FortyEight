@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import TeamData, { createFormObject, createTeamObject } from '../../data/TeamData';
 import Button from '../../components/Button';
@@ -9,11 +9,14 @@ import PageHeader from '../../components/PageHeader';
 import './style.scss';
 import { getTeamData, teamExists } from '../../data/SearchData';
 import getTeamName from '../../data/getTeamName';
+import FeedbackModalContext from '../../context/FeedbackModalContext';
+
 
 export default function Form() {
 
     const [fullTeamName, setFullTeamName] = useState("Team name will show here");
     const navigate = useNavigate();
+    const modalFunctions = useContext(FeedbackModalContext);
 
     const getFullTeamName = e => {
         if (e.target.value !== "") setFullTeamName(getTeamName(e.target.value)); else setFullTeamName("Team name will show here");
@@ -39,6 +42,8 @@ export default function Form() {
         // TODO make this respond to a more rigid structure of what performance elements exist
         form.performance.pieces = Number(getValue("pieces"));
         getTeamData(teamNumber).data.push(form);
+
+        modalFunctions.setModal("Your data was successfully submitted!", false);
         navigate("/teams");
     }
 
