@@ -1,13 +1,15 @@
 import React, { useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import Home from './screens/Home'
-import Form from './screens/Form'
-import Test from './screens/Test'
-import Teams from './screens/Teams'
+import Home from './screens/Home';
+import Form from './screens/Form';
+import Test from './screens/Test';
+import Teams from './screens/Teams';
+import ViewTeam from './screens/ViewTeam';
 import FRAME from './screens/FRAME';
 import './GlobalStyle.css';
 import TeamData from './data/TeamData';
 import { loadData } from './data/saveLoadData';
+
 
 
 export default function App() {
@@ -21,7 +23,7 @@ export default function App() {
                 <Route path="form" element={<Form />} />
                 <Route path="test" element={<Test />} />
                 <Route path="teams" element={<Teams />}/>
-                <Route path="teams/view" element={<></>} />
+                <Route path="teams/:number" element={<ViewTeam />} />
             </Route>
         </Routes>
     );

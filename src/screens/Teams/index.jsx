@@ -35,7 +35,7 @@ function Team({team}) {
                 style={openTab ? {width: 120} : {}}
             ></div>
             <div className="module-container">
-                <Link className="item-module" to="/">
+                <Link className="item-module link" to={"/teams/" + team.number}>
                     <span className="number team">{team.number}</span>
                     <span className="label">{team.name}</span>
                 </Link>
