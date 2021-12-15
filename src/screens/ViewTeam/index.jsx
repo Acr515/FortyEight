@@ -13,6 +13,8 @@ import { getTeamData } from "../../data/SearchData";
 import calculateRPI, { calculateSingleRPI } from "../../data/game_specific/calculateRPI/202X";
 import '../../assets/fonts/transandina/index.css';
 import './style.scss';
+import EventCodeHolder from "../../components/EventCodeHolder";
+import ViewTeamCells from "../../components/game_specific/ViewTeamCells/202X";
 
 ChartJS.register(
     CategoryScale,
@@ -31,7 +33,7 @@ export default function ViewTeam() {
     var team = getTeamData(teamNumber);
 
     if (team == null) return (
-        <div className="SCREEN">
+        <div className="SCREEN ._ViewTeam">
             <p>That team ({teamNumber}) does not exist in memory.</p>
         </div>
     );
@@ -91,22 +93,35 @@ export default function ViewTeam() {
                 backgroundColor: 'rgba(73, 65, 177, 0.5)',
             }
         ]
-      };
+    };
 
     return (
         <div className="SCREEN _ViewTeam">
             <div className="column-area">
                 <div className="column-section">
                     <h1 className="team-number">{teamNumber}</h1>
-                    <h2>{team.name}</h2>
-                    <div className="text-row">
-                        <div className="label">Forms</div>
-                        <div className="value">{team.data.length}</div>
+                    <h2 className="team-name">{team.name}</h2>
+
+                    <div className="info-cell-holder">
+                        <div className="info-cell">
+                            <div className="info-value rpi-number">{calculateRPI(team)}</div>
+                            <div className="info-label">RPI</div>
+                        </div>
+                        <div className="info-cell">
+                            <div className="info-value">{team.data.length}</div>
+                            <div className="info-label">Forms</div>
+                        </div>
+                        <div className="info-cell">
+                            <div className="info-value">--%</div>
+                            <div className="info-label">Defense Rate</div>
+                        </div>
+                        <div className="info-cell">
+                            <div className="info-value">-/-</div>
+                            <div className="info-label">Climbs</div>
+                        </div>
+                        <ViewTeamCells team={team}/>
                     </div>
-                    <div className="text-row">
-                        <div className="label">Sample field</div>
-                        <div className="value">Yes</div>
-                    </div>
+
                 </div>
                 <div className="column-section">
                     <div className="chart-container">
@@ -116,14 +131,58 @@ export default function ViewTeam() {
                         }}/>
                     </div>
                     <div className="non-chart-area">
-                        <div className="text-row">
-                            <div className="label">RPI</div>
-                            <div className="value rpi-number">{calculateRPI(team)}</div>
-                        </div>
+                        
                     </div>
                 </div>
             </div>
-            
+            <h2>Individual Matches</h2>
+            <div className="match-holder">
+                {
+                    data.map(match =>  { return ( <MatchData match={match} /> ) })
+                }
+            </div>
+        </div>
+    )
+}
+
+function MatchData({match}) {
+    return (
+        <div className="_MatchData">
+            <div className="match-column-area">
+                <div className="match-info-column">
+                    <div className="match-info-row first">
+                        <span className="match-cell-content"><EventCodeHolder eventCode={match.eventCode} /></span>
+                    </div>
+                    <div className="match-info-row second">
+                        <span className="match-cell-content"></span>
+                    </div>
+                    <div className="match-info-row third">
+                        <span className="match-cell-content">{match.id}</span>
+                    </div>
+                </div>
+                <div className="match-info-column">
+                    <div className="match-info-row first">
+                        <span className="match-cell-content">Match #{match.matchNumber}</span>
+                    </div>
+                    <div className="match-info-row second">
+                        <span className="match-cell-content">{match.name}</span>
+                    </div>
+                    <div className="match-info-row third">
+                        <span className="match-cell-content">{match.timestamp}</span>
+                    </div>
+                </div>
+                <div className="match-info-column third">
+                    <div className="match-info-row first">
+                        <span className="match-cell-content">RPI: {calculateSingleRPI(match)}</span>
+                    </div>
+                    <div className="match-info-row second">
+                        <span className="match-cell-content"></span>
+                    </div>
+                    <div className="match-info-row third">
+                        <span className="match-cell-content">See more</span>
+                    </div>
+                </div>
+            </div>
         </div>
     )
 }

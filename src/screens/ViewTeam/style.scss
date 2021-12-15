@@ -12,23 +12,37 @@
         margin: 0;
         font-size: 64px;
     }
-    h2 {
+    h2.team-name {
         font-size: 26px;
         font-weight: 600;
         margin-top: 4px;
     }
-    .text-row .value.rpi-number {
-        text-align: right;
-        font-family: 'industry';
-        margin: 0;
-        font-size: 36px;
-        font-weight: 500;
+    h2 {
+        font-size: 26px;
+        font-weight: 400;
     }
+
+    .info-cell {
+        display: inline-block;
+        min-width: 120px;
+        margin-right: 3px;
+        .info-value {
+            font-family: 'industry';
+            font-size: 32px;
+        }
+        .info-value.rpi-number {
+            font-weight: 700;
+        }
+        .info-label {
+            font-family: 'trasandina';
+            font-size: 15px;
+        }
+    }
+    
 
     .column-area {
         width: 100%;
         display: flex;
-
         .column-section {
             width: 50%;
             .chart-container {
@@ -60,5 +74,53 @@
             font-family: 'trasandina';
             font-weight: 600;
         }
+    }
+}
+
+._MatchData {
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+    background-color: #D0CDFC;
+    border-radius: 16px;
+    margin-bottom: 24px;
+    .match-column-area {
+        display: flex;
+        .match-info-column {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            .match-info-row {
+                min-height: 32px;
+                position: relative;
+                .match-cell-content {
+                    top: 50%;
+                    position: relative;
+                    transform: translateY(-50%);
+                    display: block;
+                }
+            }
+            .match-info-row.first {
+                font-family: 'trasandina';
+                font-size: 20px;
+                font-weight: 500;
+            }
+            .match-info-row.second {
+                font-family: 'trasandina';
+                font-size: 16px;
+            }
+            .match-info-row.third {
+                font-family: 'usual';
+                color: #444;
+                font-size: 11px;
+                font-weight: 200;
+            }
+        }
+        .match-info-column.third {
+            text-align: right;
+        }
+    }
+    .hidden-area {
+
     }
 }
