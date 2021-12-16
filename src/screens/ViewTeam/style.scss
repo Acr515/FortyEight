@@ -81,7 +81,7 @@
     width: 100%;
     padding: 20px;
     box-sizing: border-box;
-    background-color: #D0CDFC;
+    background-color: #EBEAFC;
     border-radius: 16px;
     margin-bottom: 24px;
     .match-column-area {
@@ -91,7 +91,7 @@
             display: flex;
             flex-direction: column;
             .match-info-row {
-                min-height: 32px;
+                min-height: 28px;
                 position: relative;
                 .match-cell-content {
                     top: 50%;
@@ -119,6 +119,13 @@
         .match-info-column.third {
             text-align: right;
         }
+    }
+
+    // Stuff for showing/hiding
+    .match-info-row .match-cell-content.see-more {
+        font-weight: 600;
+        color: #4941B1;
+        font-size: 13px;
     }
     .hidden-area {
 

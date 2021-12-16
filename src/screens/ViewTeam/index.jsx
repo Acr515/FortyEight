@@ -179,7 +179,7 @@ function MatchData({match}) {
                         <span className="match-cell-content"></span>
                     </div>
                     <div className="match-info-row third">
-                        <span className="match-cell-content">See more</span>
+                        <span className="match-cell-content see-more">See more</span>
                     </div>
                 </div>
             </div>
