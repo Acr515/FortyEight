@@ -1,0 +1,30 @@
+._ImageButton {
+    background-size: contain;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-color: transparent;
+    outline: none;
+    border: none;
+    cursor: pointer;
+    transition: filter .15s;
+    width: 32px;
+    height: 32px;
+}
+
+._ImageButton.white {
+    filter: invert(100%);
+}
+
+._ImageButton.white:hover {
+    filter: invert(70%) sepia(7%) saturate(2091%) hue-rotate(204deg) brightness(98%) contrast(81%);
+}
+
+._ImageButton.black {
+    filter: invert(0%);
+}
+._ImageButton.black:hover {
+    filter: invert(50%);
+}
+._ImageButton.black:active {
+    filter: invert(20%);
+}

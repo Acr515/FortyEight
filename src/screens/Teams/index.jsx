@@ -1,18 +1,31 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import ImageButton from '../../components/ImageButton';
 import PageHeader from '../../components/PageHeader';
 import calculateRPI from '../../data/game_specific/calculateRPI/202X';
 import TeamData from '../../data/TeamData';
+import XImage from '../../assets/images/x.png';
+import Plus from '../../assets/images/plus.png';
 import './style.scss';
+import { saveData } from '../../data/saveLoadData';
+
+
+
+function useForceUpdate(){
+    const [value, setValue] = useState(0); // integer state
+    return () => setValue(value => value + 1); // update the state to force render
+}
+
 
 export default function Teams() {
+    const forceUpdate = useForceUpdate();
     return (
         <div className="SCREEN _Teams">
             <PageHeader text="Teams" />
             <div className="team-list">
                 {
                     TeamData.map(team => {
-                        return (<Team team={team} key={team.number} />)
+                        return (<Team team={team} updateHook={forceUpdate} key={team.number} />)
                     })
                 }
             </div>
@@ -20,20 +33,57 @@ export default function Teams() {
     );
 }
 
-function Team({team}) {
+function Team({team, updateHook}) {
     const [openTab, setOpenTab] = useState(false);
 
     const toggleTab = () => {
         setOpenTab(!openTab);
     }
 
+    const tabMouseEnter = e => {
+        e.target.parentElement.style.backgroundColor = "#6A64C1";
+    }
+    const tabMouseLeave = e => {
+        e.target.parentElement.style.backgroundColor = "#4941B1";
+    }
+
     return (
         <div className="team-component">
             <div 
                 className="team-tab"
-                onClick={toggleTab}
                 style={openTab ? {width: 120} : {}}
-            ></div>
+            >
+                <div 
+                    className="team-tab-clickable"
+                    onMouseEnter={tabMouseEnter}
+                    onMouseLeave={tabMouseLeave}
+                    onClick={toggleTab}
+                ></div>
+                <div className="tab-button-group">
+                    <ImageButton 
+                        color="white"
+                        imageData={XImage}
+                        style={{
+                            width: 16,
+                            height: 16,
+                            position: "relative",
+                            top: -4
+                        }}
+                        onClick={() => { deleteTeam(team.number, updateHook) }}
+                    />
+                    <ImageButton 
+                        color="white"
+                        imageData={Plus}
+                        style={{
+                            width: 20,
+                            height: 20,
+                            position: "relative",
+                            top: -4,
+                            marginLeft: 24
+                        }}
+                    />
+                </div>
+            </div>
             <div className="module-container">
                 <Link className="item-module link" to={"/teams/" + team.number}>
                     <span className="number team">{team.number}</span>
@@ -50,4 +100,16 @@ function Team({team}) {
             </div>
         </div>
     )
+}
+
+function deleteTeam(num, updateHook) {
+    for (let index = 0; index < TeamData.length; index ++) {
+        if (TeamData[index].number == num) {
+            TeamData.splice(index, 1);
+            updateHook();
+            saveData();
+            return true;
+        }
+    }
+    return false;
 }
