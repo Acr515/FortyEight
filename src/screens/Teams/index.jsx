@@ -77,7 +77,7 @@ function Team({team, updateHook}) {
                         onClick={() => { dialogFunctions.setDialog({
                             body: "This will delete ALL DATA in memory for this team and cannot be undone. Are you sure you would like to continue?",
                             useConfirmation: true,
-                            //confirmFunction: () => { deleteTeam(team.number, updateHook); modalFunctions.setModal("Team " + team.number + " was successfully deleted.", false) },
+                            confirmFunction: () => { deleteTeam(team.number, updateHook); modalFunctions.setModal("Team " + team.number + " was successfully deleted.", false) },
                             confirmLabel: "Yes",
                             cancelLabel: "No"
                         })}}
