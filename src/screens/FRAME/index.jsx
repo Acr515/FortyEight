@@ -5,6 +5,7 @@ import DialogBoxContext from '../../context/DialogBoxContext';
 import FeedbackModal from '../../components/FeedbackModal';
 import './style.scss';
 import DialogBox from '../../components/DialogBox';
+import { VERSION_NAME } from '../../config';
 
 var modalHideTimer = null;
 
@@ -62,6 +63,14 @@ export default function FRAME() {
                             text="Create"
                             location={location}
                         />
+                        <NavigationLink
+                            link="/manage"
+                            text="Manage"
+                            location={location}
+                        />
+                        <div className="footer-content">
+                            v{VERSION_NAME}
+                        </div>
                     </div>
                     <div id="content-container">
                         <FeedbackModal 

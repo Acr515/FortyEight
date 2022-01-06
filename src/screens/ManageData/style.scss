@@ -1,0 +1,31 @@
+@import url('../../assets/fonts/transandina/');
+@import url('../../assets/fonts/usual/');
+
+._ManageData {
+    overflow-y: auto;
+
+    .content-area {
+        box-sizing: border-box;
+        padding: 0 32px;
+
+        .control-area {
+            display: flex;
+            margin-bottom: 50px;
+            .cell {
+                width: 100%;
+            }
+            .cell.explanation {
+                margin-right: 32px;
+                max-width: 550px;
+                p {
+                    margin: 0;
+                }
+            }
+            .file-input {
+                font-family: 'usual';
+                font-size: 15px;
+                font-weight: 500;
+            }
+        }
+    }
+}

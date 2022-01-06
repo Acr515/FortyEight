@@ -9,6 +9,7 @@ import FRAME from './screens/FRAME';
 import './GlobalStyle.css';
 import TeamData from './data/TeamData';
 import { loadData } from './data/saveLoadData';
+import ManageData from './screens/ManageData';
 
 
 
@@ -22,6 +23,7 @@ export default function App() {
                 <Route index element={<Home />} />
                 <Route path="form" element={<Form />} />
                 <Route path="test" element={<Test />} />
+                <Route path="manage" element={<ManageData />}/>
                 <Route path="teams" element={<Teams />}/>
                 <Route path="teams/:number" element={<ViewTeam />} />
             </Route>

@@ -1,4 +1,5 @@
 @import url('assets/fonts/transandina');
+@import url('assets/fonts/usual');
 
 body {
     margin: 0;
@@ -9,10 +10,17 @@ body {
     width: 100%;
     height: 100%;
     position: relative;
+    box-sizing: border-box;
 }
 
 h2 {
     font-family: 'trasandina';
     font-size: 32px;
     font-weight: 500;
+}
+
+p {
+    font-family: 'usual';
+    font-size: 15px;
+    line-height: 1.5em;
 }

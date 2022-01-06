@@ -19,6 +19,8 @@
     max-width: 220px;
     height: 100%;
     padding: 100px 0 80px;
+    box-sizing: border-box;
+    position: relative;
 
     .navigation-link {
         padding: 30px 40px;
@@ -37,5 +39,17 @@
     .navigation-link.active {
         background-color: #7670CA;
         font-weight: 700;
+    }
+
+    .footer-content {
+        position: absolute;
+        bottom: 0;
+        min-height: 100px;
+        left: 0;
+        right: 0;
+        padding: 8px 40px 18px;
+        box-sizing: border-box;
+        font-size: 13px;
+        font-weight: 300;
     }
 }
