@@ -27,19 +27,6 @@
         display: block;
         width: 100%;
     }
-    .x-button {
-        background-size: contain;
-        background-position: center center;
-        background-repeat: no-repeat;
-        background-color: transparent;
-        cursor: pointer;
-        flex-grow: 0;
-        flex-shrink: 0;
-        width: 18px;
-        height: 18px;
-        margin: auto 8px auto 0;
-        filter: invert(100%);
-    }
 }
 
 ._FeedbackModal.error {

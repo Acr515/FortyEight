@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import ImageButton from '../../components/ImageButton';
 import PageHeader from '../../components/PageHeader';
@@ -8,7 +8,7 @@ import XImage from '../../assets/images/x.png';
 import Plus from '../../assets/images/plus.png';
 import './style.scss';
 import { saveData } from '../../data/saveLoadData';
-
+import DialogBoxContext from '../../context/DialogBoxContext';
 
 
 function useForceUpdate(){
@@ -48,6 +48,8 @@ function Team({team, updateHook}) {
         e.target.parentElement.style.backgroundColor = "#4941B1";
     }
 
+    const dialogFunctions = useContext(DialogBoxContext);
+
     return (
         <div className="team-component">
             <div 
@@ -70,7 +72,13 @@ function Team({team, updateHook}) {
                             position: "relative",
                             top: -4
                         }}
-                        onClick={() => { deleteTeam(team.number, updateHook) }}
+                        onClick={() => { dialogFunctions.setDialog({
+                            body: "This will delete ALL DATA in memory for this team and cannot be undone. Are you sure you would like to continue?",
+                            useConfirmation: true,
+                            confirmFunction: () => { deleteTeam(team.number, updateHook) },
+                            confirmLabel: "Yes",
+                            cancelLabel: "No"
+                        })}}
                     />
                     <ImageButton 
                         color="white"
