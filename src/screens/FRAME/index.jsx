@@ -6,6 +6,8 @@ import FeedbackModal from '../../components/FeedbackModal';
 import './style.scss';
 import DialogBox from '../../components/DialogBox';
 
+var modalHideTimer = null;
+
 export default function FRAME() {
     const location = useLocation();
 
@@ -18,6 +20,8 @@ export default function FRAME() {
             setModalText(text);
             setModalError(isError);
             setModalRevealed(true);
+            if (modalHideTimer != null) clearTimeout(modalHideTimer);
+            modalHideTimer = setTimeout(() => { setModalRevealed(false) }, 10000);
         },
         hideModal: () => {
             setModalRevealed(false);
@@ -40,36 +44,36 @@ export default function FRAME() {
 
     return (
         <div id="app-container">
-            <DialogBox
-                options={dialogOptions}
-                revealed={dialogRevealed}
-                revealFunction={hideDialog}
-            />
-            <DialogBoxContext.Provider value={dialogContextObject}>
-                <div id="navigation-bar">
-                    <NavigationLink
-                        link="/teams"
-                        text="Teams"
-                        location={location}
-                    />
-                    <NavigationLink
-                        link="/form"
-                        text="Create"
-                        location={location}
-                    />
-                </div>
-                <div id="content-container">
-                    <FeedbackModal 
-                        text={modalText}
-                        revealed={modalRevealed}
-                        isError={modalError}
-                        revealFunction={setModalRevealed}
-                    />
-                    <FeedbackModalContext.Provider value={modalContextObject}>
+            <FeedbackModalContext.Provider value={modalContextObject}>
+                <DialogBox
+                    options={dialogOptions}
+                    revealed={dialogRevealed}
+                    revealFunction={hideDialog}
+                />
+                <DialogBoxContext.Provider value={dialogContextObject}>
+                    <div id="navigation-bar">
+                        <NavigationLink
+                            link="/teams"
+                            text="Teams"
+                            location={location}
+                        />
+                        <NavigationLink
+                            link="/form"
+                            text="Create"
+                            location={location}
+                        />
+                    </div>
+                    <div id="content-container">
+                        <FeedbackModal 
+                            text={modalText}
+                            revealed={modalRevealed}
+                            isError={modalError}
+                            revealFunction={setModalRevealed}
+                        />
                         <Outlet/>
-                    </FeedbackModalContext.Provider>
-                </div>
-            </DialogBoxContext.Provider>
+                    </div>
+                </DialogBoxContext.Provider>
+            </FeedbackModalContext.Provider>
         </div>
     );
 }

@@ -9,6 +9,7 @@ import Plus from '../../assets/images/plus.png';
 import './style.scss';
 import { saveData } from '../../data/saveLoadData';
 import DialogBoxContext from '../../context/DialogBoxContext';
+import FeedbackModalContext from '../../context/FeedbackModalContext';
 
 
 function useForceUpdate(){
@@ -49,6 +50,7 @@ function Team({team, updateHook}) {
     }
 
     const dialogFunctions = useContext(DialogBoxContext);
+    const modalFunctions = useContext(FeedbackModalContext);
 
     return (
         <div className="team-component">
@@ -75,7 +77,7 @@ function Team({team, updateHook}) {
                         onClick={() => { dialogFunctions.setDialog({
                             body: "This will delete ALL DATA in memory for this team and cannot be undone. Are you sure you would like to continue?",
                             useConfirmation: true,
-                            confirmFunction: () => { deleteTeam(team.number, updateHook) },
+                            //confirmFunction: () => { deleteTeam(team.number, updateHook); modalFunctions.setModal("Team " + team.number + " was successfully deleted.", false) },
                             confirmLabel: "Yes",
                             cancelLabel: "No"
                         })}}

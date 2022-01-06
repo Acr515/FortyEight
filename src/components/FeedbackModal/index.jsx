@@ -9,11 +9,11 @@ export default function FeedbackModal({text, isError, revealed, revealFunction})
             className={"_FeedbackModal" + (isError ? " error" : "")}
             style={{ top: revealed ? 16 : -120 }}
         >
-            <span className="modal-text">{text}</span>
+            <span className={"modal-text" + (isError ? " error" : "")}>{text}</span>
             <ImageButton
                 imageData={XImage}
                 onClick={() => revealFunction(false)}
-                color="white"
+                color={isError ? "red" : "white"}
                 style={{
                     width: 18,
                     height: 18,
