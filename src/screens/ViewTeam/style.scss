@@ -126,8 +126,27 @@
         font-weight: 600;
         color: #4941B1;
         font-size: 13px;
+        cursor: pointer;
+        user-select: none;
+        transition: color .15s;
     }
-    .hidden-area {
-
+    .match-info-row .match-cell-content.see-more:hover {
+        color: #8F89E7;
+    }
+    .match-details.hidden-area {
+        max-height: 0;
+        opacity: 0;
+    }
+    .match-details {
+        overflow: hidden;
+        transition: max-height .25s, opacity .3s;
+        opacity: 1;
+        max-height: 500px;  // may need adjustment
+        
+        h3 {
+            font-family: 'trasandina';
+            font-weight: 300;
+            font-size: 24px;
+        }
     }
 }

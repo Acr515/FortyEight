@@ -19,12 +19,13 @@ function useForceUpdate(){
 
 export default function Teams() {
     const forceUpdate = useForceUpdate();
+    const sortedTeams = TeamData.sort((a, b) => { return a.number - b.number })
     return (
         <div className="SCREEN _Teams">
             <PageHeader text="Teams" />
             <div className="team-list">
                 {
-                    TeamData.map(team => {
+                    sortedTeams.map(team => {
                         return (<Team team={team} updateHook={forceUpdate} key={team.number} />)
                     })
                 }

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useParams } from "react-router";
 import { Line } from 'react-chartjs-2';
 import {
@@ -11,10 +11,14 @@ import {
 } from 'chart.js';
 import { getTeamData } from "../../data/SearchData";
 import calculateRPI, { calculateSingleRPI } from "../../data/game_specific/calculateRPI/202X";
+import ViewTeamCells from "../../components/game_specific/ViewTeamCells/202X";
+import ViewIndividualData from "../../components/game_specific/ViewIndividualData/202X";
+import EventCodeHolder from "../../components/EventCodeHolder";
+import ImageButton from "../../components/ImageButton";
+import EditImage from '../../assets/images/edit.png';
+import XImage from '../../assets/images/x.png';
 import '../../assets/fonts/transandina/index.css';
 import './style.scss';
-import EventCodeHolder from "../../components/EventCodeHolder";
-import ViewTeamCells from "../../components/game_specific/ViewTeamCells/202X";
 
 ChartJS.register(
     CategoryScale,
@@ -25,6 +29,7 @@ ChartJS.register(
 );
 
 ChartJS.defaults.font.family = 'transandina';
+
 
 export default function ViewTeam() {
     // Retrieve team number
@@ -60,9 +65,7 @@ export default function ViewTeam() {
         pointRadius: 5,
         pointHoverRadius: 8,
         pointHoverBorderWidth: 2,
-        plugins: {
-            
-        },
+        plugins: {},
         scales: {
             y: {
                 suggestedMin: 0,
@@ -80,9 +83,6 @@ export default function ViewTeam() {
             }
         }
     };
-
-    // Collect array of match #s and RPI calculations
-    
     const chartData = {
         labels,
         datasets: [
@@ -146,6 +146,10 @@ export default function ViewTeam() {
 }
 
 function MatchData({match}) {
+
+    const [expanded, setExpanded] = useState(false);
+    const toggleExpansion = () => { setExpanded(!expanded); };
+
     return (
         <div className="_MatchData">
             <div className="match-column-area">
@@ -154,7 +158,32 @@ function MatchData({match}) {
                         <span className="match-cell-content"><EventCodeHolder eventCode={match.eventCode} /></span>
                     </div>
                     <div className="match-info-row second">
-                        <span className="match-cell-content"></span>
+                        <span className="match-cell-content">
+                            
+                            <ImageButton
+                                imageData={XImage}
+                                color="black"
+                                style={{
+                                    width: 16,
+                                    height: 16,
+                                    display: "inline-block",
+                                    marginTop: "auto",
+                                    marginBottom: "auto"
+                                }}
+                            />
+                            <ImageButton
+                                imageData={EditImage}
+                                color="black"
+                                style={{
+                                    width: 16,
+                                    height: 16,
+                                    display: "inline-block",
+                                    marginTop: "auto",
+                                    marginBottom: "auto",
+                                    marginLeft: 8
+                                }}
+                            />
+                        </span>
                     </div>
                     <div className="match-info-row third">
                         <span className="match-cell-content">{match.id}</span>
@@ -179,9 +208,19 @@ function MatchData({match}) {
                         <span className="match-cell-content"></span>
                     </div>
                     <div className="match-info-row third">
-                        <span className="match-cell-content see-more">See more</span>
+                        <span 
+                            className="match-cell-content see-more"
+                            onClick={toggleExpansion}
+                        >
+                            See {expanded ? "less" : "more"}
+                        </span>
                     </div>
                 </div>
+            </div>
+
+            <div className={"match-details" + (expanded ? "" : " hidden-area")}>
+                <h3>Match Details</h3>
+                <ViewIndividualData data={match} />
             </div>
         </div>
     )
