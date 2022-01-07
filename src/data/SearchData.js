@@ -11,6 +11,12 @@ export function teamExists(num) {
     return getTeamData(num) != null;
 }
 
+/**
+ * It is important to note that this function returns the ENTIRE TEAM OBJECT. If you need to access the 
+ * actual match data for this team, use `getTeamData(num).data`.
+ * @param {number} num The team number to search
+ * @returns The team object with the corresponding number
+ */
 export function getTeamData(num) {
     let returnTeam = null;
     TeamData.forEach(team => { if (team.number == num) { returnTeam = team; return; } });

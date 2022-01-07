@@ -4,10 +4,12 @@ import PageHeader from "../../components/PageHeader";
 import { VERSION_NAME, VERSION_NUMBER } from "../../config";
 import DialogBoxContext from "../../context/DialogBoxContext";
 import FeedbackModalContext from "../../context/FeedbackModalContext";
-import TeamData from "../../data/TeamData";
+import TeamData, { createTeamObject } from "../../data/TeamData";
 import generateHexString from "../../util/generateHexString";
 import date from 'date-and-time';
 import './style.scss';
+import { getTeamData, teamExists } from "../../data/SearchData";
+import verifyVersionNumbers from "../../util/verifyVersionNumbers";
 
 export default function ManageData() {
     const modalFunctions = useContext(FeedbackModalContext);
@@ -22,7 +24,7 @@ export default function ManageData() {
                     <div className="cell explanation">
                         <p>Use the input to the right to attach any number of .json files that contain match data created in FortyEight. The data will automatically populate under the Teams tab. Any duplicate matches will be automatically removed.</p>
                     </div>
-                    <form className="cell">
+                    <form className="cell" action="" id="import-form">
                         <input 
                             type="file" 
                             multiple 
@@ -33,6 +35,7 @@ export default function ManageData() {
                         <Button
                             text="Import"
                             style={{ maxWidth: 128 }}
+                            action={ () => { importData(modalFunctions.setModal, dialogFunctions.setDialog) } }
                         />
                     </form>
                 </div>
@@ -99,9 +102,98 @@ function downloadObjectAsJson(exportObj, exportName){
 /**
  * Imports data directly into the TeamData variable and saves the data.
  * 
- * @returns a data object with the # of new teams added, # of new matches added,
- * # of duplicates ignored, and any pairs of conflicting matches if they exist
+ * @returns a data object with a boolean for success, the # of invalid files found, # of new teams 
+ * added, # of new matches added, # of duplicates ignored, and any pairs of 
+ * conflicting matches if they exist.
  */
-function importData() {
+function importData(modalSetter, dialogSetter) {
+    let fileBatch = document.getElementById("file-import");
+    
+    if (!'files' in fileBatch || fileBatch.files.length == 0) {
+        modalSetter("You did not attach any files. Please try again.", true);
+        return;
+    }
 
+    // Iterate through each file
+    let promises = [];
+    for (let file of fileBatch.files) {
+        let filePromise = new Promise(resolve => {
+            let reader = new FileReader();
+            reader.readAsText(file);
+            reader.onload = () => resolve(reader.result);
+        });
+        promises.push(filePromise);
+    }
+    Promise.all(promises).then(fileContents => {
+        let invalidFiles = 0, newTeams = 0, newMatches = 0, duplicates = 0, staleMatches = 0, conflicts = [];
+        for (let i = 0; i < fileContents.length; i ++) {
+            let file = fileContents[i];
+            console.log(file)
+            if (file.includes("VERSION_NUM") && file.includes("VERSION_STR")) {
+                // Parse an individual file
+                try {
+                    let fileData = JSON.parse(file);
+                    // Check to make sure this version is compatible
+                    if (verifyVersionNumbers(fileData.VERSION_NUM, VERSION_NUMBER)) {
+                        // File is OK, begin parsing by team
+
+                        fileData.data.forEach(team => {
+                            if (teamExists(team.number)) {
+                                // Must check each match against existing data for this team
+                                team.data.forEach(match => {
+                                    let isDuplicate = false;
+                                    if (!verifyVersionNumbers(match.vnum, VERSION_NUMBER)) staleMatches ++; else {
+                                        getTeamData(team.number).data.forEach(existingMatch => {
+                                            if (existingMatch.id == match.id) {
+                                                // This is a duplicate
+                                                duplicates ++;
+                                                isDuplicate = true;
+                                                return;
+                                            }
+                                        });
+                                        // Not a duplicate; add it to the data
+                                        if (!isDuplicate) {
+                                            newMatches ++;
+                                            getTeamData(team.number).data.push(match);
+                                        }
+                                    }
+                                });
+                            } else {
+                                // This is a new team, so no need to check for duplicates
+                                newTeams ++;
+                                let newTeam = createTeamObject(team.number);
+                                Object.keys(team).forEach(key => {
+                                    if (key != "data" && key != "number") newTeam[key] = team[key];
+                                });
+                                team.data.forEach(match => {
+                                    if (verifyVersionNumbers(match.vnum, VERSION_NUMBER)) {
+                                        newTeam.data.push(match); 
+                                        newMatches ++;
+                                    } else staleMatches ++;
+                                });
+                                TeamData.push(newTeam);
+                            }
+                        });
+
+                    } else invalidFiles ++;
+                }
+                catch (e) {
+                    modalSetter("The files you provided failed to import. Please check the console and try again.", true)
+                    console.log(e);
+                    console.log("Error occurred while parsing the following file:", file);
+                    invalidFiles ++;
+                }
+
+                // Pull up a dialog box, the operation was successful
+                dialogSetter({ body: `Import was successful.\n\nTeams added: ${newTeams}, Matches added: ${newMatches}, Duplicates ignored: ${duplicates}\n\nInvalid files: ${invalidFiles}, Stale matches: ${staleMatches}` });
+                fileBatch.files = null;
+
+            } else {
+                // This is not a valid file
+                invalidFiles ++;
+            }
+        }
+    });
+
+    //modalSetter("Cleared checks successfully", false);
 }
