@@ -3,6 +3,8 @@
 @import url('../../assets/fonts/industry/');
 
 ._Teams {
+    overflow-y: auto;
+
     .team-list {
         display: flex;
         flex-direction: column;
