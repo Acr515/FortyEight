@@ -11,10 +11,10 @@ export const GameDataInputs = {
                     id="Form_pieces"
                     isNumerical={true}
                 />
-                <Input
+                {/*<Input
                     label="Comments"
                     id="Form_comments"
-                />
+                />*/}
             </>
         )
     },
