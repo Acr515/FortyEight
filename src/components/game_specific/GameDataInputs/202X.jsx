@@ -2,7 +2,22 @@ import React from 'react';
 import Input from '../../Input';
 
 export const GameDataInputs = {
-    AutonomousSection: () => {},
+    AutonomousSection: () => { 
+        return (
+            <>
+                <Input
+                    label="Auto cross"
+                    id="Form_autonCross"
+                    isCheckbox={true}
+                />
+                <Input
+                    label="Pieces scored"
+                    id="Form_autonPieces"
+                    isNumerical={true}
+                />
+            </>
+        ) 
+    },
     TeleopSection: () => {
         return (
             <>
@@ -11,13 +26,16 @@ export const GameDataInputs = {
                     id="Form_pieces"
                     isNumerical={true}
                 />
-                {/*<Input
-                    label="Comments"
-                    id="Form_comments"
-                />*/}
             </>
         )
     },
-    EndgameSection: () => {},
-    CheckboxSection: () => {}
+    EndgameSection: () => { 
+        return (
+            <>
+            
+            </>
+        )
+    },
+    CheckboxSection: () => {},
+    defenseFields: true
 }
