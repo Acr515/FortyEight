@@ -36,6 +36,12 @@ export const GameDataInputs = {
             </>
         )
     },
-    CheckboxSection: () => {},
+    NotesSection: () => {
+        return (
+            <>
+            
+            </>
+        )
+    },
     defenseFields: true
 }

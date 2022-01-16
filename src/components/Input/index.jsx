@@ -13,8 +13,10 @@ import Chevron from '../../assets/images/chevron.png';
  * @param optionList Omit if not using an option list. Should be an array of objects containing "label" and "value" keys
  * @param marginBottom Defaults to 18. Pixel margin to add to bottom of container element
  * @param alignLabel Where to align the label of the textbox. Accepts a string "top", "middle", or "bottom"
+ * @param textArea Whether to render the input as a text area or not
+ * @param required Attaches a "required" class to the `input` element embedded inside the component, as well as flipping on the `required` HTML attribute for the `input`
  */
-export default function Input({label, prefill, id, onInput, isCheckbox, isNumerical, optionList, marginBottom, alignLabel = "middle"}) {
+export default function Input({label, prefill, id, onInput, isCheckbox, isNumerical, optionList, marginBottom, alignLabel = "middle", textArea = false, required = false}) {
     
     optionList = typeof optionList !== "undefined" ? optionList : false;
 
@@ -53,20 +55,26 @@ export default function Input({label, prefill, id, onInput, isCheckbox, isNumeri
             <div className="input-area">
                 { !optionList ? (
                     <input 
-                        className="text-box"
+                        className={"input text-box" + (
+                            (required ? " required" : "") +
+                            (isNumerical ? " numerical" : "")
+                            )
+                        }
                         id={id} 
                         name={id}
                         type={isCheckbox ? "checkbox" : "text"}
                         value={value}
                         onInput={updateValue}
+                        required={required}
                     />
                 ) : (
                     <select
-                        className="text-box dropdown-box"
+                        className={"input text-box dropdown-box" + (required ? " required" : "")}
                         id={id}
                         name={id}
                         onInput={updateValue}
                         value={value}
+                        required={required}
                     >
                         <option value="" disabled>Select...</option>
                         {

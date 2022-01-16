@@ -10,11 +10,6 @@ var TeamData = [];
 export default TeamData;
 
 /**
- * Acts as an enumerator for different endgame possibilities
- */
-export const EndgameResult = { CLIMB: "CLIMB", PARK: "PARK", NONE: "NONE" };
-
-/**
  * Creates an object for a team to be inserted into TeamData
  * @param {Number} num the team number
  * @returns object with a bunch of empty team properties in it
@@ -46,9 +41,6 @@ export const createFormObject = () => {
         teamNumber: -1,
         eventCode: "",
         matchNumber: -1,
-        performance: {
-            pieces: -1,
-            endgame: EndgameResult.NONE
-        }
+        performance: { pieces: 0 }
     }
 }

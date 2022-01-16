@@ -23,21 +23,23 @@ export default function GameDataSection({inputs}) {
                 <Input
                     label="This team played defense"
                     isCheckbox={true}
-                    id="Form_defense"
+                    id="Form_defense_played"
                     onInput={determineDefenseVisibility}
                 />
                 { defenseVisible && (<> 
                     <Input
                         label="Rate defensive performance"
-                        id="Form_defenseRating"
+                        id="Form_defense_rating"
                         optionList={[
                             { value: "bad", label: "Poor: Robot did not disrupt opponent scoring" },
                             { value: "good", label: "Strong: Robot significantly disrupted scoring" }
                         ]}
+                        required={true}
                     />
                     <Input
                         label="Explain defensive strategy"
-                        id="Form_defenseExplain"
+                        id="Form_defense_explain"
+                        required={true}
                     />
                 </>) }
             </>) }
@@ -46,6 +48,23 @@ export default function GameDataSection({inputs}) {
                 <h2>Endgame</h2>
                 <inputs.EndgameSection /> 
             </>) }
+
+            <h2>Notes</h2>
+            <inputs.NotesSection />
+            <Input
+                label="This team's robot tipped over, broke down, OR lost communications during the match"
+                isCheckbox={true}
+                id="Form_notes_broken"
+            />
+            <Input
+                label="This team was heavily penalized OR was assessed a yellow/red card during the match"
+                isCheckbox={true}
+                id="Form_notes_fouls"
+            />
+            <Input
+                label="Comments"
+                id="Form_notes_comments"
+            />
         </div>
     )
 }
