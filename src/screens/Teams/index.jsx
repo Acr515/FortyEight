@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import ImageButton from '../../components/ImageButton';
 import PageHeader from '../../components/PageHeader';
-import calculateRPI from '../../data/game_specific/calculateRPI/202X';
+import calculateRPI from '../../data/game_specific/calculateRPI/2022';
 import TeamData from '../../data/TeamData';
 import XImage from '../../assets/images/x.png';
 import Plus from '../../assets/images/plus.png';

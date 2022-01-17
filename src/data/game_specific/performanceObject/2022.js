@@ -12,29 +12,15 @@ export default function performanceObject() {
         auto: {
             taxi: false,
             cargoLow: 0,
-            cargoHigh: 0,
-            getScore: () => this.auto.cargoLow * 2 + this.auto.cargoHigh * 4,
-            getPieces: () => this.auto.cargoLow + this.auto.cargoHigh
+            cargoHigh: 0
         },
         teleop: {
             cargoLow: 0,
-            cargoHigh: 0,
-            getScore: () => this.teleop.cargoLow + this.teleop.cargoHigh * 2,
-            getPieces: () => this.teleop.cargoLow + this.teleop.cargoHigh
+            cargoHigh: 0
         },
         endgame: {
             state: EndgameResult.NONE,
-            failedAttempt: false,
-            getScore: () => {
-                switch (this.endgame.state) {
-                    case EndgameResult.NONE: return 0;
-                    case EndgameResult.LOW_RUNG: return 4;
-                    case EndgameResult.MID_RUNG: return 6;
-                    case EndgameResult.HIGH_RUNG: return 10;
-                    case EndgameResult.TRAVERSAL_RUNG: return 15;
-                    default: return 0;
-                }
-            }
+            failedAttempt: false
         },
         defense: {},
         notes: {}

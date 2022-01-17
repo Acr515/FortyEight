@@ -10,9 +10,9 @@ import {
     Tooltip,
 } from 'chart.js';
 import { getTeamData } from "../../data/SearchData";
-import calculateRPI, { calculateSingleRPI } from "../../data/game_specific/calculateRPI/202X";
-import ViewTeamCells from "../../components/game_specific/ViewTeamCells/202X";
-import ViewIndividualData from "../../components/game_specific/ViewIndividualData/202X";
+import calculateRPI, { calculateSingleRPI } from "../../data/game_specific/calculateRPI/2022";
+import ViewTeamCells from "../../components/game_specific/ViewTeamCells/2022";
+import ViewIndividualData from "../../components/game_specific/ViewIndividualData/2022";
 import EventCodeHolder from "../../components/EventCodeHolder";
 import ImageButton from "../../components/ImageButton";
 import EditImage from '../../assets/images/edit.png';
@@ -114,10 +114,6 @@ export default function ViewTeam() {
                         <div className="info-cell">
                             <div className="info-value">--%</div>
                             <div className="info-label">Defense Rate</div>
-                        </div>
-                        <div className="info-cell">
-                            <div className="info-value">-/-</div>
-                            <div className="info-label">Climbs</div>
                         </div>
                         <ViewTeamCells team={team}/>
                     </div>

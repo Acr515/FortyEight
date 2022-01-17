@@ -33,7 +33,6 @@ export default function Input({label, prefill, id, onInput, isCheckbox, isNumeri
         if (isNumerical && (/^\d+$/.test(val) || val === "")) {
             setValue(val);
         } else if (!isNumerical) setValue(val);
-        console.log(value)
     }
 
     const increment = () => {

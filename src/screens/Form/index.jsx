@@ -52,7 +52,7 @@ export default function Form() {
         // Now assign data to form.performance, based on the year
         let performance = performanceObject();
         document.querySelectorAll(".SCREEN._Form .input").forEach(elm => {
-            let name = elm.id.split("_");console.log(name)
+            let name = elm.id.split("_");
             if (name[1] != "base") {
                 if (elm.classList.contains("numerical")) 
                     performance[name[1]][name[2]] = Number(elm.value);

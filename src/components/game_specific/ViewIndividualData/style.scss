@@ -1,0 +1,39 @@
+@import url('../../../assets/fonts/transandina/');
+@import url('../../../assets/fonts/usual/');
+@import url('../../../assets/fonts/industry/');
+
+._ViewIndividualData {
+    .data-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 16px;
+
+        .row-label {
+            font-family: 'transandina';
+            font-size: 20px;
+            font-weight: 600;
+            flex-basis: 33.333%;
+        }
+        .row-contents {
+            font-family: 'usual';
+            font-size: 15px;
+            flex-basis: 66.666%;
+            flex-shrink: 0;
+
+            .content-cell {
+                display: inline-block;
+                flex-direction: column;
+                margin-right: 10%;
+                .cell-data {
+                    font-family: 'industry';
+                    font-size: 24px;
+                    font-weight: 500;
+                }
+                .cell-label {
+                    font-family: 'transandina';
+                    font-size: 15px;
+                }
+            }
+        }
+    }
+}
