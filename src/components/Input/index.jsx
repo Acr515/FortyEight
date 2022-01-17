@@ -7,13 +7,19 @@ import Chevron from '../../assets/images/chevron.png';
  * @param label The label to display next to the text box
  * @param prefill What text/value to prefill the text box with  
  * @param id The ID assigned to the input element, as well as the `for` attribute of the label
+ * @param onInput A function that runs alongside the input's normal input event. The `e` variable is automatically used as a parameter, so keep this in mind
  * @param isCheckbox Whether to make the input a checkbox or not
  * @param isNumerical Whether to add arrows that count up/down or not
+ * @param optionList Omit if not using an option list. Should be an array of objects containing "label" and "value" keys
  * @param marginBottom Defaults to 18. Pixel margin to add to bottom of container element
  * @param alignLabel Where to align the label of the textbox. Accepts a string "top", "middle", or "bottom"
+ * @param textArea Whether to render the input as a text area or not
+ * @param required Attaches a "required" class to the `input` element embedded inside the component, as well as flipping on the `required` HTML attribute for the `input`
  */
-export default function Input({label, prefill, id, onInput, isCheckbox, isNumerical, marginBottom, alignLabel = "middle"}) {
+export default function Input({label, prefill, id, onInput, isCheckbox, isNumerical, optionList, marginBottom, alignLabel = "middle", textArea = false, required = false}) {
     
+    optionList = typeof optionList !== "undefined" ? optionList : false;
+
     const [value, setValue] = useState(
         typeof prefill !== "undefined" ? prefill :
         isNumerical ? 0 :
@@ -46,13 +52,35 @@ export default function Input({label, prefill, id, onInput, isCheckbox, isNumeri
                 {label}
             </label>
             <div className="input-area">
-                <input 
-                    className="text-box"
-                    id={id} 
-                    type={isCheckbox ? "checkbox" : "text"}
-                    value={value}
-                    onInput={updateValue}
-                />
+                { !optionList ? (
+                    <input 
+                        className={"input text-box" + (
+                            (required ? " required" : "") +
+                            (isNumerical ? " numerical" : "")
+                            )
+                        }
+                        id={id} 
+                        name={id}
+                        type={isCheckbox ? "checkbox" : "text"}
+                        value={value}
+                        onInput={updateValue}
+                        required={required}
+                    />
+                ) : (
+                    <select
+                        className={"input text-box dropdown-box" + (required ? " required" : "")}
+                        id={id}
+                        name={id}
+                        onInput={updateValue}
+                        value={value}
+                        required={required}
+                    >
+                        <option value="" disabled>Select...</option>
+                        {
+                            optionList.map(opt => <option value={opt.value}>{opt.label}</option>)
+                        }
+                    </select>
+                )}
                 {isNumerical && (
                     <div className="control-area">
                         <button 

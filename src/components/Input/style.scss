@@ -31,7 +31,11 @@
             font-weight: 500;
             font-size: 14px;
         }
-        .text-box:focus {
+        .text-box.dropdown-box {
+            height: 29px;
+            background-color: white;
+        }
+        .text-box:focus, .text-box.dropdown-box:focus {
             border-color: #4941B1;
             background-color: #F2F1FF;
         }
