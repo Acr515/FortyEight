@@ -10,6 +10,7 @@ import './style.scss';
 import { saveData } from '../../data/saveLoadData';
 import DialogBoxContext from '../../context/DialogBoxContext';
 import FeedbackModalContext from '../../context/FeedbackModalContext';
+import addLeadingZero from '../../util/addLeadingZero';
 
 
 function useForceUpdate(){
@@ -101,8 +102,8 @@ function Team({team, updateHook}) {
                     <span className="label">{team.name}</span>
                 </Link>
                 <div className="item-module short">
-                    <span className="number">{calculateRPI(team)}</span>
-                    <span className="label">RPI</span>
+                    <span className="number">{addLeadingZero(calculateRPI(team).RPI)}</span>
+                    <span className="label">RPI ({calculateRPI(team).rating})</span>
                 </div>
                 <div className="item-module short">
                     <span className="number">{team.data.length}</span>

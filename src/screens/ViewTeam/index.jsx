@@ -10,13 +10,14 @@ import {
     Tooltip,
 } from 'chart.js';
 import { getTeamData } from "../../data/SearchData";
-import calculateRPI, { calculateSingleRPI } from "../../data/game_specific/calculateRPI/2022";
+import calculateRPI, { calculateSingleRPI, getRPIRating } from "../../data/game_specific/calculateRPI/2022";
 import ViewTeamCells from "../../components/game_specific/ViewTeamCells/2022";
 import ViewIndividualData from "../../components/game_specific/ViewIndividualData/2022";
 import EventCodeHolder from "../../components/EventCodeHolder";
 import ImageButton from "../../components/ImageButton";
 import EditImage from '../../assets/images/edit.png';
 import XImage from '../../assets/images/x.png';
+import addLeadingZero from '../../util/addLeadingZero';
 import '../../assets/fonts/transandina/index.css';
 import './style.scss';
 
@@ -104,8 +105,8 @@ export default function ViewTeam() {
 
                     <div className="info-cell-holder">
                         <div className="info-cell">
-                            <div className="info-value rpi-number">{calculateRPI(team)}</div>
-                            <div className="info-label">RPI</div>
+                            <div className="info-value rpi-number">{addLeadingZero(calculateRPI(team).RPI)}</div>
+                            <div className="info-label">RPI ({calculateRPI(team).rating})</div>
                         </div>
                         <div className="info-cell">
                             <div className="info-value">{team.data.length}</div>
@@ -198,7 +199,7 @@ function MatchData({match}) {
                 </div>
                 <div className="match-info-column third">
                     <div className="match-info-row first">
-                        <span className="match-cell-content">RPI: {calculateSingleRPI(match)}</span>
+                        <span className="match-cell-content">{addLeadingZero(calculateSingleRPI(match))} RPI ({getRPIRating(calculateSingleRPI(match))})</span>
                     </div>
                     <div className="match-info-row second">
                         <span className="match-cell-content"></span>
