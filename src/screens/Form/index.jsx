@@ -29,9 +29,6 @@ export default function Form() {
     }
 
     const submitForm = () => {
-        let teamNumber = getValue("Form_base_teamNumber");
-        if (!teamExists(teamNumber)) TeamData.push(createTeamObject(teamNumber));
-
         // Validate the form
         let valid = true;
         document.querySelectorAll(".SCREEN._Form .input").forEach(elm => {
@@ -41,6 +38,10 @@ export default function Form() {
             modalFunctions.setModal("A required field was left blank. Please check your response and try again.", true);
             return;
         }
+
+        // Create team if it doesn't already exist
+        let teamNumber = getValue("Form_base_teamNumber");
+        if (!teamExists(teamNumber)) TeamData.push(createTeamObject(teamNumber));
 
         // Create universal form data
         let form = createFormObject();
