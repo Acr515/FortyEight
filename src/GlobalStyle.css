@@ -24,3 +24,11 @@ p {
     font-size: 15px;
     line-height: 1.5em;
 }
+
+.italic {
+    font-style: italic;
+}
+
+.bold {
+    font-weight: 700;
+}

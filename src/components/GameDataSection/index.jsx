@@ -31,8 +31,8 @@ export default function GameDataSection({inputs}) {
                         label="Rate defensive performance"
                         id="Form_defense_rating"
                         optionList={[
-                            { value: "bad", label: "Poor: Robot did not disrupt opponent scoring" },
-                            { value: "good", label: "Strong: Robot significantly disrupted scoring" }
+                            { value: "Poor", label: "Poor: Robot did not disrupt opponent scoring" },
+                            { value: "Strong", label: "Strong: Robot significantly disrupted scoring" }
                         ]}
                         required={true}
                     />

@@ -34,6 +34,33 @@
                     font-size: 15px;
                 }
             }
+            .flag-area {
+                color: #B14141;
+                font-family: 'usual';
+                font-weight: 600;
+                .individual-flag:not(.individual-flag:first-child) {
+                    margin-left: 10px;
+                }
+            }
+            .icon {
+                background-size: contain;
+                background-repeat: no-repeat;
+                background-position: center center;
+                filter: invert(27%) sepia(16%) saturate(6307%) hue-rotate(333deg) brightness(100%) contrast(80%);
+                display: inline-block;
+                vertical-align: center;
+                width: 14px;
+                height: 14px;
+            }
+            .commentary {
+                color: #777;
+                font-family: 'usual';
+                font-size: 14px;
+                margin-top: 12px;
+            }
         }
+    }
+    .data-row.cell-related {
+        align-items: flex-start;  // may need adjustment later
     }
 }
