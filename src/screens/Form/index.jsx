@@ -56,8 +56,8 @@ export default function Form() {
             if (name[1] != "base") {
                 if (elm.classList.contains("numerical")) 
                     performance[name[1]][name[2]] = Number(elm.value);
-                else if (elm.type == "checkbox") 
-                    performance[name[1]][name[2]] = elm.value == "true";
+                else if (elm.type == "checkbox")
+                    performance[name[1]][name[2]] = elm.checked;
                 else
                     performance[name[1]][name[2]] = elm.value;
             }
