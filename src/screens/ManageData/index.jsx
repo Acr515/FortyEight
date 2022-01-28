@@ -10,6 +10,7 @@ import date from 'date-and-time';
 import './style.scss';
 import { getTeamData, teamExists } from "../../data/SearchData";
 import verifyVersionNumbers from "../../util/verifyVersionNumbers";
+import { saveData } from "../../data/saveLoadData";
 
 export default function ManageData() {
     const modalFunctions = useContext(FeedbackModalContext);
@@ -55,6 +56,22 @@ export default function ManageData() {
                         />
                     </div>
                 </div>
+
+                <h2>Delete Data</h2>
+                <div className="control-area">
+                    <div className="cell explanation">
+                        <p>Click the button to the right to delete all teams currently stored in memory. Be sure to export the data of any team information you wish to save, as this cannot be undone!</p>
+                    </div>
+                    <div className="cell">
+                        <Button
+                            text="Delete"
+                            marginTop={1}
+                            marginBottom={1}
+                            style={{ maxWidth: 128 }}
+                            action={ () => deleteData(modalFunctions.setModal, dialogFunctions.setDialog) }
+                        />
+                    </div>
+                </div>
             </div>
             
         </div>
@@ -82,6 +99,21 @@ function exportData(modalSetter) {
         modalSetter("An error occurred while exporting the data.", true);
     }
 }
+
+
+function deleteData(modalSetter, dialogSetter) {
+    dialogSetter({
+        body: "Are you sure about dat",
+        useConfirmation: true,
+        confirmLabel: "Yes",
+        confirmFunction: () => {
+            TeamData.splice(0, TeamData.length);
+            saveData();
+            modalSetter("Success.", false);
+        }
+    })
+}
+
 
 /**
  * Downloads a json file to the user's downloads folder.
