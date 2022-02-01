@@ -20,6 +20,9 @@ import XImage from '../../assets/images/x.png';
 import addLeadingZero from '../../util/addLeadingZero';
 import '../../assets/fonts/transandina/index.css';
 import './style.scss';
+import GraphTogglerSet from "../../components/game_specific/GraphTogglerSet/2022";
+import { createDefaultData } from "../../components/game_specific/GraphTogglerSet/_Universal";
+import { Method, sortTeamData } from "../../util/sortData";
 
 ChartJS.register(
     CategoryScale,
@@ -37,26 +40,16 @@ export default function ViewTeam() {
     const params = useParams();
     const teamNumber = params.number;
     var team = getTeamData(teamNumber);
-
     if (team == null) return (
         <div className="SCREEN ._ViewTeam">
             <p>That team ({teamNumber}) does not exist in memory.</p>
         </div>
     );
+    let data = sortTeamData(getTeamData(teamNumber).data, Method.MatchAscending);
 
-    // Sort through data and store it separately
-    var data = [];
-    team.data.forEach(form => { data.push(form); });
-    data.sort((a, b) => {
-        if (a.eventCode < b.eventCode) return -1; else if (a.eventCode > b.eventCode) return 1;
-        return a.matchNumber < b.matchNumber ? -1 : 1;
-    });
 
-    // RPI and label calculation
-    var labels = [];
-    data.forEach(form => { labels.push(form.matchNumber); });
-    var RPIs = [];
-    data.forEach(form => { RPIs.push(calculateSingleRPI(form)); });
+    const [graphIndex, setGraphIndex] = useState(0);                            // numerical index for whichever graph is showing
+    const [graphInfo, setGraphInfo] = useState(createDefaultData(teamNumber));  // graph display settings & data
 
     // Configure RPI chart
     const chartOptions = {
@@ -68,30 +61,18 @@ export default function ViewTeam() {
         pointHoverBorderWidth: 2,
         plugins: {},
         scales: {
-            y: {
-                suggestedMin: 0,
-                suggestedMax: 50,
-                title: {
-                    display: true,
-                    text: "RPI"
-                }
-            },
-            x: {
-                title: {
-                    display: true,
-                    text: "Match #"
-                }
-            }
+            x: graphInfo.scaleX,
+            y: graphInfo.scaleY
         }
     };
     const chartData = {
-        labels,
+        labels: graphInfo.graphLabels,
         datasets: [
             {
-                label: 'RPI',
-                data: RPIs,
-                borderColor: 'rgb(73, 65, 177)',
-                backgroundColor: 'rgba(73, 65, 177, 0.5)',
+                label: 'RPI',   // TODO research how this is used
+                data: graphInfo.graphData,
+                borderColor: graphInfo.borderColor,
+                backgroundColor: graphInfo.backgroundColor,
             }
         ]
     };
@@ -128,7 +109,14 @@ export default function ViewTeam() {
                         }}/>
                     </div>
                     <div className="non-chart-area">
-                        
+                        <GraphTogglerSet
+                            activeIndex={graphIndex}
+                            stateFuncs={{
+                                setGraphIndex: setGraphIndex,
+                                setGraphInfo: setGraphInfo
+                            }}
+                            teamNumber={teamNumber}
+                        />
                     </div>
                 </div>
             </div>
@@ -141,6 +129,7 @@ export default function ViewTeam() {
         </div>
     )
 }
+
 
 function MatchData({match}) {
 

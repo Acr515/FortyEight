@@ -1,0 +1,18 @@
+@import url('../../../assets/fonts/usual/');
+
+._GraphToggler {
+    display: inline-block;
+    margin: 3px;
+    font-family: usual;
+    font-size: 11px;
+    text-align: center;
+    padding: 5px;
+    border-radius: 6px;
+    outline: none;
+    border-style: solid;
+    cursor: pointer;
+}
+
+._GraphToggler:hover, ._GraphToggler:focus {
+    opacity: .9
+}
