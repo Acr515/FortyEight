@@ -17,6 +17,9 @@ import EventCodeHolder from "../../components/EventCodeHolder";
 import ImageButton from "../../components/ImageButton";
 import EditImage from '../../assets/images/edit.png';
 import XImage from '../../assets/images/x.png';
+import FlagMisses from '../../assets/images/flag-misses.png';
+import FlagPenalties from '../../assets/images/flag-penalties.png';
+import FlagBreakdown from '../../assets/images/flag-breakdown.png';
 import addLeadingZero from '../../util/addLeadingZero';
 import '../../assets/fonts/transandina/index.css';
 import './style.scss';
@@ -145,7 +148,6 @@ function MatchData({match}) {
                     </div>
                     <div className="match-info-row second">
                         <span className="match-cell-content">
-                            
                             <ImageButton
                                 imageData={XImage}
                                 color="black"
@@ -191,7 +193,53 @@ function MatchData({match}) {
                         <span className="match-cell-content">{addLeadingZero(calculateSingleRPI(match))} RPI ({getRPIRating(calculateSingleRPI(match))})</span>
                     </div>
                     <div className="match-info-row second">
-                        <span className="match-cell-content"></span>
+                        <span className="match-cell-content">
+                            { match.performance.notes.misses && (
+                                <ImageButton
+                                    imageData={FlagMisses}
+                                    color="red"
+                                    disabled={true}
+                                    style={{
+                                        width: 22,
+                                        height: 22,
+                                        display: "inline-block",
+                                        marginTop: "auto",
+                                        marginBottom: "auto",
+                                        marginLeft: 6
+                                    }}
+                                />
+                            )}
+                            { match.performance.notes.broken && (
+                                <ImageButton
+                                    imageData={FlagBreakdown}
+                                    color="red"
+                                    disabled={true}
+                                    style={{
+                                        width: 22,
+                                        height: 22,
+                                        display: "inline-block",
+                                        marginTop: "auto",
+                                        marginBottom: "auto",
+                                        marginLeft: 6
+                                    }}
+                                />
+                            )}
+                            { match.performance.notes.fouls && (
+                                <ImageButton
+                                    imageData={FlagPenalties}
+                                    color="red"
+                                    disabled={true}
+                                    style={{
+                                        width: 22,
+                                        height: 22,
+                                        display: "inline-block",
+                                        marginTop: "auto",
+                                        marginBottom: "auto",
+                                        marginLeft: 6
+                                    }}
+                                />
+                            )}
+                        </span>
                     </div>
                     <div className="match-info-row third">
                         <span 
