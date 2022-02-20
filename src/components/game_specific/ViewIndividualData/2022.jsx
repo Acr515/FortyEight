@@ -91,7 +91,7 @@ export default function ViewIndividualData({data}) {
                             )}
                         </div>
                     )}
-                    <div className="italic commentary">{p.notes.comments || "No additional comments provided"}</div>
+                    <div className="italic commentary">{p.notes.comments ? `"${p.notes.comments}"` : "No additional comments provided"}</div>
                 </div>
             </div>
         </div>
