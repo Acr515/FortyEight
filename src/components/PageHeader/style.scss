@@ -4,11 +4,33 @@
     width: 100%;
     padding: 24px 32px;
     box-sizing: border-box;
+    display: flex;
+    align-items: center;
 
     h1 {
         font-family: 'transandina';
         font-size: 46px;
         font-weight: 700;
         margin: 0;
+        flex-grow: 1;
     }
+}
+
+._BackButton {
+    flex-grow: 0;
+    flex-shrink: 0;
+    transform: translateY(4px);
+    margin-right: 8px;
+    color: #4941B1;
+    cursor: pointer;
+    width: 70px;
+    transition: opacity .15s;
+    opacity: 1;
+    display: block;
+}
+._BackButton:hover {
+    opacity: .65;
+}
+._BackButton:active {
+    opacity: .8;
 }

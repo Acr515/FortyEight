@@ -95,7 +95,11 @@ export default function Form() {
     return (
         <form className="SCREEN _Form">
             <div className="constant-area">
-                <PageHeader text={edit.isEdit ? "Edit" : "Create"} />
+                <PageHeader 
+                    text={edit.isEdit ? "Edit" : "Create"} 
+                    backText={edit.isEdit ? edit.data.teamNumber : ""}
+                    showBack={edit.isEdit}
+                />
                 <div className="constant-control-container">
                     <Input
                         label="Name"
