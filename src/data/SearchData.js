@@ -22,3 +22,22 @@ export function getTeamData(num) {
     TeamData.forEach(team => { if (team.number == num) { returnTeam = team; return; } });
     return returnTeam;
 }
+
+/**
+ * Combs the TeamData object for a specific match with a given ID. Good for when the specific match is 
+ * known, but the reference to it does not directly infer its location in memory.
+ * @param {string} id The string ID correlating to the match information 
+ * @returns False if no match is found, otherwise an object with three properties: `match` containing 
+ * a copy of the match data, `dataset` containing a copy of the match array that holds it, and `index` 
+ * containing the array index of the information. You probably won't ever need `match` but it's there 
+ * in the event of some use case I can't predict
+ */
+export function findMatchDataByID(id) {
+    let returnData = false;
+    TeamData.forEach(team => {
+        team.data.forEach((match, index) => {
+            if (match.id == id) returnData = { match, index, dataset: team.data };
+        })
+    })
+    return returnData;
+}

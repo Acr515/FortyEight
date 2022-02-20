@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useParams } from "react-router";
 import { Line } from 'react-chartjs-2';
 import {
@@ -9,10 +9,11 @@ import {
     LineElement,
     Tooltip,
 } from 'chart.js';
-import { getTeamData } from "../../data/SearchData";
+import { findMatchDataByID, getTeamData } from "../../data/SearchData";
 import calculateRPI, { calculateSingleRPI, getRPIRating } from "../../data/game_specific/calculateRPI/2022";
 import ViewTeamCells from "../../components/game_specific/ViewTeamCells/2022";
 import ViewIndividualData from "../../components/game_specific/ViewIndividualData/2022";
+import FeedbackModalContext from '../../context/FeedbackModalContext';
 import EventCodeHolder from "../../components/EventCodeHolder";
 import ImageButton from "../../components/ImageButton";
 import EditImage from '../../assets/images/edit.png';
@@ -53,6 +54,7 @@ export default function ViewTeam() {
 
     const [graphIndex, setGraphIndex] = useState(0);                            // numerical index for whichever graph is showing
     const [graphInfo, setGraphInfo] = useState(createDefaultData(teamNumber));  // graph display settings & data
+    const [rerender, rerenderPage] = useState(false);
 
     // Configure RPI chart
     const chartOptions = {
@@ -126,7 +128,7 @@ export default function ViewTeam() {
             <h2>Individual Matches</h2>
             <div className="match-holder">
                 {
-                    data.map(match =>  { return ( <MatchData match={match} /> ) })
+                    data.map(match =>  { return ( <MatchData match={match} forceRenderTeamScreen={{ rerender, rerenderPage }} /> ) })
                 }
             </div>
         </div>
@@ -134,10 +136,23 @@ export default function ViewTeam() {
 }
 
 
-function MatchData({match}) {
+function MatchData({match, forceRenderTeamScreen}) {
 
     const [expanded, setExpanded] = useState(false);
     const toggleExpansion = () => { setExpanded(!expanded); };
+
+    const modalFunctions = useContext(FeedbackModalContext)
+
+    const deleteMatch = () => {
+        let matchFindObj = findMatchDataByID(match.id)
+        if (!matchFindObj) {
+            modalFunctions.setModal("That match couldn't be found. Was it already deleted?", true);
+        } else {
+            matchFindObj.dataset.splice(matchFindObj.index, 1);
+            forceRenderTeamScreen.rerenderPage(!forceRenderTeamScreen.rerender);    // jankily update useless state variable to force rerender
+            modalFunctions.setModal("Successfully deleted a match.", false);
+        }
+    }
 
     return (
         <div className="_MatchData">
@@ -158,6 +173,7 @@ function MatchData({match}) {
                                     marginTop: "auto",
                                     marginBottom: "auto"
                                 }}
+                                onClick={deleteMatch}
                             />
                             <ImageButton
                                 imageData={EditImage}
