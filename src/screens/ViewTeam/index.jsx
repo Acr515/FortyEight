@@ -191,7 +191,7 @@ function MatchData({match, forceRenderTeamScreen}) {
                                     marginBottom: "auto",
                                     marginLeft: 8
                                 }}
-                                to={"/form/" + match.id}
+                                to={"/teams/edit/" + match.id}
                             >
                                 <ImageButton
                                     imageData={EditImage}
