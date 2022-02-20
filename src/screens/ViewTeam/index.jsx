@@ -86,7 +86,7 @@ export default function ViewTeam() {
 
     return (
         <div className="SCREEN _ViewTeam">
-            <BackButton text="Teams" />
+            <BackButton text="Teams" location="/teams" />
             <div className="column-area">
                 <div className="column-section">
                     <h1 className="team-number">{teamNumber}</h1>

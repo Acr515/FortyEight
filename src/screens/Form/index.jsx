@@ -99,6 +99,7 @@ export default function Form() {
                     text={edit.isEdit ? "Edit" : "Create"} 
                     backText={edit.isEdit ? edit.data.teamNumber : ""}
                     showBack={edit.isEdit}
+                    location={edit.isEdit ? "/teams/" + edit.data.teamNumber : -1}
                 />
                 <div className="constant-control-container">
                     <Input
