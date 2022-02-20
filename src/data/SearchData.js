@@ -29,8 +29,7 @@ export function getTeamData(num) {
  * @param {string} id The string ID correlating to the match information 
  * @returns False if no match is found, otherwise an object with three properties: `match` containing 
  * a copy of the match data, `dataset` containing a copy of the match array that holds it, and `index` 
- * containing the array index of the information. You probably won't ever need `match` but it's there 
- * in the event of some use case I can't predict
+ * containing the array index of the information
  */
 export function findMatchDataByID(id) {
     let returnData = false;

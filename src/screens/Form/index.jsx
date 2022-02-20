@@ -12,6 +12,7 @@ import FeedbackModalContext from '../../context/FeedbackModalContext';
 import { saveData } from '../../data/saveLoadData';
 import { GameDataInputs } from '../../components/game_specific/GameDataInputs/2022';
 import performanceObject from '../../data/game_specific/performanceObject/2022';
+import date from 'date-and-time';
 
 
 export default function Form() {
@@ -74,11 +75,21 @@ export default function Form() {
             }
         });
         form.performance = performance;
-        getTeamData(teamNumber).data.push(form);
 
-        modalFunctions.setModal("Your data was successfully submitted!", false);
-        saveData();
-        navigate("/teams");
+        if (edit.isEdit) {
+            form.id = params.edit;
+            form.editTimestamp = date.format(new Date(), "M/D/YY, h:mm A");
+            let matchFindObj = findMatchDataByID(params.edit);
+            matchFindObj.dataset[matchFindObj.index] = form;
+            modalFunctions.setModal("Your changes were submitted.", false);
+            saveData();
+            navigate("/teams/" + form.teamNumber);
+        } else {
+            getTeamData(teamNumber).data.push(form);
+            modalFunctions.setModal("Your data was successfully submitted!", false);
+            saveData();
+            navigate("/teams");
+        }
     }
 
     return (
