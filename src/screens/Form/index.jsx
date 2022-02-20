@@ -114,6 +114,7 @@ export default function Form() {
                         onInput={getFullTeamName}
                         required={true}
                         prefill={edit.isEdit ? edit.data.teamNumber : undefined}
+                        disabled={edit.isEdit}
                     />
                     <span className="team-name">{fullTeamName}</span>
                     <Input
