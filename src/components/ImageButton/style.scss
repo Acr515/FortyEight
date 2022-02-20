@@ -11,20 +11,24 @@
     height: 32px;
 }
 
+._ImageButton.disabled {
+    cursor: default;
+}
+
 ._ImageButton.white {
     filter: invert(100%);
 }
-._ImageButton.white:hover {
+._ImageButton.white:hover:not(._ImageButton.disabled) {
     filter: invert(70%) sepia(7%) saturate(2091%) hue-rotate(204deg) brightness(98%) contrast(81%);
 }
 
 ._ImageButton.black {
     filter: invert(0%);
 }
-._ImageButton.black:hover {
+._ImageButton.black:hover:not(._ImageButton.disabled) {
     filter: invert(50%);
 }
-._ImageButton.black:active {
+._ImageButton.black:active:not(._ImageButton.disabled) {
     filter: invert(20%);
 }
 
@@ -32,11 +36,11 @@
     //#B14141
     filter: invert(27%) sepia(16%) saturate(6307%) hue-rotate(333deg) brightness(100%) contrast(80%);
 }
-._ImageButton.red:hover {
+._ImageButton.red:hover:not(._ImageButton.disabled) {
     //#D36E6E
     filter: invert(84%) sepia(54%) saturate(2698%) hue-rotate(302deg) brightness(78%) contrast(118%);
 }
-._ImageButton.red:active {
+._ImageButton.red:active:not(._ImageButton.disabled) {
     //#C65B5B
     filter: invert(52%) sepia(51%) saturate(1221%) hue-rotate(321deg) brightness(83%) contrast(84%);
 }

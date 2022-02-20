@@ -6,6 +6,7 @@ import calculateRPI from '../../data/game_specific/calculateRPI/2022';
 import TeamData from '../../data/TeamData';
 import XImage from '../../assets/images/x.png';
 import Plus from '../../assets/images/plus.png';
+import NoDataImage from '../../assets/images/no-data-graphic.png';
 import './style.scss';
 import { saveData } from '../../data/saveLoadData';
 import DialogBoxContext from '../../context/DialogBoxContext';
@@ -18,7 +19,6 @@ function useForceUpdate(){
     return () => setValue(value => value + 1); // update the state to force render
 }
 
-
 export default function Teams() {
     const forceUpdate = useForceUpdate();
     const sortedTeams = TeamData.sort((a, b) => { return a.number - b.number })
@@ -27,9 +27,16 @@ export default function Teams() {
             <PageHeader text="Teams" />
             <div className="team-list">
                 {
-                    sortedTeams.map(team => {
+                    sortedTeams.length > 0 ? sortedTeams.map(team => {
                         return (<Team team={team} updateHook={forceUpdate} key={team.number} />)
-                    })
+                    }) : (
+                        <div className="full-screen">
+                            <img src={NoDataImage} className="image"/>
+                            <p className="text">
+                                You have no team data. Use the Create tab to fill out a match form!
+                            </p>
+                        </div>
+                    )
                 }
             </div>
         </div>

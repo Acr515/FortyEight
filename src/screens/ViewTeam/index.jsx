@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useParams } from "react-router";
 import { Line } from 'react-chartjs-2';
 import {
@@ -9,17 +9,26 @@ import {
     LineElement,
     Tooltip,
 } from 'chart.js';
-import { getTeamData } from "../../data/SearchData";
+import { findMatchDataByID, getTeamData } from "../../data/SearchData";
 import calculateRPI, { calculateSingleRPI, getRPIRating } from "../../data/game_specific/calculateRPI/2022";
 import ViewTeamCells from "../../components/game_specific/ViewTeamCells/2022";
 import ViewIndividualData from "../../components/game_specific/ViewIndividualData/2022";
+import FeedbackModalContext from '../../context/FeedbackModalContext';
 import EventCodeHolder from "../../components/EventCodeHolder";
 import ImageButton from "../../components/ImageButton";
 import EditImage from '../../assets/images/edit.png';
 import XImage from '../../assets/images/x.png';
+import FlagMisses from '../../assets/images/flag-misses.png';
+import FlagPenalties from '../../assets/images/flag-penalties.png';
+import FlagBreakdown from '../../assets/images/flag-breakdown.png';
 import addLeadingZero from '../../util/addLeadingZero';
 import '../../assets/fonts/transandina/index.css';
 import './style.scss';
+import GraphTogglerSet from "../../components/game_specific/GraphTogglerSet/2022";
+import { createDefaultData } from "../../components/game_specific/GraphTogglerSet/_Universal";
+import { Method, sortTeamData } from "../../util/sortData";
+import { Link } from "react-router-dom";
+import { BackButton } from "../../components/PageHeader";
 
 ChartJS.register(
     CategoryScale,
@@ -37,26 +46,17 @@ export default function ViewTeam() {
     const params = useParams();
     const teamNumber = params.number;
     var team = getTeamData(teamNumber);
-
     if (team == null) return (
         <div className="SCREEN ._ViewTeam">
             <p>That team ({teamNumber}) does not exist in memory.</p>
         </div>
     );
+    let data = sortTeamData(getTeamData(teamNumber).data, Method.MatchAscending);
 
-    // Sort through data and store it separately
-    var data = [];
-    team.data.forEach(form => { data.push(form); });
-    data.sort((a, b) => {
-        if (a.eventCode < b.eventCode) return -1; else if (a.eventCode > b.eventCode) return 1;
-        return a.matchNumber < b.matchNumber ? -1 : 1;
-    });
 
-    // RPI and label calculation
-    var labels = [];
-    data.forEach(form => { labels.push(form.matchNumber); });
-    var RPIs = [];
-    data.forEach(form => { RPIs.push(calculateSingleRPI(form)); });
+    const [graphIndex, setGraphIndex] = useState(0);                            // numerical index for whichever graph is showing
+    const [graphInfo, setGraphInfo] = useState(createDefaultData(teamNumber));  // graph display settings & data
+    const [rerender, rerenderPage] = useState(false);
 
     // Configure RPI chart
     const chartOptions = {
@@ -68,36 +68,25 @@ export default function ViewTeam() {
         pointHoverBorderWidth: 2,
         plugins: {},
         scales: {
-            y: {
-                suggestedMin: 0,
-                suggestedMax: 50,
-                title: {
-                    display: true,
-                    text: "RPI"
-                }
-            },
-            x: {
-                title: {
-                    display: true,
-                    text: "Match #"
-                }
-            }
+            x: graphInfo.scaleX,
+            y: graphInfo.scaleY
         }
     };
     const chartData = {
-        labels,
+        labels: graphInfo.graphLabels,
         datasets: [
             {
-                label: 'RPI',
-                data: RPIs,
-                borderColor: 'rgb(73, 65, 177)',
-                backgroundColor: 'rgba(73, 65, 177, 0.5)',
+                label: 'RPI',   // TODO research how this is used
+                data: graphInfo.graphData,
+                borderColor: graphInfo.borderColor,
+                backgroundColor: graphInfo.backgroundColor,
             }
         ]
     };
 
     return (
         <div className="SCREEN _ViewTeam">
+            <BackButton text="Teams" location="/teams" />
             <div className="column-area">
                 <div className="column-section">
                     <h1 className="team-number">{teamNumber}</h1>
@@ -128,24 +117,49 @@ export default function ViewTeam() {
                         }}/>
                     </div>
                     <div className="non-chart-area">
-                        
+                        <GraphTogglerSet
+                            activeIndex={graphIndex}
+                            stateFuncs={{
+                                setGraphIndex: setGraphIndex,
+                                setGraphInfo: setGraphInfo
+                            }}
+                            teamNumber={teamNumber}
+                        />
                     </div>
                 </div>
             </div>
             <h2>Individual Matches</h2>
             <div className="match-holder">
                 {
-                    data.map(match =>  { return ( <MatchData match={match} /> ) })
+                    data.map(match =>  { return ( <MatchData 
+                        match={match} 
+                        forceRenderTeamScreen={{ rerender, rerenderPage }} 
+                        key={match.id}
+                    /> ) })
                 }
             </div>
         </div>
     )
 }
 
-function MatchData({match}) {
+
+function MatchData({match, forceRenderTeamScreen}) {
 
     const [expanded, setExpanded] = useState(false);
     const toggleExpansion = () => { setExpanded(!expanded); };
+
+    const modalFunctions = useContext(FeedbackModalContext)
+
+    const deleteMatch = () => {
+        let matchFindObj = findMatchDataByID(match.id)
+        if (!matchFindObj) {
+            modalFunctions.setModal("That match couldn't be found. Was it already deleted?", true);
+        } else {
+            matchFindObj.dataset.splice(matchFindObj.index, 1);
+            forceRenderTeamScreen.rerenderPage(!forceRenderTeamScreen.rerender);    // jankily update useless state variable to force rerender
+            modalFunctions.setModal("Successfully deleted a match.", false);
+        }
+    }
 
     return (
         <div className="_MatchData">
@@ -156,7 +170,6 @@ function MatchData({match}) {
                     </div>
                     <div className="match-info-row second">
                         <span className="match-cell-content">
-                            
                             <ImageButton
                                 imageData={XImage}
                                 color="black"
@@ -167,10 +180,9 @@ function MatchData({match}) {
                                     marginTop: "auto",
                                     marginBottom: "auto"
                                 }}
+                                onClick={deleteMatch}
                             />
-                            <ImageButton
-                                imageData={EditImage}
-                                color="black"
+                            <Link
                                 style={{
                                     width: 16,
                                     height: 16,
@@ -179,7 +191,17 @@ function MatchData({match}) {
                                     marginBottom: "auto",
                                     marginLeft: 8
                                 }}
-                            />
+                                to={"/teams/edit/" + match.id}
+                            >
+                                <ImageButton
+                                    imageData={EditImage}
+                                    color="black"
+                                    style={{
+                                        width: 18,
+                                        height: 18
+                                    }}
+                                />
+                            </Link>
                         </span>
                     </div>
                     <div className="match-info-row third">
@@ -202,7 +224,53 @@ function MatchData({match}) {
                         <span className="match-cell-content">{addLeadingZero(calculateSingleRPI(match))} RPI ({getRPIRating(calculateSingleRPI(match))})</span>
                     </div>
                     <div className="match-info-row second">
-                        <span className="match-cell-content"></span>
+                        <span className="match-cell-content">
+                            { match.performance.notes.misses && (
+                                <ImageButton
+                                    imageData={FlagMisses}
+                                    color="red"
+                                    disabled={true}
+                                    style={{
+                                        width: 22,
+                                        height: 22,
+                                        display: "inline-block",
+                                        marginTop: "auto",
+                                        marginBottom: "auto",
+                                        marginLeft: 6
+                                    }}
+                                />
+                            )}
+                            { match.performance.notes.broken && (
+                                <ImageButton
+                                    imageData={FlagBreakdown}
+                                    color="red"
+                                    disabled={true}
+                                    style={{
+                                        width: 22,
+                                        height: 22,
+                                        display: "inline-block",
+                                        marginTop: "auto",
+                                        marginBottom: "auto",
+                                        marginLeft: 6
+                                    }}
+                                />
+                            )}
+                            { match.performance.notes.fouls && (
+                                <ImageButton
+                                    imageData={FlagPenalties}
+                                    color="red"
+                                    disabled={true}
+                                    style={{
+                                        width: 22,
+                                        height: 22,
+                                        display: "inline-block",
+                                        marginTop: "auto",
+                                        marginBottom: "auto",
+                                        marginLeft: 6
+                                    }}
+                                />
+                            )}
+                        </span>
                     </div>
                     <div className="match-info-row third">
                         <span 

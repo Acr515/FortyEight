@@ -1,4 +1,5 @@
 import React, { useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import Button from "../../components/Button";
 import PageHeader from "../../components/PageHeader";
 import { VERSION_NAME, VERSION_NUMBER } from "../../config";
@@ -10,10 +11,12 @@ import date from 'date-and-time';
 import './style.scss';
 import { getTeamData, teamExists } from "../../data/SearchData";
 import verifyVersionNumbers from "../../util/verifyVersionNumbers";
+import { saveData } from "../../data/saveLoadData";
 
 export default function ManageData() {
     const modalFunctions = useContext(FeedbackModalContext);
     const dialogFunctions = useContext(DialogBoxContext);
+    const navigate = useNavigate();
 
     return (
         <div className="SCREEN _ManageData">
@@ -35,7 +38,7 @@ export default function ManageData() {
                         <Button
                             text="Import"
                             style={{ maxWidth: 128 }}
-                            action={ () => { importData(modalFunctions.setModal, dialogFunctions.setDialog) } }
+                            action={ () => { importData(modalFunctions.setModal, dialogFunctions.setDialog, navigate) } }
                         />
                     </form>
                 </div>
@@ -52,6 +55,22 @@ export default function ManageData() {
                             marginBottom={1}
                             style={{ maxWidth: 128 }}
                             action={() => exportData(modalFunctions.setModal)}
+                        />
+                    </div>
+                </div>
+
+                <h2>Delete Data</h2>
+                <div className="control-area">
+                    <div className="cell explanation">
+                        <p>Click the button to the right to delete all teams currently stored in memory. Be sure to export the data of any team information you wish to save, as this cannot be undone!</p>
+                    </div>
+                    <div className="cell">
+                        <Button
+                            text="Delete"
+                            marginTop={1}
+                            marginBottom={1}
+                            style={{ maxWidth: 128 }}
+                            action={ () => deleteData(modalFunctions.setModal, dialogFunctions.setDialog) }
                         />
                     </div>
                 </div>
@@ -83,6 +102,21 @@ function exportData(modalSetter) {
     }
 }
 
+
+function deleteData(modalSetter, dialogSetter) {
+    dialogSetter({
+        body: "This will delete all data from your current working set. To undo this, export your current data for import later. Are you sure you would like to proceed?",
+        useConfirmation: true,
+        confirmLabel: "Yes",
+        confirmFunction: () => {
+            TeamData.splice(0, TeamData.length);
+            saveData();
+            modalSetter("Success.", false);
+        }
+    })
+}
+
+
 /**
  * Downloads a json file to the user's downloads folder.
  * @param {object} exportObj an object with data to export
@@ -106,7 +140,7 @@ function downloadObjectAsJson(exportObj, exportName){
  * added, # of new matches added, # of duplicates ignored, and any pairs of 
  * conflicting matches if they exist.
  */
-function importData(modalSetter, dialogSetter) {
+function importData(modalSetter, dialogSetter, navigate) {
     let fileBatch = document.getElementById("file-import");
     
     if (!'files' in fileBatch || fileBatch.files.length == 0) {
@@ -185,9 +219,24 @@ function importData(modalSetter, dialogSetter) {
                 }
 
                 // Pull up a dialog box, the operation was successful
-                dialogSetter({ body: `Import was successful.\n\nTeams added: ${newTeams}, Matches added: ${newMatches}, Duplicates ignored: ${duplicates}\n\nInvalid files: ${invalidFiles}, Stale matches: ${staleMatches}` });
+                /*body (string)
+useConfirmation (boolean - optional, default FALSE)
+confirmLabel (string - optional)
+confirmFunction (function)
+cancelLabel (string - optional)
+cancelFunction (function - optional)*/
+                dialogSetter({ 
+                    body: `Import was successful.\n\nTeams added: ${newTeams}, Matches added: ${newMatches}, Duplicates ignored: ${duplicates}\n\nInvalid files: ${invalidFiles}, Stale matches: ${staleMatches}. Click OK below to confirm your import, or Cancel to undo.`,
+                    useConfirmation: true,
+                    confirmFunction: () => {
+                        saveData();
+                        navigate("/teams");
+                    },
+                    cancelFunction: () => {
+                        location.reload();
+                    }
+                });
                 fileBatch.files = null;
-
             } else {
                 // This is not a valid file
                 invalidFiles ++;

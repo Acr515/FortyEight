@@ -14,7 +14,16 @@ export default function ViewTeamCells({team}) {
     autoPoints /= team.data.length;
     autoPoints = Math.round(autoPoints * 10) / 10;
 
-    // Calculate success rate for climbs and determine highest climb location
+    // Calculate highest climb location
+    let highestClimb = 0;
+    team.data.forEach(match => highestClimb = Math.max(ScoreCalculator.Endgame.getNumericalLevel(match), highestClimb));
+
+    // Calculate climb rate
+    let climbFails = 0, climbs = 0;
+    team.data.forEach(match => { 
+        climbFails += match.performance.endgame.failedAttempt ? 1 : 0
+        climbs += ScoreCalculator.Endgame.didClimb(match) || match.performance.endgame.failedAttempt ? 1 : 0
+    })
 
     return (
         <>
@@ -25,6 +34,14 @@ export default function ViewTeamCells({team}) {
             <div className="info-cell">
                 <div className="info-value">{autoPoints}</div>
                 <div className="info-label">Avg. Auto</div>
+            </div>
+            <div className="info-cell">
+                <div className="info-value">{highestClimb > 0 ? ("Lv. " + highestClimb) : "--"}</div>
+                <div className="info-label">Best Climb</div>
+            </div>
+            <div className="info-cell">
+                <div className="info-value">{climbs}/{climbs + climbFails}</div>
+                <div className="info-label">Climb Success</div>
             </div>
         </>
     )

@@ -15,8 +15,9 @@ import Chevron from '../../assets/images/chevron.png';
  * @param alignLabel Where to align the label of the textbox. Accepts a string "top", "middle", or "bottom"
  * @param textArea Whether to render the input as a text area or not
  * @param required Attaches a "required" class to the `input` element embedded inside the component, as well as flipping on the `required` HTML attribute for the `input`
+ * @param disabled If true, disables the input for changes by adding the disabled HTML attribute to the element
  */
-export default function Input({label, prefill, id, onInput, isCheckbox, isNumerical, optionList, marginBottom, alignLabel = "middle", textArea = false, required = false}) {
+export default function Input({label, prefill, id, onInput, isCheckbox, isNumerical, optionList, marginBottom, alignLabel = "middle", textArea = false, required = false, disabled = false}) {
     
     optionList = typeof optionList !== "undefined" ? optionList : false;
 
@@ -63,8 +64,10 @@ export default function Input({label, prefill, id, onInput, isCheckbox, isNumeri
                         name={id}
                         type={isCheckbox ? "checkbox" : "text"}
                         value={value}
+                        defaultChecked={isCheckbox && typeof prefill !== 'undefined' && prefill}
                         onInput={updateValue}
                         required={required}
+                        disabled={disabled}
                     />
                 ) : (
                     <select
@@ -74,10 +77,11 @@ export default function Input({label, prefill, id, onInput, isCheckbox, isNumeri
                         onInput={updateValue}
                         value={value}
                         required={required}
+                        disabled={disabled}
                     >
                         <option value="" disabled>Select...</option>
                         {
-                            optionList.map(opt => <option value={opt.value}>{opt.label}</option>)
+                            optionList.map(opt => <option value={opt.value} key={opt.value}>{opt.label}</option>)
                         }
                     </select>
                 )}
@@ -88,12 +92,14 @@ export default function Input({label, prefill, id, onInput, isCheckbox, isNumeri
                             className="arrow"
                             style={{ backgroundImage: 'url(' + Chevron + ')' }}
                             onClick={increment}
+                            disabled={disabled}
                         />
                         <button 
                             type="button" 
                             className="arrow down" 
                             style={{ backgroundImage: 'url(' + Chevron + ')' }}
                             onClick={decrement}
+                            disabled={disabled}
                         />
                     </div>
                 )}

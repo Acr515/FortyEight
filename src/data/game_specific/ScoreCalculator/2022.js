@@ -22,7 +22,18 @@ const ScoreCalculator = {
                 case EndgameResult.TRAVERSAL_RUNG: return 15;
                 default: return 0;
             }
-        }
+        },
+        getNumericalLevel: data => {
+            switch (data.performance.endgame.state) {
+                case EndgameResult.NONE: return 0;
+                case EndgameResult.LOW_RUNG: return 1;
+                case EndgameResult.MID_RUNG: return 2;
+                case EndgameResult.HIGH_RUNG: return 3;
+                case EndgameResult.TRAVERSAL_RUNG: return 4;
+                default: return 0;
+            }
+        },
+        didClimb: data => { return data.performance.endgame.state != EndgameResult.NONE }
     }
 }
 

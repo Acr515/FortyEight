@@ -24,7 +24,10 @@ export default function App() {
                 <Route path="form" element={<Form />} />
                 <Route path="test" element={<Test />} />
                 <Route path="manage" element={<ManageData />}/>
-                <Route path="teams" element={<Teams />}/>
+                <Route path="teams">
+                    <Route path="" element={<Teams />} />
+                    <Route path="edit/:edit" element={<Form />} />
+                </Route>
                 <Route path="teams/:number" element={<ViewTeam />} />
             </Route>
         </Routes>

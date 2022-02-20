@@ -14,36 +14,41 @@ export const GameDataCategories = [
  * that is only true if the game allows defense to be played, warranting the display of the defense input fields
  */
 export const GameDataInputs = {
-    AutonomousSection: () => <>
+    AutonomousSection: ({edit}) => <>
         <Input
             label="Taxi"
             id="Form_auto_taxi"
             isCheckbox={true}
+            prefill={edit.isEdit ? edit.data.performance.auto.taxi : undefined}
         />
         <Input
             label="Low goal"
             id="Form_auto_cargoLow"
             isNumerical={true}
+            prefill={edit.isEdit ? edit.data.performance.auto.cargoLow : undefined}
         />
         <Input
             label="High goal"
             id="Form_auto_cargoHigh"
             isNumerical={true}
+            prefill={edit.isEdit ? edit.data.performance.auto.cargoHigh : undefined}
         />
     </>,
-    TeleopSection: () => <>
+    TeleopSection: ({edit}) => <>
         <Input
             label="Low goal"
             id="Form_teleop_cargoLow"
             isNumerical={true}
+            prefill={edit.isEdit ? edit.data.performance.teleop.cargoLow : undefined}
         />
         <Input
             label="High goal"
             id="Form_teleop_cargoHigh"
             isNumerical={true}
+            prefill={edit.isEdit ? edit.data.performance.teleop.cargoHigh : undefined}
         />
     </>,
-    EndgameSection: () => <>
+    EndgameSection: ({edit}) => <>
         <Input
             label="Climb"
             id="Form_endgame_state"
@@ -55,18 +60,21 @@ export const GameDataInputs = {
                 { value: EndgameResult.TRAVERSAL_RUNG, label: EndgameResult.TRAVERSAL_RUNG },
             ]}
             required={true}
+            prefill={edit.isEdit ? edit.data.performance.endgame.state : undefined}
         />
         <Input
             label="Tried to climb but failed?"
             id="Form_endgame_failedAttempt"
             isCheckbox={true}
+            prefill={edit.isEdit ? edit.data.performance.endgame.failedAttempt : undefined}
         />
     </>,
-    NotesSection: () => <>
+    NotesSection: ({edit}) => <>
         <Input
             label="This team missed a majority of the shots they took"
             id="Form_notes_misses"
             isCheckbox={true}
+            prefill={edit.isEdit ? edit.data.performance.notes.misses : undefined}
         />
     </>,
     defenseFields: true
