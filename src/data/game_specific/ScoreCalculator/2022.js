@@ -32,7 +32,8 @@ const ScoreCalculator = {
                 case EndgameResult.TRAVERSAL_RUNG: return 4;
                 default: return 0;
             }
-        }
+        },
+        didClimb: data => { return data.performance.endgame.state != EndgameResult.NONE }
     }
 }
 
