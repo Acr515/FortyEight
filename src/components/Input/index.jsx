@@ -77,7 +77,7 @@ export default function Input({label, prefill, id, onInput, isCheckbox, isNumeri
                     >
                         <option value="" disabled>Select...</option>
                         {
-                            optionList.map(opt => <option value={opt.value}>{opt.label}</option>)
+                            optionList.map(opt => <option value={opt.value} key={opt.value}>{opt.label}</option>)
                         }
                     </select>
                 )}

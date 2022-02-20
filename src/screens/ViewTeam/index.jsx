@@ -128,7 +128,11 @@ export default function ViewTeam() {
             <h2>Individual Matches</h2>
             <div className="match-holder">
                 {
-                    data.map(match =>  { return ( <MatchData match={match} forceRenderTeamScreen={{ rerender, rerenderPage }} /> ) })
+                    data.map(match =>  { return ( <MatchData 
+                        match={match} 
+                        forceRenderTeamScreen={{ rerender, rerenderPage }} 
+                        key={match.id}
+                    /> ) })
                 }
             </div>
         </div>
