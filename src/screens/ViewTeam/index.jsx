@@ -27,6 +27,7 @@ import './style.scss';
 import GraphTogglerSet from "../../components/game_specific/GraphTogglerSet/2022";
 import { createDefaultData } from "../../components/game_specific/GraphTogglerSet/_Universal";
 import { Method, sortTeamData } from "../../util/sortData";
+import { Link } from "react-router-dom";
 
 ChartJS.register(
     CategoryScale,
@@ -179,9 +180,7 @@ function MatchData({match, forceRenderTeamScreen}) {
                                 }}
                                 onClick={deleteMatch}
                             />
-                            <ImageButton
-                                imageData={EditImage}
-                                color="black"
+                            <Link
                                 style={{
                                     width: 16,
                                     height: 16,
@@ -190,7 +189,17 @@ function MatchData({match, forceRenderTeamScreen}) {
                                     marginBottom: "auto",
                                     marginLeft: 8
                                 }}
-                            />
+                                to={"/form/" + match.id}
+                            >
+                                <ImageButton
+                                    imageData={EditImage}
+                                    color="black"
+                                    style={{
+                                        width: 18,
+                                        height: 18
+                                    }}
+                                />
+                            </Link>
                         </span>
                     </div>
                     <div className="match-info-row third">

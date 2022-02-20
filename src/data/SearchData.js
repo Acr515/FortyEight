@@ -38,6 +38,7 @@ export function findMatchDataByID(id) {
         team.data.forEach((match, index) => {
             if (match.id == id) returnData = { match, index, dataset: team.data };
         })
-    })
+    });
+    if (!returnData) console.log("findMatchDataByID() could not find a form");
     return returnData;
 }

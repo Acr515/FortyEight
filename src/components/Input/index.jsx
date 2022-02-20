@@ -63,6 +63,7 @@ export default function Input({label, prefill, id, onInput, isCheckbox, isNumeri
                         name={id}
                         type={isCheckbox ? "checkbox" : "text"}
                         value={value}
+                        defaultChecked={isCheckbox && typeof prefill !== 'undefined' && prefill}
                         onInput={updateValue}
                         required={required}
                     />
