@@ -41,3 +41,14 @@ export function findMatchDataByID(id) {
     if (!returnData) console.log("findMatchDataByID() could not find a form");
     return returnData;
 }
+
+/**
+ * Gets the location of a given team number in the TeamData array
+ * @param {number} num The team number to search 
+ * @returns The index of the team's location in TeamData array, -1 if not found
+ */
+export function getTeamIndex(num) {
+    let ind = -1;
+    TeamData.forEach((team, i) => { if (team.number == num) ind = i; });
+    return ind;
+}
