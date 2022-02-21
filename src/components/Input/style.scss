@@ -8,6 +8,7 @@
     label {
         width: 100%;
         flex-grow: .6;
+        margin-right: 10px;
     }
 
     .input-area {
@@ -17,7 +18,7 @@
 
         .text-box {
             width: 100%;
-            max-width: 180px;
+            max-width: 200px;
             height: 19px;
             padding: 3px;
             margin: auto 0;
@@ -30,6 +31,9 @@
             font-family: 'usual';
             font-weight: 500;
             font-size: 14px;
+        }
+        .input[type=checkbox] {
+            width: 19px;
         }
         .text-box.dropdown-box {
             height: 29px;
