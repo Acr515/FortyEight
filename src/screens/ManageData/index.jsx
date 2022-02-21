@@ -219,12 +219,6 @@ function importData(modalSetter, dialogSetter, navigate) {
                 }
 
                 // Pull up a dialog box, the operation was successful
-                /*body (string)
-useConfirmation (boolean - optional, default FALSE)
-confirmLabel (string - optional)
-confirmFunction (function)
-cancelLabel (string - optional)
-cancelFunction (function - optional)*/
                 dialogSetter({ 
                     body: `Import was successful.\n\nTeams added: ${newTeams}, Matches added: ${newMatches}, Duplicates ignored: ${duplicates}\n\nInvalid files: ${invalidFiles}, Stale matches: ${staleMatches}. Click OK below to confirm your import, or Cancel to undo.`,
                     useConfirmation: true,

@@ -9,11 +9,12 @@ import {
     LineElement,
     Tooltip,
 } from 'chart.js';
-import { findMatchDataByID, getTeamData } from "../../data/SearchData";
+import { findMatchDataByID, getTeamData, getTeamIndex } from "../../data/SearchData";
 import calculateRPI, { calculateSingleRPI, getRPIRating } from "../../data/game_specific/calculateRPI/2022";
 import ViewTeamCells from "../../components/game_specific/ViewTeamCells/2022";
 import ViewIndividualData from "../../components/game_specific/ViewIndividualData/2022";
 import FeedbackModalContext from '../../context/FeedbackModalContext';
+import DialogBoxContext from '../../context/DialogBoxContext';
 import EventCodeHolder from "../../components/EventCodeHolder";
 import ImageButton from "../../components/ImageButton";
 import EditImage from '../../assets/images/edit.png';
@@ -27,8 +28,9 @@ import './style.scss';
 import GraphTogglerSet from "../../components/game_specific/GraphTogglerSet/2022";
 import { createDefaultData } from "../../components/game_specific/GraphTogglerSet/_Universal";
 import { Method, sortTeamData } from "../../util/sortData";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { BackButton } from "../../components/PageHeader";
+import TeamData from "../../data/TeamData";
 
 ChartJS.register(
     CategoryScale,
@@ -148,16 +150,33 @@ function MatchData({match, forceRenderTeamScreen}) {
     const [expanded, setExpanded] = useState(false);
     const toggleExpansion = () => { setExpanded(!expanded); };
 
-    const modalFunctions = useContext(FeedbackModalContext)
+    const modalFunctions = useContext(FeedbackModalContext);
+    const dialogFunctions = useContext(DialogBoxContext);
+    const navigate = useNavigate();
 
     const deleteMatch = () => {
         let matchFindObj = findMatchDataByID(match.id)
         if (!matchFindObj) {
             modalFunctions.setModal("That match couldn't be found. Was it already deleted?", true);
         } else {
-            matchFindObj.dataset.splice(matchFindObj.index, 1);
-            forceRenderTeamScreen.rerenderPage(!forceRenderTeamScreen.rerender);    // jankily update useless state variable to force rerender
-            modalFunctions.setModal("Successfully deleted a match.", false);
+            if (matchFindObj.dataset.length == 1) {
+                // If this is the last match in the dataset, confirm then delete team info
+                dialogFunctions.setDialog({ 
+                    body: `This is ${match.teamNumber}'s last match form. Deleting it will also remove this team from memory. Would you like to proceed?`,
+                    useConfirmation: true,
+                    confirmFunction: () => {
+                        TeamData.splice(getTeamIndex(match.teamNumber), 1);
+                        saveData();
+                        modalFunctions.setModal("Successfully deleted a match and its associated team.", false);
+                        navigate("/teams");
+                    }
+                });
+            } else {
+                matchFindObj.dataset.splice(matchFindObj.index, 1);
+                forceRenderTeamScreen.rerenderPage(!forceRenderTeamScreen.rerender);    // jankily update useless state variable to force rerender
+                saveData();
+                modalFunctions.setModal("Successfully deleted a match.", false);
+            }
         }
     }
 

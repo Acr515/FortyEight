@@ -16,7 +16,7 @@ To export out standalone files that can run without a development server:
 ```
 npm run build
 ```
-The build will populate inside the `public` directory. Open the `index.html` file in your browser to launch.
+The build will populate inside the `build` directory. Open the `index.html` file in your browser to launch.
 
 
 ## Usage
