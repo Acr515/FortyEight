@@ -16,10 +16,20 @@ module.exports = {
         use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader']
       },
       {
-        test: /\.(woff|woff2|eot|ttf|svg|jpg|png)$/,
-        use: {
-          loader: 'url-loader',
+        test: /\.(eot|ttf|svg|jpg|png)$/,
+        type: 'asset/resource',
+        parser: {
+          dataUrlCondition: {
+            maxSize: 4 * 1024
+          }
         },
+      },
+      {
+        test: /\.(woff|woff2)$/,
+        type: 'asset/resource',
+        generator: {
+          filename: 'assets/[hash][ext][query]'
+        }
       }
     ]
   },
@@ -35,6 +45,7 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, './build'),
     filename: 'bundle.js',
+    assetModuleFilename: 'assets/[hash][ext][query]'
   },
   devServer: {
     static: path.resolve(__dirname, './public'),
