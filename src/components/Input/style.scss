@@ -35,6 +35,11 @@
         .input[type=checkbox] {
             width: 19px;
         }
+        .input.warning {
+            outline: #c11 solid 3px;
+            border-color: #c11;
+            background-color: #fdd;
+        }
         .text-box.dropdown-box {
             height: 29px;
             background-color: white;

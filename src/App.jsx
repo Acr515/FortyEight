@@ -5,12 +5,12 @@ import Form from './screens/Form';
 import Test from './screens/Test';
 import Teams from './screens/Teams';
 import ViewTeam from './screens/ViewTeam';
+import ManageData from './screens/ManageData';
+import SimulatorConfig from './screens/SimulatorConfig';
 import FRAME from './screens/FRAME';
 import './GlobalStyle.css';
 import TeamData from './data/TeamData';
 import { loadData } from './data/saveLoadData';
-import ManageData from './screens/ManageData';
-
 
 
 export default function App() {
@@ -29,6 +29,9 @@ export default function App() {
                     <Route path="edit/:edit" element={<Form />} />
                 </Route>
                 <Route path="teams/:number" element={<ViewTeam />} />
+                <Route path="analysis">
+                    <Route path="simulator" element={<SimulatorConfig />}/>
+                </Route>
             </Route>
         </Routes>
     );

@@ -1,3 +1,4 @@
+import { Method, sortTeams } from "../util/sortData";
 import TeamData from "./TeamData";
 
 // Series of functions that comb TeamData and return results or booleans
@@ -51,4 +52,16 @@ export function getTeamIndex(num) {
     let ind = -1;
     TeamData.forEach((team, i) => { if (team.number == num) ind = i; });
     return ind;
+}
+
+/**
+ * Returns an array of all team numbers in memory. Sorted by number increasing
+ * @param {Team[]} teams The teams to sort through
+ * @returns An array of team numbers
+ */
+export function getTeamNumberArray(teams) {
+    let sortedTeams = sortTeams(teams, Method.TeamNoAscending);
+    let numbers = [];
+    sortedTeams.forEach(team => { numbers.push(team.number) });
+    return numbers;
 }
