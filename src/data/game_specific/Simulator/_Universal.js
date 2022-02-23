@@ -2,6 +2,7 @@ import { getTeamData } from "../../SearchData";
 import TeamData from "../../TeamData";
 import performanceObject, { EndgameResult } from "../performanceObject/2022";
 import ScoreCalculator from "../ScoreCalculator/2022";
+import date from 'date-and-time';
 
 /**
  * Simulates an FRC match with any 3 v 3 teams.
@@ -29,10 +30,13 @@ export default class Simulator {
         this.results = {
             simulations,
             applyDefense,
+            redTeamNumbers,
+            blueTeamNumbers,
             data: [],
             redWinRate: 0,
             blueWinRate: 0,
-            tieRate: 0
+            tieRate: 0,
+            timestamp: date.format(new Date(), "M/D/YY, h:mm A")
         };
     }
 

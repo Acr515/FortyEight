@@ -11,6 +11,7 @@ import FRAME from './screens/FRAME';
 import './GlobalStyle.css';
 import TeamData from './data/TeamData';
 import { loadData } from './data/saveLoadData';
+import SimulatorViewer from './screens/SimulatorViewer';
 
 
 export default function App() {
@@ -31,6 +32,7 @@ export default function App() {
                 <Route path="teams/:number" element={<ViewTeam />} />
                 <Route path="analysis">
                     <Route path="simulator" element={<SimulatorConfig />}/>
+                    <Route path="viewer" element={<SimulatorViewer />}/>
                 </Route>
             </Route>
         </Routes>

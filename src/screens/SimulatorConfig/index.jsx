@@ -44,6 +44,8 @@ export default function SimulatorConfig() {
             simulator.run(results => {
                 // Simulator is done
                 console.log(results);
+                localStorage.setItem("simulation", JSON.stringify(results));
+                navigate("/analysis/viewer");
             }, progress => {
                 // Still waiting
                 //console.log(progress);

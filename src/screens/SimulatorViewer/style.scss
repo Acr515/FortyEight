@@ -1,0 +1,106 @@
+@import url('../../assets/fonts/usual');
+@import url('../../assets/fonts/transandina');
+@import url('../../assets/fonts/industry');
+
+._SimulatorViewer {
+    overflow-x: hidden;
+    overflow-y: scroll;
+
+    .simulator-section {
+        padding: 0 30px;
+        box-sizing: border-box;
+        width: 100%;
+        margin-bottom: 50px;
+
+        h2 {
+            margin-top: 0;
+        }
+
+        .large-doughnut-container {
+            width: 100%;
+            max-width: 300px;
+            height: 300px;
+            position: relative;
+        }
+        .doughnut-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+
+            p {
+                margin-top: 0;
+                margin-bottom: 0;
+                font-family: 'industry';
+                font-size: 24px;
+            }
+            p.winner {
+                font-weight: 700;
+            }
+            p.red {
+                color: #cc3333;
+            }
+            p.blue {
+                color: #3333cc;
+            }
+            p.tie {
+                color: #999;
+            }
+        }
+
+        h2.winner-heading {
+            margin: 0;
+            font-family: 'transandina';
+            font-weight: 700;
+            font-size: 48px;
+        }
+        h3.winner-subheading {
+            font-family: 'transandina';
+            font-size: 24px;
+            font-weight: 500;
+            margin-top: 0;
+        }
+        .team-numbers-summary {
+            margin-bottom: 36px;
+            .row {
+                display: flex;
+                margin-bottom: 8px;
+
+                .number { 
+                    width: 100%;
+                    font-family: 'industry';
+                    font-size: 20px;
+                    font-weight: 400;
+                }
+                .number:last-child {
+                    text-align: right;
+                }
+            }
+        }
+
+        .simulation-meta {
+            p {
+                margin: 0;
+                font-family: 'usual';
+                font-size: 14px;
+            }
+        }
+
+        .column-section {
+            display: flex;
+            .column:first-child {
+                margin-right: 8px;
+            }
+            .column:last-child {
+                margin-left: 8px;
+            }
+            .column {
+                width: 100%;
+                flex-grow: 1;
+                flex-shrink: 1;
+                align-self: stretch;
+            }
+        }
+    }
+}
