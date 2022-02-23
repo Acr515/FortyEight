@@ -5,6 +5,7 @@ import Input from "../../components/Input";
 import PageHeader from "../../components/PageHeader";
 import DialogBoxContext from "../../context/DialogBoxContext";
 import FeedbackModalContext from "../../context/FeedbackModalContext";
+import Simulator from "../../data/game_specific/Simulator/_Universal";
 import getTeamName from "../../data/getTeamName";
 import { getTeamNumberArray } from "../../data/SearchData";
 import TeamData from "../../data/TeamData";
@@ -17,8 +18,38 @@ export default function SimulatorConfig() {
 
     const [useTextboxes, setUseTextboxes] = useState(false);
     const teamNumbers = getTeamNumberArray(TeamData);
-    const [redTeams, setRedTeams] = useState([]);
-    const [blueTeams, setBlueTeams] = useState([]);
+    const [redTeams, setRedTeams] = useState([0, 0, 0]);
+    const [blueTeams, setBlueTeams] = useState([0, 0, 0]);
+
+    const verifySettings = () => {
+        let incomplete = false, invalid = false;
+
+        const validateNum = num => {
+            if (teamNumbers.indexOf(num) == -1) invalid = true;
+            if (Number(num) == 0) incomplete = true;
+        }
+        redTeams.forEach(num => validateNum(num));
+        blueTeams.forEach(num => validateNum(num));
+
+        if (incomplete) {
+            modalFunctions.setModal("You did not provide enough teams.", true);
+        } else if (invalid) {
+            modalFunctions.setModal("You gave invalid team numbers. Please revise and try again.", true);
+        } else {
+            modalFunctions.setModal("Simulating...", false);
+
+            var simulator = new Simulator(redTeams, blueTeams, 1000, false, TeamData);
+
+            // Run the simulation!
+            simulator.run(results => {
+                // Simulator is done
+                console.log(results);
+            }, progress => {
+                // Still waiting
+                //console.log(progress);
+            });
+        }
+    }
 
     return (
         <div className="SCREEN _SimulatorConfig">
@@ -26,6 +57,7 @@ export default function SimulatorConfig() {
             <div className="content-area">
                 <div className="alliance-column">
                     <div className="alliance-cell red">
+                        <h3>Red Alliance</h3>
                         <TeamNumberInput
                             index={0}
                             stateVar={redTeams}
@@ -49,6 +81,7 @@ export default function SimulatorConfig() {
                         />
                     </div>
                     <div className="alliance-cell blue">
+                        <h3>Blue Alliance</h3>
                         <TeamNumberInput
                             index={0}
                             stateVar={blueTeams}
@@ -90,6 +123,7 @@ export default function SimulatorConfig() {
                     />
                     <Button
                         text="Run simulation"
+                        action={verifySettings}
                     />
                 </div>
             </div>
