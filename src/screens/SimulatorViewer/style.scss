@@ -78,12 +78,46 @@
                 }
             }
         }
-
         .simulation-meta {
             p {
                 margin: 0;
                 font-family: 'usual';
                 font-size: 14px;
+            }
+        }
+
+        .bar-chart-container {
+            width: 100%;
+            height: 300px;
+            position: relative;
+        }
+
+        .alliance-insights {
+            
+            .row {
+                display: flex;
+                align-items: stretch;
+                padding: 12px 14px;
+                box-sizing: border-box;
+                .label {
+                    font-family: 'usual';
+                    flex-basis: 50%;
+                    text-align: center;
+                    font-size: 14px;
+                }
+                .number {
+                    font-family: 'industry';
+                    font-size: 18px;
+                    font-weight: 600;
+                    flex-basis: 25%;
+                    text-align: left;
+                }
+                .number:last-child {
+                    text-align: right;
+                }
+            }
+            .row:nth-child(even) {
+                background-color: #eee;
             }
         }
 
@@ -96,7 +130,7 @@
                 margin-left: 8px;
             }
             .column {
-                width: 100%;
+                width: 50%;
                 flex-grow: 1;
                 flex-shrink: 1;
                 align-self: stretch;

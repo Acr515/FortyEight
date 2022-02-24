@@ -32,7 +32,7 @@ export default function App() {
                 <Route path="teams/:number" element={<ViewTeam />} />
                 <Route path="analysis">
                     <Route path="simulator" element={<SimulatorConfig />}/>
-                    <Route path="viewer" element={<SimulatorViewer />}/>
+                    <Route path="viewer" element={ <SimulatorViewer />}/>
                 </Route>
             </Route>
         </Routes>

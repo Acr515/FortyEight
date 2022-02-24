@@ -17,6 +17,8 @@ export default function SimulatorConfig() {
     const navigate = useNavigate();
 
     const [useTextboxes, setUseTextboxes] = useState(false);
+    const [simulations, setSimulations] = useState(1000);
+
     const teamNumbers = getTeamNumberArray(TeamData);
     const [redTeams, setRedTeams] = useState([0, 0, 0]);
     const [blueTeams, setBlueTeams] = useState([0, 0, 0]);
@@ -38,14 +40,14 @@ export default function SimulatorConfig() {
         } else {
             modalFunctions.setModal("Simulating...", false);
 
-            var simulator = new Simulator(redTeams, blueTeams, 1000, false, TeamData);
+            var simulator = new Simulator(redTeams, blueTeams, simulations, false, TeamData);
 
             // Run the simulation!
             simulator.run(results => {
                 // Simulator is done
                 console.log(results);
-                localStorage.setItem("simulation", JSON.stringify(results));
-                navigate("/analysis/viewer");
+                //localStorage.setItem("simulation", JSON.stringify(results));
+                navigate("/analysis/viewer", {state: {results}});
             }, progress => {
                 // Still waiting
                 //console.log(progress);
@@ -117,7 +119,8 @@ export default function SimulatorConfig() {
                     <div className="divider-line"></div>
                     <Input
                         label="# of simulations"
-                        prefill={1000}
+                        prefill={simulations}
+                        onInput={e => setSimulations(Number(e.target.value))}
                     />
                     <Input
                         label="Simulate defense"

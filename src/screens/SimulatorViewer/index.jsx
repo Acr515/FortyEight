@@ -1,25 +1,29 @@
 import React from "react";
-import { Doughnut } from "react-chartjs-2";
-import { Chart as ChartJS, ArcElement  } from "chart.js";
+import { Doughnut, Bar } from "react-chartjs-2";
+import { Chart as ChartJS, ArcElement, BarElement  } from "chart.js";
 import "./style.scss"
 import PageHeader from "../../components/PageHeader";
 import addLeadingZero from "../../util/addLeadingZero";
+import { useLocation } from "react-router-dom";
 
 
 ChartJS.defaults.font.family = 'transandina';
 ChartJS.register(ArcElement);
+ChartJS.register(BarElement);
 
 export default function SimulatorViewer() {
 
+    const location = useLocation();
+
     // Make sure there is data to use
-    if (localStorage.getItem("simulation") == null || localStorage.getItem("simulation") == "") return (
+    if (location.state == null/*localStorage.getItem("simulation") == null || localStorage.getItem("simulation") == ""*/) return (
         <div className="SCREEN _SimulatorViewer">
             There is no simulation data in memory. Run a simulation in the Simulator menu.
         </div>
     )
 
     // Parse simulation data
-    var sim = JSON.parse(localStorage.getItem("simulation"));
+    var sim = location.state.results//JSON.parse(localStorage.getItem("simulation"));
     const teamSimInfo = (colorString) => { return {
         colorName: colorString.toLowerCase(),
         colorString,
@@ -27,6 +31,8 @@ export default function SimulatorViewer() {
         winRate: Math.round((colorString == "Red" ? sim.redWinRate: sim.blueWinRate) * 1000) / 10,
         winRateString: addLeadingZero(Math.round((colorString == "Red" ? sim.redWinRate: sim.blueWinRate) * 1000) / 10) + "%",
         teamNumbers: colorString == "Red" ? sim.redTeamNumbers : sim.blueTeamNumbers,
+        rpFreq: colorString == "Red" ? sim.redRPFreq : sim.blueRPFreq,
+        stats: sim[colorString.toLowerCase()]
     }}
     
     var absoluteTie = sim.redWinRate == sim.blueWinRate;
@@ -53,6 +59,26 @@ export default function SimulatorViewer() {
     }
 
     // Bar chart and smaller doughnut charts
+    var rpData = {
+        labels: ["4RP", "3RP", "2RP", "1RP", "0RP"],
+        datasets: [
+            {
+                label: winner.colorString,
+                backgroundColor: winner.color,
+                data: winner.rpFreq.reverse(),
+            },
+            {
+                label: loser.colorString,
+                backgroundColor: loser.color,
+                data: loser.rpFreq.reverse(),
+            }
+        ]
+    };
+    var rpOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        indexAxis: 'y'
+    }
 
     return (
         <div className="SCREEN _SimulatorViewer">
@@ -114,6 +140,50 @@ export default function SimulatorViewer() {
 
             <div className="simulator-section">
                 <h2>Ranking Points</h2>
+                <div className="column-section">
+                    <div className="column">
+                        <div className="bar-chart-container">
+                            <Bar
+                                data={rpData}
+                                options={rpOptions}
+                                style={{
+                                    width: "100%",
+                                    height: "300px"
+                                }}
+                            />
+                        </div>
+                    </div>
+                    <div className="column">
+                        Other rp stats
+                    </div>
+                </div>
+            </div>
+
+
+            <div className="simulator-section">
+                <h2>Insights</h2>
+                <div className="column-section">
+                    <div className="column"></div>
+                    <div className="column">
+                        <div className="alliance-insights">
+                            <div className="row">
+                                <div className="number" style={{color: winner.color}}>{Math.round(winner.stats.scoreRange.avg * 10) / 10}</div>
+                                <div className="label">Average Score</div>
+                                <div className="number" style={{color: loser.color}}>{Math.round(loser.stats.scoreRange.avg * 10) / 10}</div>
+                            </div>
+                            <div className="row">
+                                <div className="number" style={{color: winner.color}}>{winner.stats.scoreRange.max}/{winner.stats.scoreRange.min}</div>
+                                <div className="label">High/Low Score</div>
+                                <div className="number" style={{color: loser.color}}>{loser.stats.scoreRange.max}/{loser.stats.scoreRange.min}</div>
+                            </div>
+                            <div className="row">
+                                <div className="number" style={{color: winner.color}}>{Math.round(winner.stats.marginRange.avg * 10) / 10}</div>
+                                <div className="label">Average Win Margin</div>
+                                <div className="number" style={{color: loser.color}}>{Math.round(loser.stats.marginRange.avg * 10) / 10}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     )
