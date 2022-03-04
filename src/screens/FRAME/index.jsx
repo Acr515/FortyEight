@@ -68,6 +68,11 @@ export default function FRAME() {
                             text="Manage"
                             location={location}
                         />
+                        <NavigationLink
+                            link="/analysis/simulator"
+                            text="Simulator"
+                            location={location}
+                        />
                         <div className="footer-content">
                             v{VERSION_NAME}
                         </div>

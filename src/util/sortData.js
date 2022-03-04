@@ -31,7 +31,42 @@ export function sortTeamData(data, method) {
     return newData;
 }
 
-// This function has yet to be implemented. Do not use it!!!
-export function sortTeams() {
-    return [];
+/**
+ * Sorts an array of teams. In most cases, this array will be TeamData, but you can use any you wish.
+ * @param {Team[]} data The teams to be sorted
+ * @param {Method} method The sort method (TeamNoAscending or TeamNoDescending are currently supported)
+ * @returns The newly sorted array. The array fed into the function is NOT modified.
+ */
+export function sortTeams(data, method) {
+    let newTeams = [];
+    data.forEach(team => { newTeams.push(team) });
+    newTeams.sort((a, b) => {
+        if (method == Method.TeamNoAscending) {
+            return a.number - b.number;
+        } else if (method == Method.TeamNoDescending) {
+            return b.number - a.number;
+        }
+    });
+    return newTeams;
 }
+
+/**
+ * Implemented from https://stackoverflow.com/a/2450976/9727894, randomly shuffles an array
+ * @param {[]} array The array to shuffle
+ * @returns A copy of a shuffled array
+ */
+export function shuffle(array) {
+    let currentIndex = array.length,  randomIndex;
+  
+    while (currentIndex != 0) {
+  
+      randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex--;
+  
+      // And swap it with the current element.
+      [array[currentIndex], array[randomIndex]] = [
+        array[randomIndex], array[currentIndex]];
+    }
+  
+    return array;
+  }

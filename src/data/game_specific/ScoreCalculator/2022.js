@@ -23,6 +23,16 @@ const ScoreCalculator = {
                 default: return 0;
             }
         },
+        getScoreOfConstant: result => {
+            switch (result) {
+                case EndgameResult.NONE: return 0;
+                case EndgameResult.LOW_RUNG: return 4;
+                case EndgameResult.MID_RUNG: return 6;
+                case EndgameResult.HIGH_RUNG: return 10;
+                case EndgameResult.TRAVERSAL_RUNG: return 15;
+                default: return 0;
+            }
+        },
         getNumericalLevel: data => {
             switch (data.performance.endgame.state) {
                 case EndgameResult.NONE: return 0;

@@ -4,7 +4,7 @@ import Chevron from '../../assets/images/chevron.png';
 
 /**
  * Creates an input box.
- * @param label The label to display next to the text box
+ * @param label The label to display next to the text box. If a label is not given, then the label element is not rendered.
  * @param prefill What text/value to prefill the text box with  
  * @param id The ID assigned to the input element, as well as the `for` attribute of the label
  * @param onInput A function that runs alongside the input's normal input event. The `e` variable is automatically used as a parameter, so keep this in mind
@@ -12,12 +12,14 @@ import Chevron from '../../assets/images/chevron.png';
  * @param isNumerical Whether to add arrows that count up/down or not
  * @param optionList Omit if not using an option list. Should be an array of objects containing "label" and "value" keys
  * @param marginBottom Defaults to 18. Pixel margin to add to bottom of container element
- * @param alignLabel Where to align the label of the textbox. Accepts a string "top", "middle", or "bottom"
+ * @param alignLabel Where to vertically align the label of the textbox. Accepts a string "top", "middle", or "bottom"
  * @param textArea Whether to render the input as a text area or not
  * @param required Attaches a "required" class to the `input` element embedded inside the component, as well as flipping on the `required` HTML attribute for the `input`
  * @param disabled If true, disables the input for changes by adding the disabled HTML attribute to the element
+ * @param warning If true, flags the element by outlining the input element in red to resemble an input error
+ * @param style Any custom CSS styles to apply to the parent element of the input/label pair
  */
-export default function Input({label, prefill, id, onInput, isCheckbox, isNumerical, optionList, marginBottom, alignLabel = "middle", textArea = false, required = false, disabled = false}) {
+export default function Input({label, prefill, id, onInput, isCheckbox, isNumerical, optionList, marginBottom, alignLabel = "middle", textArea = false, required = false, disabled = false, warning = false, style = {}}) {
     
     optionList = typeof optionList !== "undefined" ? optionList : false;
 
@@ -45,19 +47,22 @@ export default function Input({label, prefill, id, onInput, isCheckbox, isNumeri
     }
     
     return (
-        <div className="_Input" style={{ marginBottom: marginBottom || 18 }}>
-            <label 
-                htmlFor={id}
-                style={{ marginTop: alignLabel == "top" || alignLabel == "middle" ? "auto" : 0 , marginBottom: alignLabel == "bottom" || alignLabel == "middle" ? "auto" : 0 }}
-            >
-                {label}
-            </label>
+        <div className="_Input" style={{ ...style, marginBottom: marginBottom || 18 }}>
+            { typeof label !== 'undefined' && (
+                <label 
+                    htmlFor={id}
+                    style={{ marginTop: alignLabel == "top" || alignLabel == "middle" ? "auto" : 0 , marginBottom: alignLabel == "bottom" || alignLabel == "middle" ? "auto" : 0 }}
+                >
+                    {label}
+                </label>
+            )}
             <div className="input-area">
                 { !optionList ? (
                     <input 
                         className={"input text-box" + (
                             (required ? " required" : "") +
-                            (isNumerical ? " numerical" : "")
+                            (isNumerical ? " numerical" : "") +
+                            (warning ? " warning" : "")
                             )
                         }
                         id={id} 
