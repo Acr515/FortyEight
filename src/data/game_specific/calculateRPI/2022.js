@@ -36,8 +36,8 @@ export function calculateSingleRPI(data, round) {
     if (rpi <= 6) return "Very Poor";
     else if (rpi <= 12) return "Poor";
     else if (rpi <= 20) return "Average";
-    else if (rpi <= 29) return "Good";
-    else if (rpi <= 38) return "Very Good";
-    else if (rpi <= 47) return "Excellent";
+    else if (rpi <= 30) return "Good";
+    else if (rpi <= 41) return "Very Good";
+    else if (rpi <= 52) return "Excellent";
     else return "Godly";
 }

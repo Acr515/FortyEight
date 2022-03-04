@@ -49,3 +49,24 @@ export function sortTeams(data, method) {
     });
     return newTeams;
 }
+
+/**
+ * Implemented from https://stackoverflow.com/a/2450976/9727894, randomly shuffles an array
+ * @param {[]} array The array to shuffle
+ * @returns A copy of a shuffled array
+ */
+export function shuffle(array) {
+    let currentIndex = array.length,  randomIndex;
+  
+    while (currentIndex != 0) {
+  
+      randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex--;
+  
+      // And swap it with the current element.
+      [array[currentIndex], array[randomIndex]] = [
+        array[randomIndex], array[currentIndex]];
+    }
+  
+    return array;
+  }

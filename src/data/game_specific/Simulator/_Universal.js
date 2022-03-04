@@ -41,11 +41,16 @@ export default class Simulator {
             red: {  // full implementations of these likely to come later
                 scoreRange: { min: 1000, max: -1000, avg: 0 },
                 marginRange: { min: 1000, max: -1000, avg: 0 },
+                cargoRPRate: 0,
+                climbRPRate: 0,
             },
             blue: { // full implementations of these likely to come later
                 scoreRange: { min: 1000, max: -1000, avg: 0 },
                 marginRange: { min: 1000, max: -1000, avg: 0 },
+                cargoRPRate: 0,
+                climbRPRate: 0,
             },
+            averageMatch: {},
             timestamp: date.format(new Date(), "M/D/YY, h:mm A")
         };
     }
@@ -58,7 +63,7 @@ export default class Simulator {
     run(callback, status = count => {}) {
         // Seed a random number generator
         var seededRandom = require('seedrandom');
-        var rng = seededRandom('ramageddon');
+        var rng = seededRandom('seedageddon');
 
         // All the functions used for the simulation are below
 
@@ -108,29 +113,31 @@ export default class Simulator {
          * Gets all the match information for a team's contribution. Accounts for breakdowns, penalties, etc. Also calculates
          * the ODDS that a team will play defense and with what STRENGTH, but does NOT actually use these at all.
          * @param {Team} team The team to calculate for
+         * @param {boolean} useRandom Should always be TRUE unless getting a one-off match result that is based only on averages
+         * and doesn't make use of rng
          * @returns A Performance-like object (see performanceObject for more info)
          */
-        const getTeamContribution = (team) => {
+        const getTeamContribution = (team, useRandom = true) => {
             let result = performanceObject();
             result.teamNumber = team.number;
 
             // Get auto score
             let autoCargoLowRange = getRange(team, "auto", "cargoLow");
             let autoCargoHighRange = getRange(team, "auto", "cargoHigh");
-            result.auto.cargoLow = Math.round(biasedRandom(autoCargoLowRange.min, autoCargoLowRange.max, autoCargoLowRange.avg, this.DEFAULT_INFLUENCE));
-            result.auto.cargoHigh = Math.round(biasedRandom(autoCargoHighRange.min, autoCargoHighRange.max, autoCargoHighRange.avg, this.DEFAULT_INFLUENCE));
+            result.auto.cargoLow = Math.round(!useRandom ? autoCargoLowRange.avg : biasedRandom(autoCargoLowRange.min, autoCargoLowRange.max, autoCargoLowRange.avg, this.DEFAULT_INFLUENCE));
+            result.auto.cargoHigh = Math.round(!useRandom ? autoCargoHighRange.avg : biasedRandom(autoCargoHighRange.min, autoCargoHighRange.max, autoCargoHighRange.avg, this.DEFAULT_INFLUENCE));
             if (result.auto.cargoLow + result.auto.cargoHigh > 2) result.auto.taxi = true; else {
                 // If team used more than 2 cargo, they had to have left the tarmac... if not then figure it out ourselves
                 let taxis = 0;
                 team.data.forEach(match => taxis += match.performance.auto.taxi ? 1 : 0);
-                result.auto.taxi = rng() < (taxis / team.data.length);
+                result.auto.taxi = !useRandom ? (taxis / team.data.length > .5) : rng() < (taxis / team.data.length);
             }
 
             // Get teleop score
             let teleopCargoLowRange = getRange(team, "teleop", "cargoLow");
             let teleopCargoHighRange = getRange(team, "teleop", "cargoHigh");
-            result.teleop.cargoLow = Math.round(biasedRandom(teleopCargoLowRange.min, teleopCargoLowRange.max, teleopCargoLowRange.avg, this.DEFAULT_INFLUENCE));
-            result.teleop.cargoHigh = Math.round(biasedRandom(teleopCargoHighRange.min, teleopCargoHighRange.max, teleopCargoHighRange.avg, this.DEFAULT_INFLUENCE));
+            result.teleop.cargoLow = Math.round(!useRandom ? teleopCargoLowRange.avg : biasedRandom(teleopCargoLowRange.min, teleopCargoLowRange.max, teleopCargoLowRange.avg, this.DEFAULT_INFLUENCE));
+            result.teleop.cargoHigh = Math.round(!useRandom ? teleopCargoHighRange.avg : biasedRandom(teleopCargoHighRange.min, teleopCargoHighRange.max, teleopCargoHighRange.avg, this.DEFAULT_INFLUENCE));
             
             // Get endgame
             let ef = {};    // Endgame frequency, storing # of times each endgame occurred
@@ -142,39 +149,53 @@ export default class Simulator {
             team.data.forEach(match => ef[match.performance.endgame.state] ++);
             result.endgame.tendency = JSON.parse(JSON.stringify(ef)); // new property- only invoked in cases where more than 2 teams tries to climb to same level as this team
 
-            let endgamePicker = rng() * team.data.length;
-            if (endgamePicker < ef[EndgameResult.NONE])
-                result.endgame.state = EndgameResult.NONE;
-            else {
-                ef[EndgameResult.LOW_RUNG] += ef[EndgameResult.NONE];
-                if (endgamePicker < ef[EndgameResult.LOW_RUNG]) 
-                    result.endgame.state = EndgameResult.LOW_RUNG;
+            if (useRandom) {
+                let endgamePicker = rng() * team.data.length;
+                if (endgamePicker < ef[EndgameResult.NONE])
+                    result.endgame.state = EndgameResult.NONE;
                 else {
-                    ef[EndgameResult.MID_RUNG] += ef[EndgameResult.LOW_RUNG];
-                    if (endgamePicker < ef[EndgameResult.MID_RUNG])
-                        result.endgame.state = EndgameResult.MID_RUNG;
+                    ef[EndgameResult.LOW_RUNG] += ef[EndgameResult.NONE];
+                    if (endgamePicker < ef[EndgameResult.LOW_RUNG]) 
+                        result.endgame.state = EndgameResult.LOW_RUNG;
                     else {
-                        ef[EndgameResult.HIGH_RUNG] += ef[EndgameResult.MID_RUNG];
-                        if (endgamePicker < ef[EndgameResult.HIGH_RUNG])
-                            result.endgame.state = EndgameResult.HIGH_RUNG;
-                        else
-                            result.endgame.state = EndgameResult.TRAVERSAL_RUNG;
+                        ef[EndgameResult.MID_RUNG] += ef[EndgameResult.LOW_RUNG];
+                        if (endgamePicker < ef[EndgameResult.MID_RUNG])
+                            result.endgame.state = EndgameResult.MID_RUNG;
+                        else {
+                            ef[EndgameResult.HIGH_RUNG] += ef[EndgameResult.MID_RUNG];
+                            if (endgamePicker < ef[EndgameResult.HIGH_RUNG])
+                                result.endgame.state = EndgameResult.HIGH_RUNG;
+                            else
+                                result.endgame.state = EndgameResult.TRAVERSAL_RUNG;
+                        }
                     }
                 }
+            } else {
+                let mostCommonEndgame = EndgameResult.NONE;
+                let occurrances = 0;
+                Object.keys(ef).forEach(endgame => {
+                    if (ef[endgame] >= occurrances) {
+                        mostCommonEndgame = endgame;
+                        occurrances = ef[endgame];
+                    }
+                });
+                result.endgame.state = mostCommonEndgame;
             }
 
             // Get defense tendencies
-            let defensivePlays = 0;
-            let strongDefensePlays = 0;
-            team.data.forEach(match => {
-                if (match.performance.defense.played) {
-                    defensivePlays ++;
-                    if (match.performance.defense.rating == "Strong") strongDefensePlays ++;
-                }
-            });
-            result.defense.tendency = defensivePlays / team.data.length;    // new property- only invoked in cases where more than 1 team says yes to play defense
-            result.defense.played = rng() < result.defense.tendency;
-            result.defense.rating = rng() < (strongDefensePlays / defensivePlays) ? "Strong" : "Weak"
+            if (this.applyDefense) {
+                let defensivePlays = 0;
+                let strongDefensePlays = 0;
+                team.data.forEach(match => {
+                    if (match.performance.defense.played) {
+                        defensivePlays ++;
+                        if (match.performance.defense.rating == "Strong") strongDefensePlays ++;
+                    }
+                });
+                result.defense.tendency = defensivePlays / team.data.length;    // new property- only invoked in cases where more than 1 team says yes to play defense
+                result.defense.played = rng() < result.defense.tendency;        // TODO add option for this to not be random
+                result.defense.rating = rng() < (strongDefensePlays / defensivePlays) ? "Strong" : "Weak";
+            }
 
             return result;
         }
@@ -182,82 +203,103 @@ export default class Simulator {
 
 
         // This is where each simulation is run
-        //async function runSimulations() {
-            let redWins = 0, blueWins = 0, ties = 0;
-            for (let progress = 0; progress < this.simulations; progress ++) {
-                let redPerformances = [
-                    getTeamContribution(this.redTeams[0]),
-                    getTeamContribution(this.redTeams[1]),
-                    getTeamContribution(this.redTeams[2]),
-                ];
-                let bluePerformances = [
-                    getTeamContribution(this.blueTeams[0]),
-                    getTeamContribution(this.blueTeams[1]),
-                    getTeamContribution(this.blueTeams[2]),
-                ];
-                let matchDetails = new MatchDetails(redPerformances, bluePerformances, this.applyDefense);
-                if (matchDetails.winner == "Red") redWins ++;
-                else if (matchDetails.winner == "Blue") blueWins ++;
-                else ties ++;
+        let redWins = 0, blueWins = 0, ties = 0;
+        for (let progress = 0; progress < this.simulations; progress ++) {
+            let redPerformances = [
+                getTeamContribution(this.redTeams[0]),
+                getTeamContribution(this.redTeams[1]),
+                getTeamContribution(this.redTeams[2]),
+            ];
+            let bluePerformances = [
+                getTeamContribution(this.blueTeams[0]),
+                getTeamContribution(this.blueTeams[1]),
+                getTeamContribution(this.blueTeams[2]),
+            ];
+            let matchDetails = new MatchDetails(redPerformances, bluePerformances, this.applyDefense);
+            if (matchDetails.winner == "Red") redWins ++;
+            else if (matchDetails.winner == "Blue") blueWins ++;
+            else ties ++;
 
-                // Compile stats to running averages
-                this.results.redRPFreq[matchDetails.red.matchRP + (matchDetails.red.cargoRP ? 1 : 0) + (matchDetails.red.climbRP ? 1 : 0)] ++;
-                this.results.blueRPFreq[matchDetails.blue.matchRP + (matchDetails.blue.cargoRP ? 1 : 0) + (matchDetails.blue.climbRP ? 1 : 0)] ++;
+            // Compile stats to running averages
+            this.results.redRPFreq[matchDetails.red.matchRP + (matchDetails.red.cargoRP ? 1 : 0) + (matchDetails.red.climbRP ? 1 : 0)] ++;
+            this.results.blueRPFreq[matchDetails.blue.matchRP + (matchDetails.blue.cargoRP ? 1 : 0) + (matchDetails.blue.climbRP ? 1 : 0)] ++;
+            this.results.red.cargoRPRate += matchDetails.red.cargoRP ? 1 : 0;
+            this.results.red.climbRPRate += matchDetails.red.climbRP ? 1 : 0;
+            this.results.blue.cargoRPRate += matchDetails.blue.cargoRP ? 1 : 0;
+            this.results.blue.climbRPRate += matchDetails.blue.climbRP ? 1 : 0;
 
-                this.results.red.scoreRange.avg += matchDetails.red.score;
-                this.results.red.scoreRange.min = Math.min(matchDetails.red.score, this.results.red.scoreRange.min);
-                this.results.red.scoreRange.max = Math.max(matchDetails.red.score, this.results.red.scoreRange.max);
-                this.results.blue.scoreRange.avg += matchDetails.blue.score;
-                this.results.blue.scoreRange.min = Math.min(matchDetails.blue.score, this.results.blue.scoreRange.min);
-                this.results.blue.scoreRange.max = Math.max(matchDetails.blue.score, this.results.blue.scoreRange.max);
 
-                if (matchDetails.winner == "Red") {
-                    let margin = matchDetails.red.score - matchDetails.blue.score;
-                    this.results.red.marginRange.avg += margin;
-                    this.results.red.marginRange.min = Math.min(margin, this.results.red.marginRange.min);
-                    this.results.red.marginRange.max = Math.max(margin, this.results.red.marginRange.max);
-                } else if (matchDetails.winner == "Blue") {
-                    let margin = matchDetails.blue.score - matchDetails.red.score;
-                    this.results.blue.marginRange.avg += margin;
-                    this.results.blue.marginRange.min = Math.min(margin, this.results.blue.marginRange.min);
-                    this.results.blue.marginRange.max = Math.max(margin, this.results.blue.marginRange.max);
-                }
+            this.results.red.scoreRange.avg += matchDetails.red.score;
+            this.results.red.scoreRange.min = Math.min(matchDetails.red.score, this.results.red.scoreRange.min);
+            this.results.red.scoreRange.max = Math.max(matchDetails.red.score, this.results.red.scoreRange.max);
+            this.results.blue.scoreRange.avg += matchDetails.blue.score;
+            this.results.blue.scoreRange.min = Math.min(matchDetails.blue.score, this.results.blue.scoreRange.min);
+            this.results.blue.scoreRange.max = Math.max(matchDetails.blue.score, this.results.blue.scoreRange.max);
 
-                this.results.data.push(matchDetails);
-                status(progress);
-            }
-            
-            if (redWins > 0) {
-                this.results.red.marginRange.avg /= redWins; 
-                this.results.red.marginRange.min /= redWins; 
-                this.results.red.marginRange.max /= redWins; 
-            } else {
-                this.results.red.marginRange.min = 0;
-                this.results.blue.marginRange.max = 0;
-            }
-            if (blueWins > 0) {
-                this.results.blue.marginRange.avg /= blueWins; 
-                this.results.blue.marginRange.min /= blueWins; 
-                this.results.blue.marginRange.max /= blueWins; 
-            } else {
-                this.results.red.marginRange.min = 0;
-                this.results.blue.marginRange.max = 0;
-            }
-            this.results.redWinRate = redWins / this.simulations;
-            this.results.blueWinRate = blueWins / this.simulations;
-            this.results.tieRate = ties / this.simulations;
-            this.results.red.scoreRange.avg /= this.simulations;
-            this.results.blue.scoreRange.avg /= this.simulations;
-
-            for (let i = 0; i <= 4; i ++) {
-                this.results.redRPFreq[i] /= this.simulations;
-                this.results.blueRPFreq[i] /= this.simulations;
+            if (matchDetails.winner == "Red") {
+                let margin = matchDetails.red.score - matchDetails.blue.score;
+                this.results.red.marginRange.avg += margin;
+                this.results.red.marginRange.min = Math.min(margin, this.results.red.marginRange.min);
+                this.results.red.marginRange.max = Math.max(margin, this.results.red.marginRange.max);
+            } else if (matchDetails.winner == "Blue") {
+                let margin = matchDetails.blue.score - matchDetails.red.score;
+                this.results.blue.marginRange.avg += margin;
+                this.results.blue.marginRange.min = Math.min(margin, this.results.blue.marginRange.min);
+                this.results.blue.marginRange.max = Math.max(margin, this.results.blue.marginRange.max);
             }
 
-            console.log("SIMULATOR: Done.");
-            callback(this.results);
-        //}
-        //runSimulations();
+            this.results.data.push(matchDetails);
+            status(progress);
+        }
+        
+
+
+        // Post-simulation calculations
+        if (redWins > 0) {
+            this.results.red.marginRange.avg /= redWins;
+        } else {
+            this.results.red.marginRange.min = 0;
+            this.results.blue.marginRange.max = 0;
+        }
+        if (blueWins > 0) {
+            this.results.blue.marginRange.avg /= blueWins;
+        } else {
+            this.results.red.marginRange.min = 0;
+            this.results.blue.marginRange.max = 0;
+        }
+        this.results.redWinRate = redWins / this.simulations;
+        this.results.blueWinRate = blueWins / this.simulations;
+        this.results.tieRate = ties / this.simulations;
+        this.results.red.scoreRange.avg /= this.simulations;
+        this.results.blue.scoreRange.avg /= this.simulations;
+        this.results.red.cargoRPRate /= this.simulations;
+        this.results.red.climbRPRate /= this.simulations;
+        this.results.blue.cargoRPRate /= this.simulations;
+        this.results.blue.climbRPRate /= this.simulations;
+
+
+        for (let i = 0; i <= 4; i ++) {
+            this.results.redRPFreq[i] = this.results.redRPFreq[i] / this.simulations * 100;
+            this.results.blueRPFreq[i] = this.results.blueRPFreq[i] / this.simulations * 100;
+        }
+
+        // Get instance of an average score for this match-up
+        this.results.averageMatch = new MatchDetails(
+            [
+                getTeamContribution(this.redTeams[0], false),
+                getTeamContribution(this.redTeams[1], false),
+                getTeamContribution(this.redTeams[2], false),
+            ], 
+            [
+                getTeamContribution(this.blueTeams[0], false),
+                getTeamContribution(this.blueTeams[1], false),
+                getTeamContribution(this.blueTeams[2], false),
+            ], 
+            this.applyDefense
+        );
+
+        console.log("SIMULATOR: Done.");
+        callback(this.results);
     }
 }
 

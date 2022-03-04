@@ -1,10 +1,15 @@
-import React from "react";
+import React, { useContext, useState } from "react";
 import { Doughnut, Bar } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, BarElement  } from "chart.js";
 import "./style.scss"
 import PageHeader from "../../components/PageHeader";
 import addLeadingZero from "../../util/addLeadingZero";
 import { useLocation } from "react-router-dom";
+import FeedbackModalContext from "../../context/FeedbackModalContext";
+import { shuffle } from "../../util/sortData";
+import ScoreCalculator from "../../data/game_specific/ScoreCalculator/2022";
+import { EndgameResult } from "../../data/game_specific/performanceObject/2022";
+import getTeamName from "../../data/getTeamName";
 
 
 ChartJS.defaults.font.family = 'transandina';
@@ -39,6 +44,7 @@ export default function SimulatorViewer() {
     var winner = teamSimInfo(sim.blueWinRate > sim.redWinRate ? "Blue" : "Red");
     var loser = teamSimInfo(sim.redWinRate < sim.blueWinRate ? "Red" : "Blue");
 
+
     // Configure charts
     // Big doughnut chart
     var winData = {
@@ -58,7 +64,7 @@ export default function SimulatorViewer() {
         cutout: "70%"
     }
 
-    // Bar chart and smaller doughnut charts
+    // Bar chart
     var rpData = {
         labels: ["4RP", "3RP", "2RP", "1RP", "0RP"],
         datasets: [
@@ -79,6 +85,76 @@ export default function SimulatorViewer() {
         maintainAspectRatio: false,
         indexAxis: 'y'
     }
+
+    // Smaller doughnut charts
+    var winnerCargoRPData = {
+        labels: ["Success", "Failed"],
+        datasets: [{
+            data: [sim[winner.colorName].cargoRPRate, 1 - sim[winner.colorName].cargoRPRate],
+            backgroundColor: [
+                winner.color,
+                "transparent"
+            ]
+        }]
+    }
+    var winnerClimbRPData = {
+        labels: ["Success", "Failed"],
+        datasets: [{
+            data: [sim[winner.colorName].climbRPRate, 1 - sim[winner.colorName].climbRPRate],
+            backgroundColor: [
+                winner.color,
+                "transparent"
+            ]
+        }]
+    }
+    var loserCargoRPData = {
+        labels: ["Success", "Failed"],
+        datasets: [{
+            data: [sim[loser.colorName].cargoRPRate, 1 - sim[loser.colorName].cargoRPRate],
+            backgroundColor: [
+                loser.color,
+                "transparent"
+            ]
+        }]
+    }
+    var loserClimbRPData = {
+        labels: ["Success", "Failed"],
+        datasets: [{
+            data: [sim[loser.colorName].climbRPRate, 1 - sim[loser.colorName].climbRPRate],
+            backgroundColor: [
+                loser.color,
+                "transparent"
+            ]
+        }]
+    }
+    var smallDoughnutOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: "80%",
+        plugins: { tooltip: {
+            enabled: false
+        }}
+    }
+
+    // Calculate insight data
+    // Find best cargo scorers
+    const getBestCargoScorers = teamColor => {
+        let bestTeleopScore = -100, climbOfBestScorer = EndgameResult.NONE;
+        sim[teamColor].bestScorer = -1;
+        sim.averageMatch[teamColor].teamPerformances.forEach(team => {
+            let score = ScoreCalculator.Teleop.getScore({ performance: team });
+
+            // This line will pick whoever climbs the highest on average if the two best robots score the same # of points
+            if (score > bestTeleopScore || (score == bestTeleopScore && ScoreCalculator.Endgame.getScore({ performance: team}) > ScoreCalculator.Endgame.getScoreOfConstant(climbOfBestScorer))) {
+                bestTeleopScore = score;
+                sim[teamColor].bestScorer = team.teamNumber;
+                climbOfBestScorer = team.endgame.state;
+            }
+        });
+    };
+    getBestCargoScorers("red");
+    getBestCargoScorers("blue");    
+
 
     return (
         <div className="SCREEN _SimulatorViewer">
@@ -115,17 +191,16 @@ export default function SimulatorViewer() {
                         }}>Projected Winner</h3>
                         <div className="team-numbers-summary">
                             <div className="row">
-                                <span className="number" style={{color: winner.color, fontWeight: 600}}>{winner.teamNumbers[0]}</span>
-                                <span className="number" style={{color: loser.color}}>{loser.teamNumbers[0]}</span>
+                                <span className="number" style={{color: winner.color, fontWeight: 600}}>{winner.teamNumbers[0]} <span className="team-name">{getTeamName(winner.teamNumbers[0])}</span></span>
+                                <span className="number" style={{color: loser.color}}>{loser.teamNumbers[0]} <span className="team-name">{getTeamName(loser.teamNumbers[0])}</span></span>
                             </div>
                             <div className="row">
-                                <span className="number" style={{color: winner.color, fontWeight: 600}}>{winner.teamNumbers[1]}</span>
-                                <span className="number" style={{textAlign: "center"}}>vs</span>
-                                <span className="number" style={{color: loser.color}}>{loser.teamNumbers[1]}</span>
+                                <span className="number" style={{color: winner.color, fontWeight: 600}}>{winner.teamNumbers[1]} <span className="team-name">{getTeamName(winner.teamNumbers[1])}</span></span>
+                                <span className="number" style={{color: loser.color}}>{loser.teamNumbers[1]} <span className="team-name">{getTeamName(loser.teamNumbers[1])}</span></span>
                             </div>
                             <div className="row">
-                                <span className="number" style={{color: winner.color, fontWeight: 600}}>{winner.teamNumbers[2]}</span>
-                                <span className="number" style={{color: loser.color}}>{loser.teamNumbers[2]}</span>
+                                <span className="number" style={{color: winner.color, fontWeight: 600}}>{winner.teamNumbers[2]} <span className="team-name">{getTeamName(winner.teamNumbers[2])}</span></span>
+                                <span className="number" style={{color: loser.color}}>{loser.teamNumbers[2]} <span className="team-name">{getTeamName(loser.teamNumbers[2])}</span></span>
                             </div>
                         </div>
                         <div className="simulation-meta">
@@ -154,7 +229,60 @@ export default function SimulatorViewer() {
                         </div>
                     </div>
                     <div className="column">
-                        Other rp stats
+                        <div className="doughnuts-container">
+                            <div className="doughnut-set">
+                                <div className="single-doughnut-container">
+                                    <div className="small-doughnut">
+                                        <Doughnut data={winnerCargoRPData} options={smallDoughnutOptions} style={{
+                                            width: 86,
+                                            height: 86
+                                        }} />
+                                        <span className="percentage" style={{color: winner.color}}>
+                                            {Math.round(sim[winner.colorName].cargoRPRate * 1000) / 10}%
+                                        </span>
+                                    </div>
+                                    <p className="label">Cargo RP %</p>
+                                </div>
+                                <div className="single-doughnut-container">
+                                    <div className="small-doughnut">
+                                        <Doughnut data={loserCargoRPData} options={smallDoughnutOptions} style={{
+                                            width: 86,
+                                            height: 86
+                                        }} />
+                                        <span className="percentage" style={{color: loser.color}}>
+                                            {Math.round(sim[loser.colorName].cargoRPRate * 1000) / 10}%
+                                        </span>
+                                    </div>
+                                    <p className="label">Cargo RP %</p>
+                                </div>
+                            </div>
+                            <div className="doughnut-set">
+                                <div className="single-doughnut-container">
+                                    <div className="small-doughnut">
+                                        <Doughnut data={winnerClimbRPData} options={smallDoughnutOptions} style={{
+                                            width: 86,
+                                            height: 86
+                                        }} />
+                                        <span className="percentage" style={{color: winner.color}}>
+                                            {Math.round(sim[winner.colorName].climbRPRate * 1000) / 10}%
+                                        </span>
+                                    </div>
+                                    <p className="label">Climb RP %</p>
+                                </div>
+                                <div className="single-doughnut-container">
+                                    <div className="small-doughnut">
+                                        <Doughnut data={loserClimbRPData} options={smallDoughnutOptions} style={{
+                                            width: 86,
+                                            height: 86
+                                        }} />
+                                        <span className="percentage" style={{color: loser.color}}>
+                                            {Math.round(sim[loser.colorName].climbRPRate * 1000) / 10}%
+                                        </span>
+                                    </div>
+                                    <p className="label">Climb RP %</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -163,7 +291,9 @@ export default function SimulatorViewer() {
             <div className="simulator-section">
                 <h2>Insights</h2>
                 <div className="column-section">
-                    <div className="column"></div>
+                    {/*<div className="column">
+                        More coming soon!
+                    </div>*/}
                     <div className="column">
                         <div className="alliance-insights">
                             <div className="row">
@@ -181,10 +311,160 @@ export default function SimulatorViewer() {
                                 <div className="label">Average Win Margin</div>
                                 <div className="number" style={{color: loser.color}}>{Math.round(loser.stats.marginRange.avg * 10) / 10}</div>
                             </div>
+                            <div className="row">
+                                <div className="number" style={{color: winner.color}}>{sim[winner.colorName].bestScorer}</div>
+                                <div className="label">Strongest Cargo Scorer</div>
+                                <div className="number" style={{color: loser.color}}>{sim[loser.colorName].bestScorer}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div className="simulator-section">
+                <h2>Matches</h2>
+                <MatchViewer sim={sim} />
+            </div>
+        </div>
+    )
+}
+
+/**
+ * Displays data about individual matches, including the unrandomized average match. Manages the state and rendering
+ * of itself independent from the screen object
+ * @param {object} sim Entire simulation object 
+ */
+function MatchViewer({sim}) {
+
+    const [match, setMatch] = useState(sim.averageMatch);
+    const [matchIndex, setMatchIndex] = useState(-1);
+    const modalFunctions = useContext(FeedbackModalContext);
+
+    const displayMatch = (ind, sim) => {
+        if (ind == -1) {
+            setMatch(sim.averageMatch); 
+            setMatchIndex(-1);
+        } else {
+            setMatch(sim.data[ind]);
+            setMatchIndex(ind);
+        }
+    }
+
+    const getIndexPool = () => {
+        let arr = [];
+        for (let i = 0; i < sim.simulations; i ++) { arr.push(i); }
+        return shuffle(arr);
+    }
+
+    const getMatchRedWinner = (sim) => {
+        let arr = getIndexPool();
+        while (arr.length > 0) {
+            let ind = arr.shift();
+            if (sim.data[ind].red.score > sim.data[ind].blue.score) {
+                displayMatch(ind, sim);
+                return;
+            }
+        }
+        modalFunctions.setModal("There were no matches that match your criteria", true);
+    }
+
+    const getMatchBlueWinner = (sim) => {
+        let arr = getIndexPool();
+        while (arr.length > 0) {
+            let ind = arr.shift();
+            if (sim.data[ind].blue.score > sim.data[ind].red.score) {
+                displayMatch(ind, sim);
+                return;
+            }
+        }
+        modalFunctions.setModal("There were no matches that match your criteria", true);
+    }
+
+    const getMatchTie = (sim) => {
+        let arr = getIndexPool();
+        while (arr.length > 0) { 
+            let ind = arr.shift();
+            if (sim.data[ind].blue.score == sim.data[ind].red.score) {
+                displayMatch(ind, sim);
+                return;
+            }
+        }
+        modalFunctions.setModal("There were no matches that match your criteria", true);
+    }
+
+    return (<>
+        <div className="match-navigator-bar">
+            <a onClick={() => displayMatch(-1, sim)}>Most Likely</a>
+            <a onClick={() => getMatchRedWinner(sim)}>Any Red Win</a>
+            <a onClick={() => getMatchBlueWinner(sim)}>Any Blue Win</a>
+            <a onClick={() => getMatchTie(sim)}>Any Tie</a>
+        </div>
+        <h3 className="match-navigator-current">
+            {matchIndex == -1 ? "Most Likely Result" : "Match # " + (matchIndex + 1)}
+        </h3>
+        <div className="column-section">
+            <div className="column">
+                <div className="alliance-match-result red">
+                    <div className="teams-score-row">
+                        <div className="teams">
+                            <span className="number">{match.red.teamPerformances[0].teamNumber}</span>
+                            <span className="number">{match.red.teamPerformances[1].teamNumber}</span>
+                            <span className="number">{match.red.teamPerformances[2].teamNumber}</span>
+                        </div>
+                        <div className="score">
+                            <div className="number">{match.red.score}</div>
+                            {match.red.score >= match.blue.score && (
+                                <div className="win-label">{match.red.score == match.blue.score ? "TIE" : "WIN"}</div>
+                            )}
+                        </div>
+                    </div>
+                    <div className="rp-scores-row">
+                        <div className="rps">
+                            <div className="total-rp">{match.red.matchRP + (match.red.cargoRP ? 1 : 0) + (match.red.climbRP ? 1 : 0)} RP</div>
+                            <div className={"rp-cell" + (match.red.cargoRP ? " win" : "")}>CARGO</div>
+                            <div className={"rp-cell" + (match.red.climbRP ? " win" : "")}>HANGAR</div>
+                            <div className={"rp-cell" + (match.red.matchRP > 0 ? " win" : "")}>{match.red.score == match.blue.score ? "TIE" : "WIN"}</div>
+                        </div>
+                        <div className="scores">
+                            <div className="row"><div className="label">AUTO</div><div className="score">{match.red.autoScore}</div></div>
+                            <div className="row"><div className="label">TELEOP</div><div className="score">{match.red.teleopScore}</div></div>
+                            <div className="row"><div className="label">HANGAR</div><div className="score">{match.red.endgameScore}</div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div className="column">
+                <div className="alliance-match-result blue">
+                    <div className="teams-score-row">
+                        <div className="score">
+                            <div className="number">{match.blue.score}</div>
+                            {match.blue.score >= match.red.score && (
+                                <div className="win-label">{match.blue.score == match.red.score ? "TIE" : "WIN"}</div>
+                            )}
+                        </div>
+                        <div className="teams">
+                            <span className="number">{match.blue.teamPerformances[0].teamNumber}</span>
+                            <span className="number">{match.blue.teamPerformances[1].teamNumber}</span>
+                            <span className="number">{match.blue.teamPerformances[2].teamNumber}</span>
+                        </div>
+                    </div>
+                    
+                    <div className="rp-scores-row">
+                        <div className="scores">
+                            <div className="row"><div className="score">{match.blue.autoScore}</div><div className="label">AUTO</div></div>
+                            <div className="row"><div className="score">{match.blue.teleopScore}</div><div className="label">TELEOP</div></div>
+                            <div className="row"><div className="score">{match.blue.endgameScore}</div><div className="label">HANGAR</div></div>
+                        </div>
+                        <div className="rps">
+                            <div className="total-rp">{match.blue.matchRP + (match.blue.cargoRP ? 1 : 0) + (match.blue.climbRP ? 1 : 0)} RP</div>
+                            <div className={"rp-cell" + (match.blue.cargoRP ? " win" : "")}>CARGO</div>
+                            <div className={"rp-cell" + (match.blue.climbRP ? " win" : "")}>HANGAR</div>
+                            <div className={"rp-cell" + (match.blue.matchRP > 0 ? " win" : "")}>{match.red.score == match.blue.score ? "TIE" : "WIN"}</div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    )
+    </>)
 }
