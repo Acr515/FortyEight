@@ -31,6 +31,7 @@ import { Method, sortTeamData } from "../../util/sortData";
 import { Link, useNavigate } from "react-router-dom";
 import { BackButton } from "../../components/PageHeader";
 import TeamData from "../../data/TeamData";
+import { saveData } from "../../data/saveLoadData";
 
 ChartJS.register(
     CategoryScale,
