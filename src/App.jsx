@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Home from './screens/Home';
 import Form from './screens/Form';
@@ -9,14 +9,12 @@ import ManageData from './screens/ManageData';
 import SimulatorConfig from './screens/SimulatorConfig';
 import FRAME from './screens/FRAME';
 import './GlobalStyle.css';
-import TeamData from './data/TeamData';
 import { loadData } from './data/saveLoadData';
 import SimulatorViewer from './screens/SimulatorViewer';
 
 
 export default function App() {
-    TeamData;
-    useEffect(loadData, []);
+    loadData();
 
     return (
         <Routes>
