@@ -1,10 +1,15 @@
 // A number of functions intended to be used for sorting data
 
+import calculateRPI from "../data/game_specific/calculateRPI/2022";
+import Events from "../data/game_specific/eventCodes/2022";
+import { findEvent } from "../data/game_specific/eventCodes/_Universal";
+
 export const Method = {
     MatchAscending: "Match Ascending",
     MatchDescending: "Match Descending",
     TeamNoAscending: "Team # Ascending",
-    TeamNoDescending: "Team # Descending"
+    TeamNoDescending: "Team # Descending",
+    StrengthDescending: "Strength Descending",
 }
 
 /**
@@ -18,11 +23,23 @@ export function sortTeamData(data, method) {
     data.forEach(form => { newData.push(form); });
     newData.sort((a, b) => {
         if (method == Method.MatchAscending) {
-            if (a.eventCode < b.eventCode) return -1; else if (a.eventCode > b.eventCode) return 1;
-            return a.matchNumber < b.matchNumber ? -1 : 1;
+            let aEvent = findEvent(Events, a.eventCode);
+            let bEvent = findEvent(Events, b.eventCode);
+            if (aEvent == null) return 1;
+            if (bEvent == null) return -1;
+            if (aEvent.code == bEvent.code) return a.matchNumber < b.matchNumber ? -1 : 1;
+            if (aEvent.week == bEvent.week) return a.eventCode < b.eventCode ? -1 : 1;
+            return (aEvent.week + 1) - (bEvent.week + 1);
         } else if (method == Method.MatchDescending) {
-            if (a.eventCode < b.eventCode) return 1; else if (a.eventCode > b.eventCode) return -1;
-            return a.matchNumber < b.matchNumber ? 1 : -1;
+            let aEvent = findEvent(Events, a.eventCode);
+            let bEvent = findEvent(Events, b.eventCode);
+            if (aEvent == null) return 1;
+            if (bEvent == null) return -1;
+            if (aEvent.code == bEvent.code) return a.matchNumber > b.matchNumber ? -1 : 1;
+            if (aEvent.week == bEvent.week) return a.eventCode > b.eventCode ? -1 : 1;
+            return (bEvent.week + 1) - (aEvent.week + 1);
+        } else if (method == Method.StrengthDescending) {
+            return calculateRPI(b).RPI - calculateRPI(a).RPI;
         } else {
             console.log("The sort method could not be determined and a team data array was not sorted properly.");
             return 1;
