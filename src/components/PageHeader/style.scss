@@ -27,6 +27,10 @@
     transition: opacity .15s;
     opacity: 1;
     display: block;
+
+    .back-button-image {
+        transform: rotate(-90deg);
+    }
 }
 ._BackButton:hover {
     opacity: .65;
@@ -34,3 +38,8 @@
 ._BackButton:active {
     opacity: .8;
 }
+@supports (-moz-appearance: none) {
+    ._BackButton .back-button-image {
+        transform: translateY(-6px) rotate(-90deg);
+    }
+ }

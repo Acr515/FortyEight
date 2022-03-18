@@ -27,10 +27,10 @@ export function BackButton({text, location}) {
             <ImageButton
                 color="black"
                 imageData={Chevron}
+                className="back-button-image"
                 style={{
                     width: 16,
                     height: 16,
-                    transform: "rotate(-90deg) translateX(6px)",
                     filter: "invert(22%) sepia(56%) saturate(2475%) hue-rotate(231deg) brightness(99%) contrast(93%)"
                 }}
                 disabled={true}
