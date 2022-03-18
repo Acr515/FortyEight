@@ -53,6 +53,10 @@ export default function FRAME() {
                 />
                 <DialogBoxContext.Provider value={dialogContextObject}>
                     <div id="navigation-bar">
+                        <Link to={"/"} className="title-section">
+                            <span className="number">48</span>
+                            <span className="title">FortyEight</span>
+                        </Link>
                         <NavigationLink
                             link="/teams"
                             text="Teams"

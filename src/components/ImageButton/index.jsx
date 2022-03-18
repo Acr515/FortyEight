@@ -11,12 +11,12 @@ import './style.scss';
  * @param {string} color Tints the image. Currently accepts either black, white, or red 
  * @param {boolean} disabled Turns off any hover/active animations in the CSS by adding the disabled class
  */
-export default function ImageButton({imageName, imageData, onClick, style, color, disabled}) {
-    let className = "_ImageButton" + (color != undefined ? " " + color : "") + (disabled != undefined && disabled ? " disabled" : "");
+export default function ImageButton({imageName, imageData, onClick, style, color, disabled, className = ""}) {
+    let combinedClassName = "_ImageButton" + (color != undefined ? " " + color : "") + (disabled != undefined && disabled ? " disabled" : "") + " " + className;
     let imageURL = imageData != undefined ? imageData : imageImports.icons[imageName];
     return (
         <button 
-            className={className}
+            className={combinedClassName}
             onClick={onClick}
             style={{ backgroundImage: 'url(' + imageURL + ')', ...style }} 
         ></button>

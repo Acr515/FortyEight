@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import TeamData, { createFormObject, createTeamObject } from '../../data/TeamData';
 import Button from '../../components/Button';
 import GameDataSection from '../../components/GameDataSection';
@@ -106,7 +106,7 @@ export default function Form() {
                         label="Name"
                         id="Form_base_name"
                         required={true}
-                        prefill={edit.isEdit ? edit.data.name : undefined}
+                        prefill={edit.isEdit ? edit.data.name : localStorage.getItem("ScoutNamePrefill")}
                     />
                     <Input
                         label="Team #"
@@ -128,7 +128,7 @@ export default function Form() {
                         label="Event Code"
                         id="Form_base_eventCode"
                         required={true}
-                        prefill={edit.isEdit ? edit.data.eventCode : undefined}
+                        prefill={edit.isEdit ? edit.data.eventCode : localStorage.getItem("EventCodePrefill")}
                     />
                     <Button
                         text="Submit"
