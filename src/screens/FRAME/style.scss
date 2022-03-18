@@ -1,5 +1,6 @@
 @import url('../../assets/fonts/transandina/');
 @import url('../../assets/fonts/usual/');
+@import url('../../assets/fonts/industry/');
 
 #app-container {
     width: 100vw;
@@ -18,9 +19,40 @@
     width: 100%;
     max-width: 220px;
     height: 100%;
-    padding: 100px 0 80px;
+    padding: 20px 0 80px;
     box-sizing: border-box;
     position: relative;
+
+    .title-section {
+        display: flex;
+        height: 80px;
+        align-items: center;
+        padding: 0 40px 0;
+        color: white;
+        text-decoration: none;
+        transition: opacity .15s;
+
+        .number {
+            font-family: 'industry';
+            font-size: 29px;
+            font-weight: 600;
+            flex-grow: 0;
+            flex-shrink: 0;
+            margin-right: 4px;
+        }
+        .title {
+            font-weight: 200;
+            font-size: 12px;
+            flex-grow: 1;
+            margin-top: 6px;
+        }
+    }
+    .title-section:hover {
+        opacity: .6;
+    }
+    .title-section:active {
+        opacity: .4;
+    }
 
     .navigation-link {
         padding: 30px 40px;
