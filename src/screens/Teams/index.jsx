@@ -12,19 +12,38 @@ import { saveData } from '../../data/saveLoadData';
 import DialogBoxContext from '../../context/DialogBoxContext';
 import FeedbackModalContext from '../../context/FeedbackModalContext';
 import addLeadingZero from '../../util/addLeadingZero';
+import { Method, sortTeams } from '../../util/sortData';
+import Input from '../../components/Input';
 
 
-function useForceUpdate(){
+function useForceUpdate() {
     const [value, setValue] = useState(0); // integer state
     return () => setValue(value => value + 1); // update the state to force render
 }
 
 export default function Teams() {
+    const [sortMethod, setSortMethod] = useState(Method.TeamNoAscending);
     const forceUpdate = useForceUpdate();
-    const sortedTeams = TeamData.sort((a, b) => { return a.number - b.number })
+    const sortedTeams = sortTeams(TeamData, sortMethod);
+    console.log(sortMethod)
+
     return (
         <div className="SCREEN _Teams">
-            <PageHeader text="Teams" />
+            <div className="header-section">
+                <PageHeader text="Teams" />
+                <div className="team-sort-options">
+                    <Input
+                        optionList={[
+                            { label: "Sort by Team #", value: Method.TeamNoAscending }, 
+                            { label: "Sort by RPI", value: Method.StrengthDescending },
+                            { label: "Sort by Avg. Endgame", value: Method.AverageEndgameDescending }
+                        ]}
+                        prefill={Method.TeamNoAscending}
+                        onInput={e => { setSortMethod(e.target.value); }}
+                        id="team-sort-options"
+                    />
+                </div>
+            </div>
             <div className="team-list">
                 {
                     sortedTeams.length > 0 ? sortedTeams.map(team => {

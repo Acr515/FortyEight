@@ -5,6 +5,24 @@
 ._Teams {
     overflow-y: auto;
 
+    .header-section {
+        display: flex;
+        ._PageHeader {
+            width: 100%;
+            padding-right: 10px;
+            flex-grow: 1;
+        }
+        .team-sort-options {
+            width: 160px;
+            box-sizing: border-box;
+            flex-shrink: 0;
+            flex-grow: 0;
+            align-self: center;
+            padding-right: 20px;
+            height: 32px;
+        }
+    }
+
     .full-screen {
         width: 100%;
         height: 100vh;
