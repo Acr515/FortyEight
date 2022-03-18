@@ -25,7 +25,6 @@ export default function Teams() {
     const [sortMethod, setSortMethod] = useState(Method.TeamNoAscending);
     const forceUpdate = useForceUpdate();
     const sortedTeams = sortTeams(TeamData, sortMethod);
-    console.log(sortMethod)
 
     return (
         <div className="SCREEN _Teams">

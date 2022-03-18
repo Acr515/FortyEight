@@ -12,7 +12,7 @@ export default function Home() {
 
     const [prefillName, setPrefillName] = useState(localStorage.getItem("ScoutNamePrefill"));
     const [prefillKey, setPrefillKey] = useState(localStorage.getItem("EventCodePrefill"));
-    const [eventName, setEventName] = useState(prefillKey || "Type an event code to see its name here");
+    const [eventName, setEventName] = useState("Type an event code to see its name here");
 
     const updateData = (newString, idString) => {
         if (idString == "ScoutNamePrefill") setPrefillName(newString);
