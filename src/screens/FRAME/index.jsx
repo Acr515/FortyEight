@@ -57,26 +57,28 @@ export default function FRAME() {
                             <span className="number">48</span>
                             <span className="title">FortyEight</span>
                         </Link>
-                        <NavigationLink
-                            link="/teams"
-                            text="Teams"
-                            location={location}
-                        />
-                        <NavigationLink
-                            link="/form"
-                            text="Create"
-                            location={location}
-                        />
-                        <NavigationLink
-                            link="/manage"
-                            text="Manage"
-                            location={location}
-                        />
-                        <NavigationLink
-                            link="/analysis/simulator"
-                            text="Simulator"
-                            location={location}
-                        />
+                        <div className="links">
+                            <NavigationLink
+                                link="/teams"
+                                text="Teams"
+                                location={location}
+                            />
+                            <NavigationLink
+                                link="/form"
+                                text="Create"
+                                location={location}
+                            />
+                            <NavigationLink
+                                link="/manage"
+                                text="Manage"
+                                location={location}
+                            />
+                            <NavigationLink
+                                link="/analysis/simulator"
+                                text="Simulator"
+                                location={location}
+                            />
+                        </div>
                         <div className="footer-content">
                             v{VERSION_NAME}
                         </div>
