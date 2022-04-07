@@ -22,7 +22,7 @@ export function BackButton({text, location}) {
     return (
         <a 
             className="_BackButton"
-            onClick={() => { navigate(location); }}
+            onClick={() => { if (location == "/-1" || location == "-1") navigate(-1); else navigate(location); }}
         >
             <ImageButton
                 color="black"

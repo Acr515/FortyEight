@@ -48,6 +48,8 @@ export default function ViewTeam() {
     // Retrieve team number
     const params = useParams();
     const teamNumber = params.number;
+    const backLocation = params.referral ? ("/" + params.referral.replaceAll(".", "/")) : "/teams";
+    const backText = params.backtext || "Teams";
     var team = getTeamData(teamNumber);
     if (team == null) return (
         <div className="SCREEN ._ViewTeam">
@@ -89,7 +91,7 @@ export default function ViewTeam() {
 
     return (
         <div className="SCREEN _ViewTeam">
-            <BackButton text="Teams" location="/teams" />
+            <BackButton text={backText} location={backLocation} />
             <div className="column-area">
                 <div className="column-section">
                     <h1 className="team-number">{teamNumber}</h1>

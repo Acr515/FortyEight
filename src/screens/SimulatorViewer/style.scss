@@ -6,6 +6,16 @@
     overflow-x: hidden;
     overflow-y: scroll;
 
+    .team-link {
+        transition: opacity .15s;
+    }
+    .team-link:hover {
+        opacity: .65;
+    }
+    .team-link:active {
+        opacity: .45;
+    }
+
     .simulator-section {
         padding: 0 30px;
         box-sizing: border-box;
@@ -72,6 +82,7 @@
                     font-family: 'industry';
                     font-size: 20px;
                     font-weight: 400;
+                    text-decoration: none;
 
                     .team-name {
                         font-family: 'transandina';
@@ -153,6 +164,7 @@
                     font-weight: 600;
                     flex-basis: 25%;
                     text-align: left;
+                    text-decoration: none;
                 }
                 .number:last-child {
                     text-align: right;

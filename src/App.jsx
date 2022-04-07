@@ -28,6 +28,7 @@ export default function App() {
                     <Route path="edit/:edit" element={<Form />} />
                 </Route>
                 <Route path="teams/:number" element={<ViewTeam />} />
+                <Route path="teams/:number/:referral/:backtext" element={<ViewTeam />} />
                 <Route path="analysis">
                     <Route path="simulator" element={<SimulatorConfig />}/>
                     <Route path="viewer" element={ <SimulatorViewer />}/>

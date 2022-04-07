@@ -4,7 +4,7 @@ import { Chart as ChartJS, ArcElement, BarElement  } from "chart.js";
 import "./style.scss"
 import PageHeader from "../../components/PageHeader";
 import addLeadingZero from "../../util/addLeadingZero";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import FeedbackModalContext from "../../context/FeedbackModalContext";
 import { shuffle } from "../../util/sortData";
 import ScoreCalculator from "../../data/game_specific/ScoreCalculator/2022";
@@ -191,16 +191,16 @@ export default function SimulatorViewer() {
                         }}>Projected Winner</h3>
                         <div className="team-numbers-summary">
                             <div className="row">
-                                <span className="number" style={{color: winner.color, fontWeight: 600}}>{winner.teamNumbers[0]} <span className="team-name">{getTeamName(winner.teamNumbers[0])}</span></span>
-                                <span className="number" style={{color: loser.color}}>{loser.teamNumbers[0]} <span className="team-name">{getTeamName(loser.teamNumbers[0])}</span></span>
+                                <TopLevelTeamNumber isWinner={true} number={winner.teamNumbers[0]} color={winner.color} />
+                                <TopLevelTeamNumber isWinner={false} number={loser.teamNumbers[0]} color={loser.color} />
                             </div>
                             <div className="row">
-                                <span className="number" style={{color: winner.color, fontWeight: 600}}>{winner.teamNumbers[1]} <span className="team-name">{getTeamName(winner.teamNumbers[1])}</span></span>
-                                <span className="number" style={{color: loser.color}}>{loser.teamNumbers[1]} <span className="team-name">{getTeamName(loser.teamNumbers[1])}</span></span>
+                                <TopLevelTeamNumber isWinner={true} number={winner.teamNumbers[1]} color={winner.color} />
+                                <TopLevelTeamNumber isWinner={false} number={loser.teamNumbers[1]} color={loser.color} />
                             </div>
                             <div className="row">
-                                <span className="number" style={{color: winner.color, fontWeight: 600}}>{winner.teamNumbers[2]} <span className="team-name">{getTeamName(winner.teamNumbers[2])}</span></span>
-                                <span className="number" style={{color: loser.color}}>{loser.teamNumbers[2]} <span className="team-name">{getTeamName(loser.teamNumbers[2])}</span></span>
+                                <TopLevelTeamNumber isWinner={true} number={winner.teamNumbers[2]} color={winner.color} />
+                                <TopLevelTeamNumber isWinner={false} number={loser.teamNumbers[2]} color={loser.color} />
                             </div>
                         </div>
                         <div className="simulation-meta">
@@ -312,9 +312,9 @@ export default function SimulatorViewer() {
                                 <div className="number" style={{color: loser.color}}>{Math.round(loser.stats.marginRange.avg * 10) / 10}</div>
                             </div>
                             <div className="row">
-                                <div className="number" style={{color: winner.color}}>{sim[winner.colorName].bestScorer}</div>
+                                <TeamLink className="number" style={{color: winner.color}} number={sim[winner.colorName].bestScorer}>{sim[winner.colorName].bestScorer}</TeamLink>
                                 <div className="label">Strongest Cargo Scorer</div>
-                                <div className="number" style={{color: loser.color}}>{sim[loser.colorName].bestScorer}</div>
+                                <TeamLink className="number" style={{color: loser.color}} number={sim[loser.colorName].bestScorer}>{sim[loser.colorName].bestScorer}</TeamLink>
                             </div>
                         </div>
                     </div>
@@ -328,6 +328,37 @@ export default function SimulatorViewer() {
             </div>
         </div>
     )
+}
+
+/**
+ * Links any element to its team number
+ * @param {number} number The team # 
+ */
+function TeamLink({children, number, style, className}) {
+    return <Link
+        to={"/teams/" + number + "/-1/Results"}
+        style={style}
+        className={className + " team-link"}
+    >
+        {children}
+    </Link>
+}
+
+/**
+ * Used at the top of the simulator results page to show winning/losing teams and their numbers
+ * @param {number} number The team #
+ */
+function TopLevelTeamNumber({number, color, isWinner}) {
+    return <TeamLink
+        className="number"
+        style={{ color: color, fontWeight: isWinner ? 600 : 400 }}
+        number={number}
+    >
+        {number}
+        <span className="team-name">
+            {getTeamName(number)}
+        </span>
+    </TeamLink>;
 }
 
 /**
