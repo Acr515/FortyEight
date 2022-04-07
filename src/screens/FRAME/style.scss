@@ -71,15 +71,27 @@
             text-decoration: none;
             display: block;
             transition: background-color .15s;
+            cursor: pointer;
+            user-select: none;
         }
-    
         .navigation-link:hover:not(.active) {
             background-color: #6155BA;
         }
-    
         .navigation-link.active {
             background-color: #7670CA;
             font-weight: 700;
+        }
+
+        .link-group {
+            transition: height .25s;
+            overflow: hidden;
+        }
+        .sublink {
+            padding: 20px 40px;
+            height: 57px;
+            box-sizing: border-box;
+            font-size: 15px;
+            background: #3e389b;
         }
     }
 

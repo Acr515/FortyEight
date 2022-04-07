@@ -73,10 +73,16 @@ export default function FRAME() {
                                 text="Manage"
                                 location={location}
                             />
-                            <NavigationLink
-                                link="/analysis/simulator"
-                                text="Simulator"
-                                location={location}
+                            <NavigationGroup
+                                text="Analysis"
+                                links={[
+                                    <NavigationLink
+                                        link="/analysis/simulator"
+                                        text="Simulator"
+                                        location={location}
+                                        sublink={true}
+                                    />
+                                ]}
                             />
                         </div>
                         <div className="footer-content">
@@ -98,10 +104,32 @@ export default function FRAME() {
     );
 }
 
-function NavigationLink({link, text, location}) {
+function NavigationLink({link, text, location, sublink = false}) {
     return (
-        <Link to={link} className={location.pathname.includes(link) ? "navigation-link active" : "navigation-link"}>
+        <Link to={link} className={"navigation-link" + (location.pathname.includes(link) ? " active" : "") + (sublink ? " sublink" : "")}>
             {text}
         </Link>
+    )
+}
+
+function NavigationGroup({links, text}) {
+
+    const [opened, setOpened] = useState(false);
+
+    return (
+        <>
+            <div 
+                className="navigation-link"
+                onClick={() => setOpened(!opened)}
+            >
+                {text}
+            </div>
+            <div 
+                className={"link-group" + (opened ? "" : " hidden")}
+                style={{ height: opened ? 57 * links.length : 0 }}
+            >
+                {links}
+            </div>
+        </>
     )
 }
