@@ -385,43 +385,43 @@ function MatchViewer({sim}) {
     const getIndexPool = () => {
         let arr = [];
         for (let i = 0; i < sim.simulations; i ++) { arr.push(i); }
-        return shuffle(arr);
+        return arr;
     }
 
     const getMatchRedWinner = (sim) => {
-        let arr = getIndexPool();
-        while (arr.length > 0) {
-            let ind = arr.shift();
-            if (sim.data[ind].red.score > sim.data[ind].blue.score) {
-                displayMatch(ind, sim);
+        let startIndex = matchIndex, currentIndex = matchIndex + 1;
+        while (startIndex != currentIndex) {
+            if (sim.data[currentIndex].red.score > sim.data[currentIndex].blue.score) {
+                displayMatch(currentIndex, sim);
                 return;
             }
+            currentIndex = (currentIndex >= sim.data.length - 1 ? 0 : currentIndex + 1);
         }
-        modalFunctions.setModal("There were no matches that match your criteria", true);
+        modalFunctions.setModal("There were no matches that fit your criteria.", true);
     }
 
     const getMatchBlueWinner = (sim) => {
-        let arr = getIndexPool();
-        while (arr.length > 0) {
-            let ind = arr.shift();
-            if (sim.data[ind].blue.score > sim.data[ind].red.score) {
-                displayMatch(ind, sim);
+        let startIndex = matchIndex, currentIndex = matchIndex + 1;
+        while (startIndex != currentIndex) {
+            if (sim.data[currentIndex].blue.score > sim.data[currentIndex].red.score) {
+                displayMatch(currentIndex, sim);
                 return;
             }
+            currentIndex = (currentIndex >= sim.data.length - 1 ? 0 : currentIndex + 1);
         }
-        modalFunctions.setModal("There were no matches that match your criteria", true);
+        modalFunctions.setModal("There were no matches that fit your criteria.", true);
     }
 
     const getMatchTie = (sim) => {
-        let arr = getIndexPool();
-        while (arr.length > 0) { 
-            let ind = arr.shift();
-            if (sim.data[ind].blue.score == sim.data[ind].red.score) {
-                displayMatch(ind, sim);
+        let startIndex = matchIndex, currentIndex = matchIndex + 1;
+        while (startIndex != currentIndex) {
+            if (sim.data[currentIndex].red.score == sim.data[currentIndex].blue.score) {
+                displayMatch(currentIndex, sim);
                 return;
             }
+            currentIndex = (currentIndex >= sim.data.length - 1 ? 0 : currentIndex + 1);
         }
-        modalFunctions.setModal("There were no matches that match your criteria", true);
+        modalFunctions.setModal("There were no matches that fit your criteria.", true);
     }
 
     return (<>
