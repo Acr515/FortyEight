@@ -30,25 +30,43 @@ export default class Simulator {
         this.results = {
             simulations,
             applyDefense,
-            redTeamNumbers,
-            blueTeamNumbers,
             data: [],
-            redWinRate: 0,
-            blueWinRate: 0,
             tieRate: 0,
-            redRPFreq: [0, 0, 0, 0, 0],
-            blueRPFreq: [0, 0, 0, 0, 0],
-            red: {  // full implementations of these likely to come later
+            red: {
+                teamNumbers: redTeamNumbers,
+                winRate: 0,
                 scoreRange: { min: 1000, max: -1000, avg: 0 },
                 marginRange: { min: 1000, max: -1000, avg: 0 },
                 cargoRPRate: 0,
                 climbRPRate: 0,
+                RPFreq: [0, 0, 0, 0, 0],
+                endgameCeiling: 0,
+                insights: {
+                    endgameAboveThreshold: { threshold: 16, count: 0, wins: 0, string: "endgame" },
+                    endgameBelowThreshold: { threshold: 15, count: 0, wins: 0, string: "endgame" },
+                    autoAboveThreshold: { threshold: 14, count: 0, wins: 0, string: "autonomous" },
+                    outscoredEndgame: { count: 0, wins: 0, string: "endgame" },
+                    outscoredTeleop: { count: 0, wins: 0, string: "teleop" },
+                    outscoredAuto: { count: 0, wins: 0, string: "autonomous" },
+                }
             },
-            blue: { // full implementations of these likely to come later
+            blue: {
+                teamNumbers: blueTeamNumbers,
+                winRate: 0,
                 scoreRange: { min: 1000, max: -1000, avg: 0 },
                 marginRange: { min: 1000, max: -1000, avg: 0 },
                 cargoRPRate: 0,
                 climbRPRate: 0,
+                RPFreq: [0, 0, 0, 0, 0],
+                endgameCeiling: 0,
+                insights: {
+                    endgameAboveThreshold: { threshold: 16, count: 0, wins: 0, string: "endgame" },
+                    endgameBelowThreshold: { threshold: 15, count: 0, wins: 0, string: "endgame" },
+                    autoAboveThreshold: { threshold: 14, count: 0, wins: 0, string: "autonomous" },
+                    outscoredEndgame: { count: 0, wins: 0, string: "endgame" },
+                    outscoredTeleop: { count: 0, wins: 0, string: "teleop" },
+                    outscoredAuto: { count: 0, wins: 0, string: "autonomous" },
+                }
             },
             averageMatch: {},
             timestamp: date.format(new Date(), "M/D/YY, h:mm A")
@@ -220,33 +238,54 @@ export default class Simulator {
             else if (matchDetails.winner == "Blue") blueWins ++;
             else ties ++;
 
-            // Compile stats to running averages
-            this.results.redRPFreq[matchDetails.red.matchRP + (matchDetails.red.cargoRP ? 1 : 0) + (matchDetails.red.climbRP ? 1 : 0)] ++;
-            this.results.blueRPFreq[matchDetails.blue.matchRP + (matchDetails.blue.cargoRP ? 1 : 0) + (matchDetails.blue.climbRP ? 1 : 0)] ++;
-            this.results.red.cargoRPRate += matchDetails.red.cargoRP ? 1 : 0;
-            this.results.red.climbRPRate += matchDetails.red.climbRP ? 1 : 0;
-            this.results.blue.cargoRPRate += matchDetails.blue.cargoRP ? 1 : 0;
-            this.results.blue.climbRPRate += matchDetails.blue.climbRP ? 1 : 0;
+            // Compile stats to running averages and calculate team-specific insight data related to this match
+            const calcRunningAverages = color => {
 
+                // Running averages/ranges
+                this.results[color].RPFreq[matchDetails[color].matchRP + (matchDetails[color].cargoRP ? 1 : 0) + (matchDetails[color].climbRP ? 1 : 0)] ++;
+                this.results[color].cargoRPRate += matchDetails[color].cargoRP ? 1 : 0;
+                this.results[color].climbRPRate += matchDetails[color].climbRP ? 1 : 0;
+                this.results[color].endgameCeiling = Math.max(this.results[color].endgameCeiling, matchDetails[color].endgameScore);
 
-            this.results.red.scoreRange.avg += matchDetails.red.score;
-            this.results.red.scoreRange.min = Math.min(matchDetails.red.score, this.results.red.scoreRange.min);
-            this.results.red.scoreRange.max = Math.max(matchDetails.red.score, this.results.red.scoreRange.max);
-            this.results.blue.scoreRange.avg += matchDetails.blue.score;
-            this.results.blue.scoreRange.min = Math.min(matchDetails.blue.score, this.results.blue.scoreRange.min);
-            this.results.blue.scoreRange.max = Math.max(matchDetails.blue.score, this.results.blue.scoreRange.max);
+                this.results[color].scoreRange.avg += matchDetails[color].score;
+                this.results[color].scoreRange.min = Math.min(matchDetails[color].score, this.results[color].scoreRange.min);
+                this.results[color].scoreRange.max = Math.max(matchDetails[color].score, this.results[color].scoreRange.max);
+                if (matchDetails.winner.toLowerCase() == color) {
+                    let margin = matchDetails[color].score - matchDetails[color == "red" ? "blue" : "red"].score;
+                    this.results[color].marginRange.avg += margin;
+                    this.results[color].marginRange.min = Math.min(margin, this.results[color].marginRange.min);
+                    this.results[color].marginRange.max = Math.max(margin, this.results[color].marginRange.max);
+                }
 
-            if (matchDetails.winner == "Red") {
-                let margin = matchDetails.red.score - matchDetails.blue.score;
-                this.results.red.marginRange.avg += margin;
-                this.results.red.marginRange.min = Math.min(margin, this.results.red.marginRange.min);
-                this.results.red.marginRange.max = Math.max(margin, this.results.red.marginRange.max);
-            } else if (matchDetails.winner == "Blue") {
-                let margin = matchDetails.blue.score - matchDetails.red.score;
-                this.results.blue.marginRange.avg += margin;
-                this.results.blue.marginRange.min = Math.min(margin, this.results.blue.marginRange.min);
-                this.results.blue.marginRange.max = Math.max(margin, this.results.blue.marginRange.max);
+                // Insights
+                if (matchDetails[color].endgameScore > this.results[color].insights.endgameAboveThreshold.threshold) {
+                    this.results[color].insights.endgameAboveThreshold.count ++;
+                    if (matchDetails.winner.toLowerCase() == color) this.results[color].insights.endgameAboveThreshold.wins ++
+                }
+                if (matchDetails[color].endgameScore < this.results[color].insights.endgameBelowThreshold.threshold) {
+                    this.results[color].insights.endgameBelowThreshold.count ++;
+                    if (matchDetails.winner.toLowerCase() == color) this.results[color].insights.endgameBelowThreshold.wins ++
+                }
+                if (matchDetails[color].autoScore > this.results[color].insights.autoAboveThreshold.threshold) {
+                    this.results[color].insights.autoAboveThreshold.count ++;
+                    if (matchDetails.winner.toLowerCase() == color) this.results[color].insights.autoAboveThreshold.wins ++
+                }
             }
+            calcRunningAverages("red");
+            calcRunningAverages("blue");
+            
+            // Calculate inter-team insights related to this match
+            let color = matchDetails.red.autoScore > matchDetails.blue.autoScore ? "red" : "blue";
+            this.results[color].insights.outscoredAuto.count ++;
+            this.results[color].insights.outscoredAuto.wins += matchDetails.winner.toLowerCase() == color ? 1 : 0;
+
+            color = matchDetails.red.teleopScore > matchDetails.blue.teleopScore ? "red" : "blue";
+            this.results[color].insights.outscoredTeleop.count ++;
+            this.results[color].insights.outscoredTeleop.wins += matchDetails.winner.toLowerCase() == color ? 1 : 0;
+
+            color = matchDetails.red.endgameScore > matchDetails.blue.endgameScore ? "red" : "blue";
+            this.results[color].insights.outscoredEndgame.count ++;
+            this.results[color].insights.outscoredEndgame.wins += matchDetails.winner.toLowerCase() == color ? 1 : 0;
 
             this.results.data.push(matchDetails);
             status(progress);
@@ -267,8 +306,8 @@ export default class Simulator {
             this.results.red.marginRange.min = 0;
             this.results.blue.marginRange.max = 0;
         }
-        this.results.redWinRate = redWins / this.simulations;
-        this.results.blueWinRate = blueWins / this.simulations;
+        this.results.red.winRate = redWins / this.simulations;
+        this.results.blue.winRate = blueWins / this.simulations;
         this.results.tieRate = ties / this.simulations;
         this.results.red.scoreRange.avg /= this.simulations;
         this.results.blue.scoreRange.avg /= this.simulations;
@@ -277,10 +316,9 @@ export default class Simulator {
         this.results.blue.cargoRPRate /= this.simulations;
         this.results.blue.climbRPRate /= this.simulations;
 
-
         for (let i = 0; i <= 4; i ++) {
-            this.results.redRPFreq[i] = this.results.redRPFreq[i] / this.simulations * 100;
-            this.results.blueRPFreq[i] = this.results.blueRPFreq[i] / this.simulations * 100;
+            this.results.red.RPFreq[i] = this.results.red.RPFreq[i] / this.simulations * 100;
+            this.results.blue.RPFreq[i] = this.results.blue.RPFreq[i] / this.simulations * 100;
         }
 
         // Get instance of an average score for this match-up

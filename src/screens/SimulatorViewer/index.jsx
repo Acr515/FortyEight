@@ -1,20 +1,20 @@
 import React, { useContext, useState } from "react";
 import { Doughnut, Bar } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, BarElement  } from "chart.js";
-import "./style.scss"
 import PageHeader from "../../components/PageHeader";
 import addLeadingZero from "../../util/addLeadingZero";
 import { Link, useLocation } from "react-router-dom";
 import FeedbackModalContext from "../../context/FeedbackModalContext";
-import { shuffle } from "../../util/sortData";
 import ScoreCalculator from "../../data/game_specific/ScoreCalculator/2022";
 import { EndgameResult } from "../../data/game_specific/performanceObject/2022";
 import getTeamName from "../../data/getTeamName";
+import "./style.scss";
 
 
 ChartJS.defaults.font.family = 'transandina';
 ChartJS.register(ArcElement);
 ChartJS.register(BarElement);
+
 
 export default function SimulatorViewer() {
 
@@ -33,16 +33,17 @@ export default function SimulatorViewer() {
         colorName: colorString.toLowerCase(),
         colorString,
         color: colorString == "Red" ? "#cc3333" : "#3333cc",
-        winRate: Math.round((colorString == "Red" ? sim.redWinRate: sim.blueWinRate) * 1000) / 10,
-        winRateString: addLeadingZero(Math.round((colorString == "Red" ? sim.redWinRate: sim.blueWinRate) * 1000) / 10) + "%",
-        teamNumbers: colorString == "Red" ? sim.redTeamNumbers : sim.blueTeamNumbers,
-        rpFreq: colorString == "Red" ? sim.redRPFreq : sim.blueRPFreq,
-        stats: sim[colorString.toLowerCase()]
+        winRate: Math.round(sim[colorString.toLowerCase()].winRate * 1000) / 10,
+        winRateString: addLeadingZero(Math.round(sim[colorString.toLowerCase()].winRate * 1000) / 10) + "%",
+        teamNumbers: sim[colorString.toLowerCase()].teamNumbers,
+        RPFreq: sim[colorString.toLowerCase()].RPFreq,
+        stats: sim[colorString.toLowerCase()],
+        insights: []
     }}
     
-    var absoluteTie = sim.redWinRate == sim.blueWinRate;
-    var winner = teamSimInfo(sim.blueWinRate > sim.redWinRate ? "Blue" : "Red");
-    var loser = teamSimInfo(sim.redWinRate < sim.blueWinRate ? "Red" : "Blue");
+    var absoluteTie = sim.red.winRate == sim.blue.winRate;
+    var winner = teamSimInfo(sim.blue.winRate > sim.red.winRate ? "Blue" : "Red");
+    var loser = teamSimInfo(sim.red.winRate < sim.blue.winRate ? "Red" : "Blue");
 
 
     // Configure charts
@@ -71,12 +72,12 @@ export default function SimulatorViewer() {
             {
                 label: winner.colorString,
                 backgroundColor: winner.color,
-                data: winner.rpFreq.reverse(),
+                data: winner.RPFreq.reverse(),
             },
             {
                 label: loser.colorString,
                 backgroundColor: loser.color,
-                data: loser.rpFreq.reverse(),
+                data: loser.RPFreq.reverse(),
             }
         ]
     };
@@ -136,6 +137,7 @@ export default function SimulatorViewer() {
         }}
     }
 
+
     // Calculate insight data
     // Find best cargo scorers
     const getBestCargoScorers = teamColor => {
@@ -153,7 +155,43 @@ export default function SimulatorViewer() {
         });
     };
     getBestCargoScorers("red");
-    getBestCargoScorers("blue");    
+    getBestCargoScorers("blue");
+
+    // Find most statistically relevant insights to show
+    const getInsights = alliance => {
+        const createInsightObject = (rate, string, isLosingRate = false) => {
+            return {
+                rate,
+                Element: <div className="individual-insight">
+                    <span className={alliance.colorName + "-text alliance-name"}>{alliance.colorString} Alliance</span> {isLosingRate ? "lost" : "won"} <span className={alliance.colorName + "-text percentage"}>{Math.round(rate * 1000) / 10}%</span> of matches when {string}
+                </div>
+            }
+        }
+
+        Object.keys(sim[alliance.colorName].insights).forEach(insightKey => {
+            let insight = sim[alliance.colorName].insights[insightKey];
+            if (insightKey.includes("BelowThreshold")) {
+                // Get loss rate when scoring below a threshold
+                let rate = (insight.count - insight.wins) / insight.count;
+                if (insight.count > 0 && (alliance.colorName == winner.colorName || winner.winRate < 80)) {    // we don't really need to calculate this for a losing alliance when the matchup is lopsided
+                    alliance.insights.push(createInsightObject(rate, "scoring below " + insight.threshold + " during " + insight.string, true));
+                }
+            } else if (insightKey.includes("AboveThreshold")) {
+                // Get win rate when scoring above a threshold
+                let rate = insight.wins / insight.count;
+                if (insight.count > 0) alliance.insights.push(createInsightObject(rate, "scoring above " + insight.threshold + " during " + insight.string));
+
+            } else if (insightKey.includes("outscored")) {
+                // Get win rate when outscoring opponent
+                let rate = insight.wins / insight.count;
+                if (insight.count > 0) alliance.insights.push(createInsightObject(rate, "outscoring their opponents during " + insight.string));
+            }
+        });
+
+        alliance.insights.sort((a, b) => b.rate - a.rate);
+    };
+    getInsights(winner);
+    getInsights(loser);
 
 
     return (
@@ -291,9 +329,6 @@ export default function SimulatorViewer() {
             <div className="simulator-section">
                 <h2>Insights</h2>
                 <div className="column-section">
-                    {/*<div className="column">
-                        More coming soon!
-                    </div>*/}
                     <div className="column">
                         <div className="alliance-insights">
                             <div className="row">
@@ -316,7 +351,26 @@ export default function SimulatorViewer() {
                                 <div className="label">Strongest Cargo Scorer</div>
                                 <TeamLink className="number" style={{color: loser.color}} number={sim[loser.colorName].bestScorer}>{sim[loser.colorName].bestScorer}</TeamLink>
                             </div>
+                            <div className="row">
+                                <div className="number" style={{color: winner.color}}>{sim[winner.colorName].endgameCeiling}</div>
+                                <div className="label">Best Endgame</div>
+                                <div className="number" style={{color: loser.color}}>{sim[loser.colorName].endgameCeiling}</div>
+                            </div>
                         </div>
+                    </div>
+                    <div className="column advanced-insights">
+                            {
+                                winner.insights.map((insight, index) => {
+                                    if (index > 2 || !(winner.winRate < 80 && insight.rate > .75)) return <></>;
+                                    return insight.Element;
+                                })
+                            }
+                            {
+                                loser.insights.map((insight, index) => {
+                                    if (index > 2 || (index > 2 && insight.rate < .45)) return <></>;
+                                    return insight.Element;
+                                })
+                            }
                     </div>
                 </div>
             </div>
@@ -380,12 +434,6 @@ function MatchViewer({sim}) {
             setMatch(sim.data[ind]);
             setMatchIndex(ind);
         }
-    }
-
-    const getIndexPool = () => {
-        let arr = [];
-        for (let i = 0; i < sim.simulations; i ++) { arr.push(i); }
-        return arr;
     }
 
     const getMatchRedWinner = (sim) => {

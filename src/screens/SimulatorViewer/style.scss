@@ -16,6 +16,13 @@
         opacity: .45;
     }
 
+    .red-text {
+        color: #cc3333;
+    }
+    .blue-text {
+        color: #3333cc;
+    }
+
     .simulator-section {
         padding: 0 30px;
         box-sizing: border-box;
@@ -154,14 +161,15 @@
                 box-sizing: border-box;
                 .label {
                     font-family: 'usual';
+                    font-weight: 400;
                     flex-basis: 50%;
                     text-align: center;
-                    font-size: 14px;
+                    font-size: 15px;
                 }
                 .number {
                     font-family: 'industry';
-                    font-size: 18px;
-                    font-weight: 600;
+                    font-size: 17px;
+                    font-weight: 500;
                     flex-basis: 25%;
                     text-align: left;
                     text-decoration: none;
@@ -172,6 +180,22 @@
             }
             .row:nth-child(even) {
                 background-color: #eee;
+            }
+        }
+        .advanced-insights .individual-insight {
+            margin-bottom: 12px;
+            font-size: 15px;
+            color: #333;
+            line-height: 1.5em;
+
+            .alliance-name {
+                font-weight: 500;
+                font-size: 16px;
+            }
+            .percentage {
+                font-family: 'industry';
+                font-size: 20px;
+                font-weight: 600;
             }
         }
 
