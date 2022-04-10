@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Button from "../../components/Button";
 import Input from "../../components/Input";
 import PageHeader from "../../components/PageHeader";
@@ -14,14 +14,28 @@ import './style.scss';
 export default function SimulatorConfig() {
     const modalFunctions = useContext(FeedbackModalContext);
     const dialogFunctions = useContext(DialogBoxContext);
+    const location = useLocation();
     const navigate = useNavigate();
 
+
+    // Figure out if we're returning from the simulation viewer so we can prefill the form from query params
+    const urlSearchParams = new URLSearchParams(window.location.hash);
+    const prefill = Object.fromEntries(urlSearchParams.entries());
+    var configPrefill = false;
+    if (typeof prefill.t !== 'undefined') {
+        configPrefill = true;
+        prefill.t = JSON.parse(prefill.t);
+        prefill.sims = Number(prefill.sims);
+        prefill.def = prefill.def == "true";
+    }
+
+
     const [useTextboxes, setUseTextboxes] = useState(false);
-    const [simulations, setSimulations] = useState(1000);
+    const [simulations, setSimulations] = useState(configPrefill ? prefill.sims : 1000);
 
     const teamNumbers = getTeamNumberArray(TeamData);
-    const [redTeams, setRedTeams] = useState([0, 0, 0]);
-    const [blueTeams, setBlueTeams] = useState([0, 0, 0]);
+    const [redTeams, setRedTeams] = useState(configPrefill ? [prefill.t[0], prefill.t[1], prefill.t[2]] : [0, 0, 0]);
+    const [blueTeams, setBlueTeams] = useState(configPrefill ? [prefill.t[3], prefill.t[4], prefill.t[5]] : [0, 0, 0]);
 
     const verifySettings = () => {
         let incomplete = false, invalid = false;
@@ -46,7 +60,6 @@ export default function SimulatorConfig() {
             simulator.run(results => {
                 // Simulator is done
                 console.log(results);
-                //localStorage.setItem("simulation", JSON.stringify(results));
                 navigate("/analysis/viewer", {state: {results}});
             }, progress => {
                 // Still waiting
@@ -68,6 +81,7 @@ export default function SimulatorConfig() {
                             stateFunc={setRedTeams}
                             teamNumbers={teamNumbers}
                             useTextbox={useTextboxes}
+                            prefill={configPrefill ? prefill.t[0] : -1}
                         />
                         <TeamNumberInput
                             index={1}
@@ -75,6 +89,7 @@ export default function SimulatorConfig() {
                             stateFunc={setRedTeams}
                             teamNumbers={teamNumbers}
                             useTextbox={useTextboxes}
+                            prefill={configPrefill ? prefill.t[1] : -1}
                         />
                         <TeamNumberInput
                             index={2}
@@ -82,6 +97,7 @@ export default function SimulatorConfig() {
                             stateFunc={setRedTeams}
                             teamNumbers={teamNumbers}
                             useTextbox={useTextboxes}
+                            prefill={configPrefill ? prefill.t[2] : -1}
                         />
                     </div>
                     <div className="alliance-cell blue">
@@ -92,6 +108,7 @@ export default function SimulatorConfig() {
                             stateFunc={setBlueTeams}
                             teamNumbers={teamNumbers}
                             useTextbox={useTextboxes}
+                            prefill={configPrefill ? prefill.t[3] : -1}
                         />
                         <TeamNumberInput
                             index={1}
@@ -99,6 +116,7 @@ export default function SimulatorConfig() {
                             stateFunc={setBlueTeams}
                             teamNumbers={teamNumbers}
                             useTextbox={useTextboxes}
+                            prefill={configPrefill ? prefill.t[4] : -1}
                         />
                         <TeamNumberInput
                             index={2}
@@ -106,6 +124,7 @@ export default function SimulatorConfig() {
                             stateFunc={setBlueTeams}
                             teamNumbers={teamNumbers}
                             useTextbox={useTextboxes}
+                            prefill={configPrefill ? prefill.t[5] : -1}
                         />
                     </div>
                 </div>
@@ -119,12 +138,13 @@ export default function SimulatorConfig() {
                     <div className="divider-line"></div>
                     <Input
                         label="# of simulations"
-                        prefill={simulations}
                         onInput={e => setSimulations(Number(e.target.value))}
+                        prefill={configPrefill ? prefill.sims : simulations}
                     />
                     <Input
                         label="Simulate defense"
                         isCheckbox={true}
+                        prefill={configPrefill ? prefill.def : false}
                     />
                     <Button
                         text="Run simulation"
@@ -136,10 +156,10 @@ export default function SimulatorConfig() {
     )
 }
 
-function TeamNumberInput({index, stateVar, stateFunc, teamNumbers, useTextbox}) {
+function TeamNumberInput({index, stateVar, stateFunc, teamNumbers, useTextbox, prefill = -1}) {
 
-    const [teamNumber, setTeamNumber] = useState("");
-    const [teamName, setTeamName] = useState("");
+    const [teamNumber, setTeamNumber] = useState(prefill == -1 ? "" : prefill);
+    const [teamName, setTeamName] = useState(prefill == -1 ? "" : getTeamName(Number(prefill)));
     const [validNumber, setValidNumber] = useState(true);   // does not mean field isn't blank!
 
     // Generate label-value pair array to use

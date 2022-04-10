@@ -200,7 +200,7 @@ export default function SimulatorViewer() {
                 text="Results"
                 showBack={true}
                 backText="Config"
-                location="/analysis/simulator"
+                location={"/analysis/simulator?pf=y&t=[" + sim.red.teamNumbers + "," + sim.blue.teamNumbers + "]&sims=" + sim.simulations + "&def=" + (sim.applyDefense ? "true" : "false")}
             />
             <div className="simulator-section">
                 <h2>Summary</h2>
