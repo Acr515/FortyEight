@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Button from "../../components/Button";
 import Input from "../../components/Input";
@@ -21,7 +21,7 @@ export default function SimulatorConfig() {
 
     // Figure out if we're returning from the simulation viewer so we can prefill the form from query params
     const urlSearchParams = new URLSearchParams(window.location.hash);
-    const prefill = Object.fromEntries(urlSearchParams.entries());
+    var prefill = Object.fromEntries(urlSearchParams.entries());
     var configPrefill = false;
     if (typeof prefill.t !== 'undefined') {
         configPrefill = true;
@@ -33,6 +33,8 @@ export default function SimulatorConfig() {
 
     const [useTextboxes, setUseTextboxes] = useState(false);
     const [simulations, setSimulations] = useState(configPrefill ? prefill.sims : 1000);
+    const [importEventCode, setImportEventCode] = useState("");
+    const [importMatch, setImportMatch] = useState("");
 
     const teamNumbers = getTeamNumberArray(TeamData);
     const [redTeams, setRedTeams] = useState(configPrefill ? [prefill.t[0], prefill.t[1], prefill.t[2]] : [0, 0, 0]);
@@ -69,6 +71,32 @@ export default function SimulatorConfig() {
                 // Still waiting
                 //console.log(progress);
             });
+        }
+    }
+
+    // Prefills based on schedule input
+    const getFromSchedule = async () => {
+        if (importEventCode == "" || importMatch == "" || localStorage.getItem("schedules") == null) return;
+
+        await sleep(250);
+        let matchNumber = Number(importMatch);
+        
+        let schedule = JSON.parse(localStorage.getItem("schedules"));
+        let didChange = false;
+        schedule.forEach(event => {
+            if (event.code == importEventCode) event.matches.forEach(match => {
+                if (match.n == matchNumber) {
+                    setRedTeams(match.r);
+                    setBlueTeams(match.b);
+                    prefill = [];
+                    configPrefill = false;
+                    didChange = true;
+                }
+            })
+        });
+        if (!didChange) {
+            setRedTeams([0, 0, 0]);
+            setBlueTeams([0, 0, 0]);
         }
     }
 
@@ -139,6 +167,14 @@ export default function SimulatorConfig() {
                         isCheckbox={true}
                         onInput={ e => setUseTextboxes(e.target.checked) }
                     />
+                    <Input
+                        label="Event code for auto-import"
+                        onInput={ e => { setImportEventCode(e.target.value); getFromSchedule() } }
+                    />
+                    <Input
+                        label="Match # for auto-import"
+                        onInput={ e => { setImportMatch(e.target.value); getFromSchedule() } }
+                    />
                     <div className="divider-line"></div>
                     <Input
                         label="# of simulations"
@@ -170,9 +206,14 @@ function TeamNumberInput({index, stateVar, stateFunc, teamNumbers, useTextbox, p
     let optionValues = [];
     teamNumbers.forEach(num => { optionValues.push({ label: num.toString(), value: num }); });
 
+    useEffect(() => {
+        checkTeamNumber({target: {value: stateVar[index]}});
+    }, [stateVar])
+
     // Execute every time the number is changed
     const checkTeamNumber = e => {
         let num = e.target.value;
+        if (num == teamNumber) return;
         if (teamNumbers.indexOf(Number(num)) == -1) {
             setValidNumber(false);
             setTeamName("???");
