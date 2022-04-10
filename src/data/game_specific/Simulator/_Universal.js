@@ -78,7 +78,7 @@ export default class Simulator {
      * @param {function} callback Runs when the simulation is finished
      * @param {function} status Runs periodically to report status
      */
-    run(callback, status = count => {}) {
+    async run(callback, status = count => {}) {
         // Seed a random number generator
         var seededRandom = require('seedrandom');
         var rng = seededRandom('seedageddon');

@@ -40,7 +40,7 @@ module.exports = {
       new MiniCssExtractPlugin(),
       new HtmlWebpackPlugin({
         template: 'src/index.html'
-      })
+      }),
   ],
   output: {
     path: path.resolve(__dirname, './build'),

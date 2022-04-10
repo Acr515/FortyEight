@@ -9,6 +9,7 @@ import Simulator from "../../data/game_specific/Simulator/_Universal";
 import getTeamName from "../../data/getTeamName";
 import { getTeamNumberArray } from "../../data/SearchData";
 import TeamData from "../../data/TeamData";
+import sleep from "../../util/sleep";
 import './style.scss';
 
 export default function SimulatorConfig() {
@@ -37,7 +38,7 @@ export default function SimulatorConfig() {
     const [redTeams, setRedTeams] = useState(configPrefill ? [prefill.t[0], prefill.t[1], prefill.t[2]] : [0, 0, 0]);
     const [blueTeams, setBlueTeams] = useState(configPrefill ? [prefill.t[3], prefill.t[4], prefill.t[5]] : [0, 0, 0]);
 
-    const verifySettings = () => {
+    const verifySettings = async () => {
         let incomplete = false, invalid = false;
 
         const validateNum = num => {
@@ -52,7 +53,8 @@ export default function SimulatorConfig() {
         } else if (invalid) {
             modalFunctions.setModal("You gave invalid team numbers. Please revise and try again.", true);
         } else {
-            modalFunctions.setModal("Simulating...", false);
+            dialogFunctions.setDialog({body: "Simulating...", confirmFunction: () => {}});
+            await sleep(250);
 
             var simulator = new Simulator(redTeams, blueTeams, simulations, false, TeamData);
 
@@ -60,6 +62,8 @@ export default function SimulatorConfig() {
             simulator.run(results => {
                 // Simulator is done
                 console.log(results);
+                dialogFunctions.hideDialog();
+                modalFunctions.setModal("Simulation complete!", false)
                 navigate("/analysis/viewer", {state: {results}});
             }, progress => {
                 // Still waiting
