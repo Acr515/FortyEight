@@ -5,7 +5,7 @@ import DialogBoxContext from '../../context/DialogBoxContext';
 import FeedbackModal from '../../components/FeedbackModal';
 import './style.scss';
 import DialogBox from '../../components/DialogBox';
-import { VERSION_NAME } from '../../config';
+import { DEVELOP_MODE, VERSION_NAME } from '../../config';
 
 var modalHideTimer = null;
 
@@ -82,7 +82,13 @@ export default function FRAME() {
                                         location={location}
                                         sublink={true}
                                     />
-                                ]}
+                                ].concat(DEVELOP_MODE ? [<NavigationLink
+                                        link="/analysis/sim-accuracy"
+                                        text="Sim. Accuracy"
+                                        location={location}
+                                        sublink={true}
+                                    />] : [])
+                                }
                             />
                         </div>
                         <div className="footer-content">
