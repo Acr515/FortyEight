@@ -31,6 +31,7 @@ export default function SimulatorConfig() {
 
 
     const [useTextboxes, setUseTextboxes] = useState(false);
+    const [useMatchImport, setUseMatchImport] = useState(false);
     const [simulations, setSimulations] = useState(configPrefill ? prefill.sims : 1000);
     const [importEventCode, setImportEventCode] = useState("");
     const [importMatch, setImportMatch] = useState("");
@@ -167,13 +168,20 @@ export default function SimulatorConfig() {
                         onInput={ e => setUseTextboxes(e.target.checked) }
                     />
                     <Input
-                        label="Event code for auto-import"
-                        onInput={ e => { setImportEventCode(e.target.value); } }
+                        label="Import match from schedule"
+                        isCheckbox={true}
+                        onInput={ e => setUseMatchImport(e.target.checked) }
                     />
-                    <Input
-                        label="Match # for auto-import"
-                        onInput={ e => { setImportMatch(e.target.value); getFromSchedule(e.target.value) } }
-                    />
+                    { useMatchImport && <>
+                        <Input
+                            label="Event code"
+                            onInput={ e => { setImportEventCode(e.target.value); } }
+                        />
+                        <Input
+                            label="Match #"
+                            onInput={ e => { setImportMatch(e.target.value); getFromSchedule(e.target.value) } }
+                        />
+                    </>}
                     <div className="divider-line"></div>
                     <Input
                         label="# of simulations"
