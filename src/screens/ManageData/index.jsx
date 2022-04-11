@@ -44,7 +44,7 @@ export default function ManageData() {
     }
 
     const deleteAllSchedules = () => {
-        dialogFunctions.showDialog({
+        dialogFunctions.setDialog({
             body: "Any schedules in memory will be removed. They can easily be redownloaded using the controls above. Would you like to continue?",
             useConfirmation: true,
             confirmFunction: () => {
@@ -114,7 +114,7 @@ export default function ManageData() {
                 <h2>Download Schedule from TBA</h2>
                 <div className="control-area">
                     <div className="cell explanation">
-                        <p>Using the controls on the right, you can download a match schedule for a full event that will allow you to simulate any of its matches simply by typing in the qualification match #.</p>
+                        <p>Using the controls on the right, you can download a qualification match schedule for a full event that will allow you to simulate any of its matches simply by typing in its match number.</p>
                     </div>
                     <div className="cell">
                         <Input
@@ -130,8 +130,8 @@ export default function ManageData() {
                         />
                         <Button
                             text="Delete All"
-                            marginTop={1}
-                            marginBottom={1}
+                            marginTop={12}
+                            useBorder={true}
                             style={{ maxWidth: 128 }}
                             action={ deleteAllSchedules }
                         />
