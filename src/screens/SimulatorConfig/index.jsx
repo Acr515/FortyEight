@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Button from "../../components/Button";
 import Input from "../../components/Input";
 import PageHeader from "../../components/PageHeader";
@@ -15,7 +15,6 @@ import './style.scss';
 export default function SimulatorConfig() {
     const modalFunctions = useContext(FeedbackModalContext);
     const dialogFunctions = useContext(DialogBoxContext);
-    const location = useLocation();
     const navigate = useNavigate();
 
 
@@ -37,15 +36,15 @@ export default function SimulatorConfig() {
     const [importMatch, setImportMatch] = useState("");
 
     const teamNumbers = getTeamNumberArray(TeamData);
-    const [redTeams, setRedTeams] = useState(configPrefill ? [prefill.t[0], prefill.t[1], prefill.t[2]] : [0, 0, 0]);
-    const [blueTeams, setBlueTeams] = useState(configPrefill ? [prefill.t[3], prefill.t[4], prefill.t[5]] : [0, 0, 0]);
+    const [redTeams, setRedTeams] = useState(configPrefill ? [prefill.t[0], prefill.t[1], prefill.t[2]] : ["", "", ""]);
+    const [blueTeams, setBlueTeams] = useState(configPrefill ? [prefill.t[3], prefill.t[4], prefill.t[5]] : ["", "", ""]);
 
     const verifySettings = async () => {
         let incomplete = false, invalid = false;
 
         const validateNum = num => {
             if (teamNumbers.indexOf(num) == -1) invalid = true;
-            if (Number(num) == 0) incomplete = true;
+            if (num == "" || Number(num) == 0) incomplete = true;
         }
         redTeams.forEach(num => validateNum(num));
         blueTeams.forEach(num => validateNum(num));
@@ -75,14 +74,14 @@ export default function SimulatorConfig() {
     }
 
     // Prefills based on schedule input
-    const getFromSchedule = async () => {
-        if (importEventCode == "" || importMatch == "" || localStorage.getItem("schedules") == null) return;
+    const getFromSchedule = (num = null) => {
+        if (importEventCode == "" || (importMatch == "" && num == null) || localStorage.getItem("schedules") == null) return;
 
-        await sleep(250);
-        let matchNumber = Number(importMatch);
+        let matchNumber = Number(num != null ? num : importMatch);
         
         let schedule = JSON.parse(localStorage.getItem("schedules"));
         let didChange = false;
+        
         schedule.forEach(event => {
             if (event.code == importEventCode) event.matches.forEach(match => {
                 if (match.n == matchNumber) {
@@ -95,8 +94,8 @@ export default function SimulatorConfig() {
             })
         });
         if (!didChange) {
-            setRedTeams([0, 0, 0]);
-            setBlueTeams([0, 0, 0]);
+            setRedTeams(["", "", ""]);
+            setBlueTeams(["", "", ""]);
         }
     }
 
@@ -169,11 +168,11 @@ export default function SimulatorConfig() {
                     />
                     <Input
                         label="Event code for auto-import"
-                        onInput={ e => { setImportEventCode(e.target.value); getFromSchedule() } }
+                        onInput={ e => { setImportEventCode(e.target.value); } }
                     />
                     <Input
                         label="Match # for auto-import"
-                        onInput={ e => { setImportMatch(e.target.value); getFromSchedule() } }
+                        onInput={ e => { setImportMatch(e.target.value); getFromSchedule(e.target.value) } }
                     />
                     <div className="divider-line"></div>
                     <Input
@@ -196,9 +195,9 @@ export default function SimulatorConfig() {
     )
 }
 
-function TeamNumberInput({index, stateVar, stateFunc, teamNumbers, useTextbox, prefill = -1}) {
+function TeamNumberInput({ index, stateVar, stateFunc, teamNumbers, useTextbox, prefill = -1 }) {
 
-    const [teamNumber, setTeamNumber] = useState(prefill == -1 ? "" : prefill);
+    // const [teamNumber, setTeamNumber] = useState(prefill == -1 ? "" : prefill);
     const [teamName, setTeamName] = useState(prefill == -1 ? "" : getTeamName(Number(prefill)));
     const [validNumber, setValidNumber] = useState(true);   // does not mean field isn't blank!
 
@@ -206,30 +205,33 @@ function TeamNumberInput({index, stateVar, stateFunc, teamNumbers, useTextbox, p
     let optionValues = [];
     teamNumbers.forEach(num => { optionValues.push({ label: num.toString(), value: num }); });
 
-    useEffect(() => {
-        checkTeamNumber({target: {value: stateVar[index]}});
-    }, [stateVar])
+    const updateTeamNumber = num => {
+        let newStateVar = [];
+        stateVar.forEach(num => newStateVar.push(num));
+        newStateVar[index] = num;
+        stateFunc(newStateVar);
+    }
 
     // Execute every time the number is changed
-    const checkTeamNumber = e => {
-        let num = e.target.value;
-        if (num == teamNumber) return;
+    const checkTeamNumber = (num, updateState = true) => {
         if (teamNumbers.indexOf(Number(num)) == -1) {
             setValidNumber(false);
             setTeamName("???");
-            setTeamNumber("");
+            //if (updateState) updateTeamNumber("");
         } else {
-            setTeamNumber(Number(e.target.value));
             setValidNumber(true);
-            setTeamName(getTeamName(Number(e.target.value)));
-            
-            // Create a new team array based on stateVar
-            let newStateVar = [];
-            stateVar.forEach(num => newStateVar.push(num));
-            newStateVar[index] = Number(e.target.value);
-            stateFunc(newStateVar);
+            setTeamName(getTeamName(Number(num)));
+            if (updateState) updateTeamNumber(Number(num));
         }
     }
+
+    const numberInput = e => {
+        checkTeamNumber(e.target.value);
+    }
+
+    useEffect(() => {
+        checkTeamNumber(stateVar[index], false);
+    }, [teamNumbers])
 
     return (
         <div className="_TeamNumberInput">
@@ -242,8 +244,10 @@ function TeamNumberInput({index, stateVar, stateFunc, teamNumbers, useTextbox, p
                     }}
                     marginBottom={0}
                     warning={!validNumber}
-                    onInput={checkTeamNumber}
-                    prefill={teamNumber}
+                    onInput={numberInput}
+                    prefill={stateVar[index]}
+                    externalUpdate={stateVar}
+                    getExternalUpdate={() => stateVar[index]}
                 />
             :
                 <Input
@@ -254,8 +258,10 @@ function TeamNumberInput({index, stateVar, stateFunc, teamNumbers, useTextbox, p
                         display: "inline-block"
                     }}
                     marginBottom={0}
-                    onInput={checkTeamNumber}
-                    prefill={teamNumber}
+                    onInput={numberInput}
+                    prefill={stateVar[index]}
+                    externalUpdate={stateVar}
+                    getExternalUpdate={() => stateVar[index]}
                 />
             }
             <div className="team-name-label">

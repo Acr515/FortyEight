@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './style.scss';
 import Chevron from '../../assets/images/chevron.png';
 
@@ -18,8 +18,10 @@ import Chevron from '../../assets/images/chevron.png';
  * @param disabled If true, disables the input for changes by adding the disabled HTML attribute to the element
  * @param warning If true, flags the element by outlining the input element in red to resemble an input error
  * @param style Any custom CSS styles to apply to the parent element of the input/label pair
+ * @param externalUpdate If you wish to have control over this input's values using state from its parent, its state should be set using this property. A `useEffect()` hook will run when it changes
+ * @param getExternalUpdate This function should return a value that will be used to set the value state of this input component
  */
-export default function Input({label, prefill, id, onInput, isCheckbox, isNumerical, optionList, marginBottom, alignLabel = "middle", textArea = false, required = false, disabled = false, warning = false, style = {}}) {
+export default function Input({label, prefill, id, onInput, isCheckbox, isNumerical, optionList, marginBottom, alignLabel = "middle", textArea = false, required = false, disabled = false, warning = false, style = {}, externalUpdate = null, getExternalUpdate = null}) {
     
     optionList = typeof optionList !== "undefined" ? optionList : false;
 
@@ -29,7 +31,7 @@ export default function Input({label, prefill, id, onInput, isCheckbox, isNumeri
         isCheckbox ? false : ""
     );
 
-    const updateValue = e => {
+    const inputUpdated = e => {
         if (typeof onInput !== "undefined") onInput(e);
 
         let val = e.target.value;
@@ -45,6 +47,10 @@ export default function Input({label, prefill, id, onInput, isCheckbox, isNumeri
     const decrement = () => {
         setValue(Number(value) - 1);
     }
+
+    if (externalUpdate != null) useEffect(() => {
+        setValue(getExternalUpdate());
+    }, [externalUpdate])
     
     return (
         <div className="_Input" style={{ ...style, marginBottom: marginBottom || 18 }}>
@@ -70,7 +76,7 @@ export default function Input({label, prefill, id, onInput, isCheckbox, isNumeri
                         type={isCheckbox ? "checkbox" : "text"}
                         value={value}
                         defaultChecked={isCheckbox && typeof prefill !== 'undefined' && prefill}
-                        onInput={updateValue}
+                        onInput={inputUpdated}
                         required={required}
                         disabled={disabled}
                     />
@@ -79,7 +85,7 @@ export default function Input({label, prefill, id, onInput, isCheckbox, isNumeri
                         className={"input text-box dropdown-box" + (required ? " required" : "")}
                         id={id}
                         name={id}
-                        onInput={updateValue}
+                        onInput={inputUpdated}
                         value={value}
                         required={required}
                         disabled={disabled}
