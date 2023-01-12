@@ -13,7 +13,9 @@ module.exports = {
       },
       {
         test: /\.(css|sass|scss)$/,
-        use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader']
+        use: [
+          'style-loader', 'css-loader', 'sass-loader'
+        ]
       },
       {
         test: /\.(eot|ttf|svg|jpg|png)$/,
@@ -37,7 +39,6 @@ module.exports = {
     extensions: ['*', '.js', '.jsx']
   },
   plugins: [
-      new MiniCssExtractPlugin(),
       new HtmlWebpackPlugin({
         template: 'src/index.html'
       }),
