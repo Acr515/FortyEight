@@ -43,6 +43,16 @@ const ScoreCalculator = {
                 default: return 0;
             }
         },
+        getLevelFromNumber: num => {
+            switch (num) {
+                case 0: return EndgameResult.NONE;
+                case 1: return EndgameResult.LOW_RUNG;
+                case 2: return EndgameResult.MID_RUNG;
+                case 3: return EndgameResult.HIGH_RUNG;
+                case 4: return EndgameResult.TRAVERSAL_RUNG;
+                default: return EndgameResult.NONE;
+            }
+        },
         didClimb: data => { return data.performance.endgame.state != EndgameResult.NONE }
     }
 }
