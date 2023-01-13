@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import FeedbackModalContext from '../../context/FeedbackModalContext';
-import DialogBoxContext from '../../context/DialogBoxContext';
-import FeedbackModal from '../../components/FeedbackModal';
-import './style.scss';
-import DialogBox from '../../components/DialogBox';
 import { DEVELOP_MODE, VERSION_NAME } from '../../config';
+import FeedbackModal from 'components/FeedbackModal';
+import DialogBox from 'components/DialogBox';
+import FeedbackModalContext from 'context/FeedbackModalContext';
+import DialogBoxContext from 'context/DialogBoxContext';
+import gameData from 'util/gameData';
+import './style.scss';
 
 var modalHideTimer = null;
 
@@ -92,7 +93,8 @@ export default function FRAME() {
                             />
                         </div>
                         <div className="footer-content">
-                            v{VERSION_NAME}
+                            <p>{`${gameData.name}`}</p>
+                            <p>v{VERSION_NAME}</p>
                         </div>
                     </div>
                     <div id="content-container">
