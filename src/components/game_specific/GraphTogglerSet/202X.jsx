@@ -28,13 +28,13 @@ export default function GraphTogglerSet({activeIndex, stateFuncs, teamNumber}) {
         [ 177, 65, 73 ]
     );
 
-    // Get endgame status per game
-    let endgameLabels = [];
-    data.forEach(form => { endgameLabels.push(form.matchNumber); });
-    let endgameData = [];
-    data.forEach(form => { endgameData.push(ScoreCalculator.Endgame.getNumericalLevel(form)); });
-    let endgameGraphInfo = new GraphInfo(
-        endgameData, endgameLabels,
+    // Get auto cross status per game
+    let autocrossLabels = [];
+    data.forEach(form => { autocrossLabels.push(form.matchNumber); });
+    let autocrossData = [];
+    data.forEach(form => { autocrossData.push(Number(form.performance.auto.cross)); });
+    let autocrossGraphInfo = new GraphInfo(
+        autocrossData, autocrossLabels,
         {
             title: { text: "Match #" }
         },
@@ -44,7 +44,7 @@ export default function GraphTogglerSet({activeIndex, stateFuncs, teamNumber}) {
             ticks: {
                 precision: 0
             },
-            title: { text: "Endgame Level" }
+            title: { text: "Autocross" }
         },
         [ 204, 201, 57 ]
     );
@@ -64,8 +64,8 @@ export default function GraphTogglerSet({activeIndex, stateFuncs, teamNumber}) {
                 stateFuncs={stateFuncs}
             />
             <GraphToggler
-                graphInfo={endgameGraphInfo}
-                label="Endgame/game"
+                graphInfo={autocrossGraphInfo}
+                label="Autocross/game"
                 index={2}
                 activeIndex={activeIndex}
                 stateFuncs={stateFuncs}

@@ -1,7 +1,6 @@
 import React from "react";
-import imageImports from "../../../util/imageImports";
-import XImage from '../../../assets/images/x.png';
-import { EndgameResult } from "../../../data/game_specific/performanceObject/2022";
+import { EndgameResult } from "data/game_specific/performanceObject/2022";
+import XImage from 'assets/images/x.png';
 import './style.scss';
 
 // Displays a breakdown of all given data in form

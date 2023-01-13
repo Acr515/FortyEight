@@ -1,4 +1,4 @@
-import { EndgameResult } from "../performanceObject/2022";
+import { EndgameResult } from "data/game_specific/performanceObject/2022";
 
 /**
  * Takes a match performance object and outputs scoring data related to certain parts of the game (auto, teleop, endgame scores)

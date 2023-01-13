@@ -1,7 +1,7 @@
-import { VERSION_NAME, VERSION_NUMBER } from '../config';
-import getTeamName from './getTeamName';
-import generateHexString from '../util/generateHexString';
 import date from 'date-and-time';
+import { VERSION_NAME, VERSION_NUMBER } from '../config';
+import generateHexString from 'util/generateHexString';
+import getTeamName from 'data/getTeamName';
 
 /**
  * A mutable array that holds every team object

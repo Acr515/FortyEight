@@ -1,5 +1,5 @@
-import { Method, sortTeams } from "../util/sortData";
-import TeamData from "./TeamData";
+import { Method, sortTeams } from "util/sortData";
+import TeamData from "data/TeamData";
 
 // Series of functions that comb TeamData and return results or booleans
 

@@ -1,13 +1,13 @@
 import React from 'react';
-import Input from '../../Input';
-import { EndgameResult } from '../../../data/game_specific/performanceObject/2022';
+import Input from 'components/Input';
+import { EndgameResult } from 'data/game_specific/performanceObject/2022';
 
 /**
  * An array that stores all categories as strings that have data
  */
 export const GameDataCategories = [
     "auto", "teleop", "endgame"
-]
+];
 
 /**
  * A collection of JSX elements that contain the input elements for the game. Also contains a property, `defenseFields`,
@@ -78,4 +78,4 @@ export const GameDataInputs = {
         />
     </>,
     defenseFields: true
-}
+};

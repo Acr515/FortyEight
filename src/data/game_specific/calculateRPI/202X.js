@@ -1,3 +1,5 @@
+import ScoreCalculator from "data/game_specific/ScoreCalculator/202X";
+
 /**
  * Runs calculations to determine a team's RPI
  * @param {object} team An entire team object
@@ -15,9 +17,13 @@ export default function calculateRPI(team) {
 }
 
 // Same as calculateRPI but only performs calculation on one individual match
-export function calculateSingleRPI(data) {
-    let RPI = Number(data.performance.pieces) * 4;
-    return Math.round(RPI * 10) / 10;
+export function calculateSingleRPI(data, round) {
+    let RPI = 0;
+    RPI += ScoreCalculator.Auto.getScore(data) + ScoreCalculator.Teleop.getScore(data);
+
+    if (data.performance.notes.fouls) RPI -= 3;
+
+    return round ? Math.round(RPI * 10) / 10 : RPI;
 }
 
 /**

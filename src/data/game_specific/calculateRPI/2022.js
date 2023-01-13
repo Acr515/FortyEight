@@ -1,4 +1,4 @@
-import ScoreCalculator from "../ScoreCalculator/2022";
+import ScoreCalculator from "data/game_specific/ScoreCalculator/2022";
 
 /**
  * Runs calculations to determine a team's RPI
@@ -11,7 +11,7 @@ export default function calculateRPI(team) {
     team.data.forEach(data => {
         RPI += calculateSingleRPI(data);
     });
-    RPI = Math.round(RPI / count * 10) / 10
+    RPI = Math.round(RPI / count * 10) / 10;
 
     return { RPI: RPI, rating: getRPIRating(RPI) };
 }

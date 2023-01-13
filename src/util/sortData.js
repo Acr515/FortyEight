@@ -1,10 +1,10 @@
 // A number of functions intended to be used for sorting data
 
-import calculateRPI from "../data/game_specific/calculateRPI/2022";
-import Events from "../data/game_specific/eventCodes/2022";
-import { findEvent } from "../data/game_specific/eventCodes/_Universal";
-import ScoreCalculator from "../data/game_specific/ScoreCalculator/2022";
-import { getTeamData } from "../data/SearchData";
+import { getTeamData } from "data/SearchData";
+import { findEvent } from "data/game_specific/eventCodes/_Universal";
+import calculateRPI from "data/game_specific/calculateRPI/2022";
+import Events from "data/game_specific/eventCodes/2022";
+import ScoreCalculator from "data/game_specific/ScoreCalculator/2022";
 
 export const Method = {
     MatchAscending: "Match Ascending",
