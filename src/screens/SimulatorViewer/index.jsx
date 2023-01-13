@@ -1,13 +1,13 @@
 import React, { useContext, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { Doughnut, Bar } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, BarElement  } from "chart.js";
-import PageHeader from "../../components/PageHeader";
-import addLeadingZero from "../../util/addLeadingZero";
-import { Link, useLocation } from "react-router-dom";
-import FeedbackModalContext from "../../context/FeedbackModalContext";
-import ScoreCalculator from "../../data/game_specific/ScoreCalculator/2022";
-import { EndgameResult } from "../../data/game_specific/performanceObject/2022";
-import getTeamName from "../../data/getTeamName";
+import PageHeader from "components/PageHeader";
+import ScoreCalculator from "data/game_specific/ScoreCalculator/2022";
+import { EndgameResult } from "data/game_specific/performanceObject/2022";
+import getTeamName from "data/getTeamName";
+import FeedbackModalContext from "context/FeedbackModalContext";
+import addLeadingZero from "util/addLeadingZero";
 import "./style.scss";
 
 

@@ -10,9 +10,9 @@ import {
     Tooltip,
 } from 'chart.js';
 import { findMatchDataByID, getTeamData, getTeamIndex } from "../../data/SearchData";
-import calculateRPI, { calculateSingleRPI, getRPIRating } from "../../data/game_specific/calculateRPI/2022";
-import ViewTeamCells from "../../components/game_specific/ViewTeamCells/2022";
-import ViewIndividualData from "../../components/game_specific/ViewIndividualData/2022";
+import calculateRPI, { calculateSingleRPI, getRPIRating } from "../../data/game_specific/calculateRPI/GAME_YEAR";
+import ViewTeamCells from "../../components/game_specific/ViewTeamCells/GAME_YEAR";
+import ViewIndividualData from "../../components/game_specific/ViewIndividualData/GAME_YEAR";
 import FeedbackModalContext from '../../context/FeedbackModalContext';
 import DialogBoxContext from '../../context/DialogBoxContext';
 import EventCodeHolder from "../../components/EventCodeHolder";
@@ -25,7 +25,7 @@ import FlagBreakdown from '../../assets/images/flag-breakdown.png';
 import addLeadingZero from '../../util/addLeadingZero';
 import '../../assets/fonts/transandina/index.css';
 import './style.scss';
-import GraphTogglerSet from "../../components/game_specific/GraphTogglerSet/2022";
+import GraphTogglerSet from "../../components/game_specific/GraphTogglerSet/GAME_YEAR";
 import { createDefaultData } from "../../components/game_specific/GraphTogglerSet/_Universal";
 import { Method, sortTeamData } from "../../util/sortData";
 import { Link, useNavigate } from "react-router-dom";

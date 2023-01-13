@@ -2,9 +2,9 @@
 
 import { getTeamData } from "data/SearchData";
 import { findEvent } from "data/game_specific/eventCodes/_Universal";
-import calculateRPI from "data/game_specific/calculateRPI/2022";
-import Events from "data/game_specific/eventCodes/2022";
-import ScoreCalculator from "data/game_specific/ScoreCalculator/2022";
+import calculateRPI from "data/game_specific/calculateRPI/GAME_YEAR";
+import Events from "data/game_specific/eventCodes/GAME_YEAR";
+import ScoreCalculator from "data/game_specific/ScoreCalculator/GAME_YEAR";
 
 export const Method = {
     MatchAscending: "Match Ascending",

@@ -1,8 +1,10 @@
+const webpack = require('webpack');
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-module.exports = {
+
+module.exports = env => ({
     entry: path.resolve(__dirname, './src/index.js'),
     module: {
         rules: [
@@ -42,6 +44,14 @@ module.exports = {
         new HtmlWebpackPlugin({
             template: 'src/index.html'
         }),
+        new webpack.NormalModuleReplacementPlugin(
+            /(.*)GAME_YEAR(\.*)/,
+            function (resource) {
+                resource.request = resource.request.replace(
+                    /GAME_YEAR/, env.game_year
+                );
+            }
+        ),
     ],
     output: {
         path: path.resolve(__dirname, './build'),
@@ -62,4 +72,4 @@ module.exports = {
             util: path.resolve(__dirname, "src", "util"),
         }
     }
-};
+});

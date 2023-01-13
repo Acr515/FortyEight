@@ -1,6 +1,6 @@
 import React from "react";
 import GraphTogglerSet_Universal, { GraphToggler, GraphInfo } from "./_Universal";
-import ScoreCalculator from "data/game_specific/ScoreCalculator/2022";
+import ScoreCalculator from "data/game_specific/ScoreCalculator/202X";
 import { getTeamData } from "data/SearchData";
 import { Method, sortTeamData } from "util/sortData";
 
@@ -32,7 +32,7 @@ export default function GraphTogglerSet({activeIndex, stateFuncs, teamNumber}) {
     let autocrossLabels = [];
     data.forEach(form => { autocrossLabels.push(form.matchNumber); });
     let autocrossData = [];
-    data.forEach(form => { autocrossData.push(Number(form.performance.auto.cross)); });
+    data.forEach(form => { autocrossData.push((form.performance.auto.cross)); });
     let autocrossGraphInfo = new GraphInfo(
         autocrossData, autocrossLabels,
         {

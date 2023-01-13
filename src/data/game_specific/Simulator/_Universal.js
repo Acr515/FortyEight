@@ -1,8 +1,8 @@
 import date from 'date-and-time';
 import TeamData from "data/TeamData";
 import { getTeamData } from "data/SearchData";
-import performanceObject, { EndgameResult } from "data/game_specific/performanceObject/2022";
-import ScoreCalculator from "data/game_specific/ScoreCalculator/2022";
+import performanceObject, { EndgameResult } from "data/game_specific/performanceObject/GAME_YEAR";
+import ScoreCalculator from "data/game_specific/ScoreCalculator/GAME_YEAR";
 
 /**
  * Simulates an FRC match with any 3 v 3 teams.

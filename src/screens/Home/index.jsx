@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import Input from '../../components/Input';
-import Events from '../../data/game_specific/eventCodes/2022';
-import { findEvent } from '../../data/game_specific/eventCodes/_Universal';
+import Input from 'components/Input';
+import Events from 'data/game_specific/eventCodes/GAME_YEAR';
+import { findEvent } from 'data/game_specific/eventCodes/_Universal';
 import './style.scss';
 
 export default function Home() {

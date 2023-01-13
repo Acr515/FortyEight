@@ -1,5 +1,5 @@
 import TeamData from "data/TeamData";
-import performanceObject from "data/game_specific/performanceObject/2022";
+import performanceObject from "data/game_specific/performanceObject/GAME_YEAR";
 
 /**
  * Saves TeamData to localStorage. Accepts no parameters.

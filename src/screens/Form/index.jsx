@@ -1,18 +1,18 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import TeamData, { createFormObject, createTeamObject } from '../../data/TeamData';
-import Button from '../../components/Button';
-import GameDataSection from '../../components/GameDataSection';
-import Input from '../../components/Input';
-import PageHeader from '../../components/PageHeader';
-import './style.scss';
-import { findMatchDataByID, getTeamData, teamExists } from '../../data/SearchData';
-import getTeamName from '../../data/getTeamName';
-import FeedbackModalContext from '../../context/FeedbackModalContext';
-import { saveData } from '../../data/saveLoadData';
-import { GameDataInputs } from '../../components/game_specific/GameDataInputs/2022';
-import performanceObject from '../../data/game_specific/performanceObject/2022';
 import date from 'date-and-time';
+import GameDataSection from 'components/GameDataSection';
+import Button from 'components/Button';
+import Input from 'components/Input';
+import PageHeader from 'components/PageHeader';
+import { GameDataInputs } from 'components/game_specific/GameDataInputs/GAME_YEAR';
+import getTeamName from 'data/getTeamName';
+import TeamData, { createFormObject, createTeamObject } from 'data/TeamData';
+import { findMatchDataByID, getTeamData, teamExists } from 'data/SearchData';
+import { saveData } from 'data/saveLoadData';
+import performanceObject from 'data/game_specific/performanceObject/GAME_YEAR';
+import FeedbackModalContext from 'context/FeedbackModalContext';
+import './style.scss';
 
 
 export default function Form() {
