@@ -58,7 +58,14 @@ export default function SimulatorConfig() {
             dialogFunctions.setDialog({body: "Simulating...", confirmFunction: () => {}});
             await sleep(250);
 
-            var simulator = new Simulator(redTeams, blueTeams, simulations, false, TeamData);
+            var simulator = new Simulator(
+                redTeams,
+                blueTeams, 
+                {
+                    simulations, 
+                    applyDefense: false, 
+                }
+            );
 
             // Run the simulation!
             simulator.run(results => {
@@ -67,9 +74,6 @@ export default function SimulatorConfig() {
                 dialogFunctions.hideDialog();
                 modalFunctions.setModal("Simulation complete!", false)
                 navigate("/analysis/viewer", {state: {results}});
-            }, progress => {
-                // Still waiting
-                //console.log(progress);
             });
         }
     }

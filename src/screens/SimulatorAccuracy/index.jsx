@@ -97,9 +97,11 @@ function testSimulatorAccuracy(eventCode, modalFunctions, stateUpdate) {
                 let simulator = new Simulator(
                     match.alliances.red.team_keys.map(t => Number(t.substr(3))),
                     match.alliances.blue.team_keys.map(t => Number(t.substr(3))),
-                    1000,
-                    false,
-                    TeamData
+                    {
+                        simulations: 1000,
+                        applyDefense: false,
+                        dataset: TeamData
+                    }
                 );
                 simulator.run(sim => {
                     simulatedResults.push({
