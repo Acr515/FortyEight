@@ -1,12 +1,14 @@
 import React, { useContext, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { Doughnut, Bar } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, BarElement  } from "chart.js";
 import PageHeader from "components/PageHeader";
-import ScoreCalculator from "data/game_specific/ScoreCalculator/2022";
-import { EndgameResult } from "data/game_specific/performanceObject/2022";
-import getTeamName from "data/getTeamName";
+import TeamLink from "components/TeamLink";
+import SimulatorInsightRow from "components/SimulatorInsightRow";
+import SimulatorRPGraphs from "components/game_specific/SimulatorRPGraphs/GAME_YEAR";
+import SimulatorInsightRowSet from "components/game_specific/SimulatorInsightRowSet/GAME_YEAR";
 import FeedbackModalContext from "context/FeedbackModalContext";
+import getTeamName from "data/getTeamName";
 import addLeadingZero from "util/addLeadingZero";
 import "./style.scss";
 
@@ -86,77 +88,7 @@ export default function SimulatorViewer() {
         maintainAspectRatio: false,
         indexAxis: 'y'
     }
-
-    // Smaller doughnut charts
-    var winnerCargoRPData = {
-        labels: ["Success", "Failed"],
-        datasets: [{
-            data: [sim[winner.colorName].cargoRPRate, 1 - sim[winner.colorName].cargoRPRate],
-            backgroundColor: [
-                winner.color,
-                "transparent"
-            ]
-        }]
-    }
-    var winnerClimbRPData = {
-        labels: ["Success", "Failed"],
-        datasets: [{
-            data: [sim[winner.colorName].climbRPRate, 1 - sim[winner.colorName].climbRPRate],
-            backgroundColor: [
-                winner.color,
-                "transparent"
-            ]
-        }]
-    }
-    var loserCargoRPData = {
-        labels: ["Success", "Failed"],
-        datasets: [{
-            data: [sim[loser.colorName].cargoRPRate, 1 - sim[loser.colorName].cargoRPRate],
-            backgroundColor: [
-                loser.color,
-                "transparent"
-            ]
-        }]
-    }
-    var loserClimbRPData = {
-        labels: ["Success", "Failed"],
-        datasets: [{
-            data: [sim[loser.colorName].climbRPRate, 1 - sim[loser.colorName].climbRPRate],
-            backgroundColor: [
-                loser.color,
-                "transparent"
-            ]
-        }]
-    }
-    var smallDoughnutOptions = {
-        responsive: true,
-        maintainAspectRatio: false,
-        cutout: "80%",
-        plugins: { tooltip: {
-            enabled: false
-        }}
-    }
-
-
-    // Calculate insight data
-    // Find best cargo scorers
-    const getBestCargoScorers = teamColor => {
-        let bestTeleopScore = -100, climbOfBestScorer = EndgameResult.NONE;
-        sim[teamColor].bestScorer = -1;
-        sim.averageMatch[teamColor].teamPerformances.forEach(team => {
-            let score = ScoreCalculator.Teleop.getScore({ performance: team });
-
-            // This line will pick whoever climbs the highest on average if the two best robots score the same # of points
-            if (score > bestTeleopScore || (score == bestTeleopScore && ScoreCalculator.Endgame.getScore({ performance: team}) > ScoreCalculator.Endgame.getScoreOfConstant(climbOfBestScorer))) {
-                bestTeleopScore = score;
-                sim[teamColor].bestScorer = team.teamNumber;
-                climbOfBestScorer = team.endgame.state;
-            }
-        });
-    };
-    getBestCargoScorers("red");
-    getBestCargoScorers("blue");
-
+    
     // Find most statistically relevant insights to show
     const getInsights = alliance => {
         const createInsightObject = (rate, string, isLosingRate = false) => {
@@ -187,7 +119,6 @@ export default function SimulatorViewer() {
                 if (insight.count > 0) alliance.insights.push(createInsightObject(rate, "outscoring their opponents during " + insight.string));
             }
         });
-
         alliance.insights.sort((a, b) => b.rate - a.rate);
     };
     getInsights(winner);
@@ -267,60 +198,11 @@ export default function SimulatorViewer() {
                         </div>
                     </div>
                     <div className="column">
-                        <div className="doughnuts-container">
-                            <div className="doughnut-set">
-                                <div className="single-doughnut-container">
-                                    <div className="small-doughnut">
-                                        <Doughnut data={winnerCargoRPData} options={smallDoughnutOptions} style={{
-                                            width: 86,
-                                            height: 86
-                                        }} />
-                                        <span className="percentage" style={{color: winner.color}}>
-                                            {Math.round(sim[winner.colorName].cargoRPRate * 1000) / 10}%
-                                        </span>
-                                    </div>
-                                    <p className="label">Cargo RP %</p>
-                                </div>
-                                <div className="single-doughnut-container">
-                                    <div className="small-doughnut">
-                                        <Doughnut data={loserCargoRPData} options={smallDoughnutOptions} style={{
-                                            width: 86,
-                                            height: 86
-                                        }} />
-                                        <span className="percentage" style={{color: loser.color}}>
-                                            {Math.round(sim[loser.colorName].cargoRPRate * 1000) / 10}%
-                                        </span>
-                                    </div>
-                                    <p className="label">Cargo RP %</p>
-                                </div>
-                            </div>
-                            <div className="doughnut-set">
-                                <div className="single-doughnut-container">
-                                    <div className="small-doughnut">
-                                        <Doughnut data={winnerClimbRPData} options={smallDoughnutOptions} style={{
-                                            width: 86,
-                                            height: 86
-                                        }} />
-                                        <span className="percentage" style={{color: winner.color}}>
-                                            {Math.round(sim[winner.colorName].climbRPRate * 1000) / 10}%
-                                        </span>
-                                    </div>
-                                    <p className="label">Climb RP %</p>
-                                </div>
-                                <div className="single-doughnut-container">
-                                    <div className="small-doughnut">
-                                        <Doughnut data={loserClimbRPData} options={smallDoughnutOptions} style={{
-                                            width: 86,
-                                            height: 86
-                                        }} />
-                                        <span className="percentage" style={{color: loser.color}}>
-                                            {Math.round(sim[loser.colorName].climbRPRate * 1000) / 10}%
-                                        </span>
-                                    </div>
-                                    <p className="label">Climb RP %</p>
-                                </div>
-                            </div>
-                        </div>
+                        <SimulatorRPGraphs
+                            sim={sim}
+                            winner={winner}
+                            loser={loser}
+                        />
                     </div>
                 </div>
             </div>
@@ -331,31 +213,32 @@ export default function SimulatorViewer() {
                 <div className="column-section">
                     <div className="column">
                         <div className="alliance-insights">
-                            <div className="row">
-                                <div className="number" style={{color: winner.color}}>{Math.round(winner.stats.scoreRange.avg * 10) / 10}</div>
-                                <div className="label">Average Score</div>
-                                <div className="number" style={{color: loser.color}}>{Math.round(loser.stats.scoreRange.avg * 10) / 10}</div>
-                            </div>
-                            <div className="row">
-                                <div className="number" style={{color: winner.color}}>{winner.stats.scoreRange.max}/{winner.stats.scoreRange.min}</div>
-                                <div className="label">High/Low Score</div>
-                                <div className="number" style={{color: loser.color}}>{loser.stats.scoreRange.max}/{loser.stats.scoreRange.min}</div>
-                            </div>
-                            <div className="row">
-                                <div className="number" style={{color: winner.color}}>{Math.round(winner.stats.marginRange.avg * 10) / 10}</div>
-                                <div className="label">Average Win Margin</div>
-                                <div className="number" style={{color: loser.color}}>{Math.round(loser.stats.marginRange.avg * 10) / 10}</div>
-                            </div>
-                            <div className="row">
-                                <TeamLink className="number" style={{color: winner.color}} number={sim[winner.colorName].bestScorer}>{sim[winner.colorName].bestScorer}</TeamLink>
-                                <div className="label">Strongest Cargo Scorer</div>
-                                <TeamLink className="number" style={{color: loser.color}} number={sim[loser.colorName].bestScorer}>{sim[loser.colorName].bestScorer}</TeamLink>
-                            </div>
-                            <div className="row">
-                                <div className="number" style={{color: winner.color}}>{sim[winner.colorName].endgameCeiling}</div>
-                                <div className="label">Best Endgame</div>
-                                <div className="number" style={{color: loser.color}}>{sim[loser.colorName].endgameCeiling}</div>
-                            </div>
+                            <SimulatorInsightRow
+                                label="Average Score"
+                                winnerValue={Math.round(winner.stats.scoreRange.avg * 10) / 10}
+                                winnerColor={winner.color}
+                                loserValue={Math.round(loser.stats.scoreRange.avg * 10) / 10}
+                                loserColor={loser.color}
+                            />
+                            <SimulatorInsightRow
+                                label="High/Low Score"
+                                winnerValue={`${winner.stats.scoreRange.max}/${winner.stats.scoreRange.min}`}
+                                winnerColor={winner.color}
+                                loserValue={`${loser.stats.scoreRange.max}/${loser.stats.scoreRange.min}`}
+                                loserColor={loser.color}
+                            />
+                            <SimulatorInsightRow
+                                label="Average Win Margin"
+                                winnerValue={Math.round(winner.stats.marginRange.avg * 10) / 10}
+                                winnerColor={winner.color}
+                                loserValue={Math.round(loser.stats.marginRange.avg * 10) / 10}
+                                loserColor={loser.color}
+                            />
+                            <SimulatorInsightRowSet
+                                sim={sim}
+                                winner={winner}
+                                loser={loser}
+                            />
                         </div>
                     </div>
                     <div className="column advanced-insights">
@@ -382,20 +265,6 @@ export default function SimulatorViewer() {
             </div>
         </div>
     )
-}
-
-/**
- * Links any element to its team number
- * @param {number} number The team # 
- */
-function TeamLink({children, number, style, className}) {
-    return <Link
-        to={"/teams/" + number + "/-1/Results"}
-        style={style}
-        className={className + " team-link"}
-    >
-        {children}
-    </Link>
 }
 
 /**

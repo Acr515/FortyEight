@@ -6,16 +6,6 @@
     overflow-x: hidden;
     overflow-y: scroll;
 
-    .team-link {
-        transition: opacity .15s;
-    }
-    .team-link:hover {
-        opacity: .65;
-    }
-    .team-link:active {
-        opacity: .45;
-    }
-
     .red-text {
         color: #cc3333;
     }
@@ -120,65 +110,10 @@
             height: 300px;
             position: relative;
         }
-        .doughnuts-container {
-            .doughnut-set { text-align: center; width: 100%; }
-            .single-doughnut-container {
-                display: inline-block;
-                margin: 0 12px;
-            }
-            .small-doughnut {
-                width: 86px;
-                display: inline-block;
-                position: relative;
-                .percentage {
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    font-family: 'industry';
-                    font-size: 16px;
-                    font-weight: 500;
-                }
-            }
-            .single-doughnut-container {
-                margin-bottom: 20px;
-                width: 86px;
-                .label {
-                    margin: 8px 0 0;
-                    font-size: 13px;
-                    text-align: center;
-                }
-            }
-        }
-
-
+        
 
         .alliance-insights {
-            .row {
-                display: flex;
-                align-items: stretch;
-                padding: 12px 14px;
-                box-sizing: border-box;
-                .label {
-                    font-family: 'usual';
-                    font-weight: 400;
-                    flex-basis: 50%;
-                    text-align: center;
-                    font-size: 15px;
-                }
-                .number {
-                    font-family: 'industry';
-                    font-size: 17px;
-                    font-weight: 500;
-                    flex-basis: 25%;
-                    text-align: left;
-                    text-decoration: none;
-                }
-                .number:last-child {
-                    text-align: right;
-                }
-            }
-            .row:nth-child(even) {
+            ._SimulatorInsightRow:nth-child(even) {
                 background-color: #eee;
             }
         }

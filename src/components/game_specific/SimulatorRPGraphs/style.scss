@@ -1,0 +1,38 @@
+._SimulatorRPGraphs {
+    .doughnut-set {
+        text-align: center;
+        width: 100%;
+    }
+
+    .single-doughnut-container {
+        display: inline-block;
+        margin: 0 12px;
+    }
+
+    .small-doughnut {
+        width: 86px;
+        display: inline-block;
+        position: relative;
+
+        .percentage {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'industry';
+            font-size: 16px;
+            font-weight: 500;
+        }
+    }
+
+    .single-doughnut-container {
+        margin-bottom: 20px;
+        width: 86px;
+
+        .label {
+            margin: 8px 0 0;
+            font-size: 13px;
+            text-align: center;
+        }
+    }
+}

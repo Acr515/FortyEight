@@ -1,0 +1,27 @@
+._SimulatorInsightRow {
+    display: flex;
+    align-items: stretch;
+    padding: 12px 14px;
+    box-sizing: border-box;
+
+    .label {
+        font-family: 'usual';
+        font-weight: 400;
+        flex-basis: 50%;
+        text-align: center;
+        font-size: 15px;
+    }
+
+    .number {
+        font-family: 'industry';
+        font-size: 17px;
+        font-weight: 500;
+        flex-basis: 25%;
+        text-align: left;
+        text-decoration: none;
+    }
+
+    .number:last-child {
+        text-align: right;
+    }
+}
