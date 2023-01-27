@@ -2,7 +2,7 @@ import React from "react";
 import { Doughnut } from "react-chartjs-2";
 import './style.scss';
 
-export default function SimulatorRPGraphs_Universal({sim, graphOptions, winner, loser}) {
+export default function SimulatorRPGraphs_Universal({graphOptions, winner, loser}) {
 
     // Chart configuration
     const smallDoughnutOptions = {
@@ -35,7 +35,7 @@ export default function SimulatorRPGraphs_Universal({sim, graphOptions, winner, 
                         height: 86
                     }} />
                     <span className="percentage" style={{color: loser.color}}>
-                        {Math.round(sim[loser.colorName].cargoRPRate * 1000) / 10}%
+                        {graphOptions.loser1.value}%
                     </span>
                 </div>
                 <p className="label">{graphOptions.loser1.label}</p>
@@ -49,7 +49,7 @@ export default function SimulatorRPGraphs_Universal({sim, graphOptions, winner, 
                         height: 86
                     }} />
                     <span className="percentage" style={{color: winner.color}}>
-                        {Math.round(sim[winner.colorName].climbRPRate * 1000) / 10}%
+                        {graphOptions.winner2.value}%
                     </span>
                 </div>
                 <p className="label">{graphOptions.winner2.label}</p>
@@ -61,7 +61,7 @@ export default function SimulatorRPGraphs_Universal({sim, graphOptions, winner, 
                         height: 86
                     }} />
                     <span className="percentage" style={{color: loser.color}}>
-                        {Math.round(sim[loser.colorName].climbRPRate * 1000) / 10}%
+                        {graphOptions.loser2.value}%
                     </span>
                 </div>
                 <p className="label">{graphOptions.loser2.label}</p>

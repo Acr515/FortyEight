@@ -11,69 +11,69 @@ import SimulatorRPGraphs_Universal from "./_Universal";
 export default function SimulatorRPGraphs({ sim, winner, loser }) {
     
     // Chart data
-    const winnerCargoRPData = {
+    const winnerAutoRPData = {
         chartData: {
             labels: ["Success", "Failed"],
             datasets: [{
-                data: [sim[winner.colorName].cargoRPRate, 1 - sim[winner.colorName].cargoRPRate],
+                data: [sim[winner.colorName].autoRPRate, 1 - sim[winner.colorName].autoRPRate],
                 backgroundColor: [
                     winner.color,
                     "transparent"
                 ]
             }]
         },
-        label: "Cargo RP %",
-        value: Math.round(sim[winner.colorName].cargoRPRate * 1000) / 10
+        label: "Auto RP %",
+        value: Math.round(sim[winner.colorName].autoRPRate * 1000) / 10
     };
-    const winnerClimbRPData = {
+    const winnerTeleopRPData = {
         chartData: {
             labels: ["Success", "Failed"],
             datasets: [{
-                data: [sim[winner.colorName].climbRPRate, 1 - sim[winner.colorName].climbRPRate],
+                data: [sim[winner.colorName].teleopRPRate, 1 - sim[winner.colorName].teleopRPRate],
                 backgroundColor: [
                     winner.color,
                     "transparent"
                 ]
             }]
         },
-        label: "Climb RP %",
-        value: Math.round(sim[winner.colorName].climbRPRate * 1000) / 10
+        label: "Teleop RP %",
+        value: Math.round(sim[winner.colorName].teleopRPRate * 1000) / 10
     };
-    const loserCargoRPData = {
+    const loserAutoRPData = {
         chartData: {
             labels: ["Success", "Failed"],
             datasets: [{
-                data: [sim[loser.colorName].cargoRPRate, 1 - sim[loser.colorName].cargoRPRate],
+                data: [sim[loser.colorName].autoRPRate, 1 - sim[loser.colorName].autoRPRate],
                 backgroundColor: [
                     loser.color,
                     "transparent"
                 ]
             }]
         },
-        label: "Cargo RP %",
-        value: Math.round(sim[loser.colorName].cargoRPRate * 1000) / 10
+        label: "Auto RP %",
+        value: Math.round(sim[loser.colorName].autoRPRate * 1000) / 10
     };
-    const loserClimbRPData = {
+    const loserTeleopRPData = {
         chartData: {
             labels: ["Success", "Failed"],
             datasets: [{
-                data: [sim[loser.colorName].climbRPRate, 1 - sim[loser.colorName].climbRPRate],
+                data: [sim[loser.colorName].teleopRPRate, 1 - sim[loser.colorName].teleopRPRate],
                 backgroundColor: [
                     loser.color,
                     "transparent"
                 ]
             }]
         },
-        label: "Climb RP %",
-        value: Math.round(sim[loser.colorName].climbRPRate * 1000) / 10
+        label: "Teleop RP %",
+        value: Math.round(sim[loser.colorName].teleopRPRate * 1000) / 10
     };
 
     // Putting it all together for the universal component
     const graphOptions = {
-        winner1: winnerCargoRPData,
-        winner2: winnerClimbRPData,
-        loser1: loserCargoRPData,
-        loser2: loserClimbRPData
+        winner1: winnerAutoRPData,
+        winner2: winnerTeleopRPData,
+        loser1: loserAutoRPData,
+        loser2: loserTeleopRPData
     };
 
     return <SimulatorRPGraphs_Universal
