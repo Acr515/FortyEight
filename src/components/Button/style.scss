@@ -20,7 +20,33 @@
 ._Button:hover {
     background-color: #7069C7;
 }
-
 ._Button:active {
     background-color: #5C54C5;
+}
+
+
+._Button.bordered {
+    border: 3px solid #4941B1;
+    background-color: transparent;
+    transition: color .1s;
+
+    .button-label {
+        color: #4941B1;
+        transition: color .1s;
+    }
+}
+
+._Button.bordered:hover {
+    border: 3px solid #7069C7;
+    
+    .button-label {
+        color: #7069C7;
+    }
+}
+._Button.bordered:active {
+    border: 3px solid #5C54C5;
+    
+    .button-label {
+        color: #5C54C5;
+    }
 }

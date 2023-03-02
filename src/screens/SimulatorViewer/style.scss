@@ -6,6 +6,13 @@
     overflow-x: hidden;
     overflow-y: scroll;
 
+    .red-text {
+        color: #cc3333;
+    }
+    .blue-text {
+        color: #3333cc;
+    }
+
     .simulator-section {
         padding: 0 30px;
         box-sizing: border-box;
@@ -72,6 +79,7 @@
                     font-family: 'industry';
                     font-size: 20px;
                     font-weight: 400;
+                    text-decoration: none;
 
                     .team-name {
                         font-family: 'transandina';
@@ -102,64 +110,27 @@
             height: 300px;
             position: relative;
         }
-        .doughnuts-container {
-            .doughnut-set { text-align: center; width: 100%; }
-            .single-doughnut-container {
-                display: inline-block;
-                margin: 0 12px;
-            }
-            .small-doughnut {
-                width: 86px;
-                display: inline-block;
-                position: relative;
-                .percentage {
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    font-family: 'industry';
-                    font-size: 16px;
-                    font-weight: 500;
-                }
-            }
-            .single-doughnut-container {
-                margin-bottom: 20px;
-                width: 86px;
-                .label {
-                    margin: 8px 0 0;
-                    font-size: 13px;
-                    text-align: center;
-                }
-            }
-        }
-
-
+        
 
         .alliance-insights {
-            .row {
-                display: flex;
-                align-items: stretch;
-                padding: 12px 14px;
-                box-sizing: border-box;
-                .label {
-                    font-family: 'usual';
-                    flex-basis: 50%;
-                    text-align: center;
-                    font-size: 14px;
-                }
-                .number {
-                    font-family: 'industry';
-                    font-size: 18px;
-                    font-weight: 600;
-                    flex-basis: 25%;
-                    text-align: left;
-                }
-                .number:last-child {
-                    text-align: right;
-                }
-            }
-            .row:nth-child(even) {
+            ._SimulatorInsightRow:nth-child(even) {
                 background-color: #eee;
+            }
+        }
+        .advanced-insights .individual-insight {
+            margin-bottom: 12px;
+            font-size: 15px;
+            color: #333;
+            line-height: 1.5em;
+
+            .alliance-name {
+                font-weight: 500;
+                font-size: 16px;
+            }
+            .percentage {
+                font-family: 'industry';
+                font-size: 20px;
+                font-weight: 600;
             }
         }
 

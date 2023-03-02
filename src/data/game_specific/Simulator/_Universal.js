@@ -1,54 +1,54 @@
-import { getTeamData } from "../../SearchData";
-import TeamData from "../../TeamData";
-import performanceObject, { EndgameResult } from "../performanceObject/2022";
-import ScoreCalculator from "../ScoreCalculator/2022";
 import date from 'date-and-time';
+import TeamData from "data/TeamData";
+import { getTeamData } from "data/SearchData";
+import ScoreCalculator from "data/game_specific/ScoreCalculator/GAME_YEAR";
+import SimulationInformation from './GAME_YEAR';
 
 /**
  * Simulates an FRC match with any 3 v 3 teams.
  */
 export default class Simulator {
-    redTeams = [];          // Team objects for red alliance
-    blueTeams = [];         // Team objects for blue alliance
-    results;                // Array of resulting simulated matches
-    simulations;            // # of simulations to run
-    applyDefense;           // Whether to use defense or not
-    confidence;             // A number between 0 and 1 representing the simulator's confidence in the results based on number of matches submitted
-    DEFAULT_INFLUENCE = 1;  // The default influence value to give to biasedRandom
+    redTeams = [];              // Team objects for red alliance
+    blueTeams = [];             // Team objects for blue alliance
+    results;                    // Array of resulting simulated matches
+    confidence;                 // A number between 0 and 1 representing the simulator's confidence in the results based on number of matches submitted
+    config;                     // An object with a number of configuration options
 
     /**
      * Sets up the simulator. Defaults to using TeamData; use the other constructor if you have other data to use
      * @param {number[]} redTeamNumbers Array of red team #s
      * @param {number[]} blueTeamNumbers Array of blue team #s
-     * @param {Team[]} dataset Defaults to TeamData
+     * @param {object} config An object of options
      */
-    constructor(redTeamNumbers, blueTeamNumbers, simulations, applyDefense, dataset = TeamData) {
-        this.simulations = simulations;
-        this.applyDefense = applyDefense;
-        redTeamNumbers.forEach(num => this.redTeams.push(getTeamData(num, dataset)));
-        blueTeamNumbers.forEach(num => this.blueTeams.push(getTeamData(num, dataset)));
+    constructor(redTeamNumbers, blueTeamNumbers, config) {
+        // Define config defaults
+        this.config = config;
+        this.config.simulations ??= 1000;       // The number of matches to play
+        this.config.applyDefense ??= false;     // Whether or not the simulator should take defensive tendencies into account
+        this.config.dataset ??= TeamData;       // The dataset to isolate simulation reference data from
+        this.config.defaultInfluence ??= 1.5;   // The default influence value to give to biasedRandom
+        this.config.biasMethod ??= "median";    // The bias method to use on the random number generator
+        this.config.rngSeed ??= "seedageddon";  // The seed to feed into the random number generator
+
+        // Setup team data and results
+        redTeamNumbers.forEach(num => this.redTeams.push(getTeamData(num, this.config.dataset)));
+        blueTeamNumbers.forEach(num => this.blueTeams.push(getTeamData(num, this.config.dataset)));
         this.results = {
-            simulations,
-            applyDefense,
-            redTeamNumbers,
-            blueTeamNumbers,
+            simulations: this.config.simulations,
+            applyDefense: this.config.applyDefense,
             data: [],
-            redWinRate: 0,
-            blueWinRate: 0,
             tieRate: 0,
-            redRPFreq: [0, 0, 0, 0, 0],
-            blueRPFreq: [0, 0, 0, 0, 0],
-            red: {  // full implementations of these likely to come later
-                scoreRange: { min: 1000, max: -1000, avg: 0 },
-                marginRange: { min: 1000, max: -1000, avg: 0 },
-                cargoRPRate: 0,
-                climbRPRate: 0,
+            red: {
+                teamNumbers: redTeamNumbers,
+                ...structuredClone(BaseAllianceSimulationResults),
+                ...structuredClone(SimulationInformation.baseAllianceData),
+                insights: structuredClone(SimulationInformation.allianceInsights)
             },
-            blue: { // full implementations of these likely to come later
-                scoreRange: { min: 1000, max: -1000, avg: 0 },
-                marginRange: { min: 1000, max: -1000, avg: 0 },
-                cargoRPRate: 0,
-                climbRPRate: 0,
+            blue: {
+                teamNumbers: blueTeamNumbers,
+                ...structuredClone(BaseAllianceSimulationResults),
+                ...structuredClone(SimulationInformation.baseAllianceData),
+                insights: structuredClone(SimulationInformation.allianceInsights)
             },
             averageMatch: {},
             timestamp: date.format(new Date(), "M/D/YY, h:mm A")
@@ -60,12 +60,10 @@ export default class Simulator {
      * @param {function} callback Runs when the simulation is finished
      * @param {function} status Runs periodically to report status
      */
-    run(callback, status = count => {}) {
+    async run(callback, status = () => {}) {
         // Seed a random number generator
         var seededRandom = require('seedrandom');
-        var rng = seededRandom('seedageddon');
-
-        // All the functions used for the simulation are below
+        var rng = seededRandom(this.config.rngSeed);
 
         /**
          * Generates a random number biased towards a certain number within the range. Read the StackOverflow answer
@@ -81,177 +79,74 @@ export default class Simulator {
             var rnd = rng() * (max - min) + min,    // random in range
                 mix = rng() * influence;            // random mixer
             return rnd * (1 - mix) + bias * mix;    // mix full range and bias
-        }
+        };
 
         /**
-         * Finds the minimum, maximum, and average values for a scoring category of a team. Also finds the number of
-         * occurrances of the lowest value.
+         * Finds the minimum, maximum, average, and median for a scoring category of a team. Also finds the number of
+         * occurrances of the lowest value. The full implementation can be found inside the year's `SimulationInformation` object.
          * @param {Team} team The team object
          * @param {string} key The part of the game (i.e. auto, teleop)
          * @param {string} subkey The scoring category (i.e. cargoLow)
          * @returns A object with keys for min, max, avg, and lowFreq
          */
-        const getRange = (team, key, subkey) => {
-            let min = Number.MAX_VALUE, max = 0, avg = 0, lowFreq = 0;
-
-            team.data.forEach(match => {
-                let score = match.performance[key][subkey];
-                if (key == "endgame" && subkey == "state") ScoreCalculator.Endgame.getNumericalLevel(match);
-                min = Math.min(score, min);
-                max = Math.max(score, max);
-                avg += score;
-            });
-
-            team.data.forEach(match => {
-                if (match.performance[key][subkey] == min) lowFreq ++;
-            })
-
-            return { min, max, avg: (avg / team.data.length), lowFreq };
-        }
+        const getRange = (team, key, subkey) => SimulationInformation.getRange(team, key, subkey);
 
         /**
          * Gets all the match information for a team's contribution. Accounts for breakdowns, penalties, etc. Also calculates
          * the ODDS that a team will play defense and with what STRENGTH, but does NOT actually use these at all.
+         * The full implementation can be found inside the year's `SimulationInformation` object.
+         * @param {object} func A dictionary of universal functions for generating numbers
          * @param {Team} team The team to calculate for
          * @param {boolean} useRandom Should always be TRUE unless getting a one-off match result that is based only on averages
+         * @param {string} biasMethod Used to determine the range with which to bias the number generator. Should be either "avg" or "median"
          * and doesn't make use of rng
          * @returns A Performance-like object (see performanceObject for more info)
          */
-        const getTeamContribution = (team, useRandom = true) => {
-            let result = performanceObject();
-            result.teamNumber = team.number;
-
-            // Get auto score
-            let autoCargoLowRange = getRange(team, "auto", "cargoLow");
-            let autoCargoHighRange = getRange(team, "auto", "cargoHigh");
-            result.auto.cargoLow = Math.round(!useRandom ? autoCargoLowRange.avg : biasedRandom(autoCargoLowRange.min, autoCargoLowRange.max, autoCargoLowRange.avg, this.DEFAULT_INFLUENCE));
-            result.auto.cargoHigh = Math.round(!useRandom ? autoCargoHighRange.avg : biasedRandom(autoCargoHighRange.min, autoCargoHighRange.max, autoCargoHighRange.avg, this.DEFAULT_INFLUENCE));
-            if (result.auto.cargoLow + result.auto.cargoHigh > 2) result.auto.taxi = true; else {
-                // If team used more than 2 cargo, they had to have left the tarmac... if not then figure it out ourselves
-                let taxis = 0;
-                team.data.forEach(match => taxis += match.performance.auto.taxi ? 1 : 0);
-                result.auto.taxi = !useRandom ? (taxis / team.data.length > .5) : rng() < (taxis / team.data.length);
-            }
-
-            // Get teleop score
-            let teleopCargoLowRange = getRange(team, "teleop", "cargoLow");
-            let teleopCargoHighRange = getRange(team, "teleop", "cargoHigh");
-            result.teleop.cargoLow = Math.round(!useRandom ? teleopCargoLowRange.avg : biasedRandom(teleopCargoLowRange.min, teleopCargoLowRange.max, teleopCargoLowRange.avg, this.DEFAULT_INFLUENCE));
-            result.teleop.cargoHigh = Math.round(!useRandom ? teleopCargoHighRange.avg : biasedRandom(teleopCargoHighRange.min, teleopCargoHighRange.max, teleopCargoHighRange.avg, this.DEFAULT_INFLUENCE));
-            
-            // Get endgame
-            let ef = {};    // Endgame frequency, storing # of times each endgame occurred
-            ef[EndgameResult.NONE] = 0;
-            ef[EndgameResult.LOW_RUNG] = 0;
-            ef[EndgameResult.MID_RUNG] = 0;
-            ef[EndgameResult.HIGH_RUNG] = 0;
-            ef[EndgameResult.TRAVERSAL_RUNG] = 0;
-            team.data.forEach(match => ef[match.performance.endgame.state] ++);
-            result.endgame.tendency = JSON.parse(JSON.stringify(ef)); // new property- only invoked in cases where more than 2 teams tries to climb to same level as this team
-
-            if (useRandom) {
-                let endgamePicker = rng() * team.data.length;
-                if (endgamePicker < ef[EndgameResult.NONE])
-                    result.endgame.state = EndgameResult.NONE;
-                else {
-                    ef[EndgameResult.LOW_RUNG] += ef[EndgameResult.NONE];
-                    if (endgamePicker < ef[EndgameResult.LOW_RUNG]) 
-                        result.endgame.state = EndgameResult.LOW_RUNG;
-                    else {
-                        ef[EndgameResult.MID_RUNG] += ef[EndgameResult.LOW_RUNG];
-                        if (endgamePicker < ef[EndgameResult.MID_RUNG])
-                            result.endgame.state = EndgameResult.MID_RUNG;
-                        else {
-                            ef[EndgameResult.HIGH_RUNG] += ef[EndgameResult.MID_RUNG];
-                            if (endgamePicker < ef[EndgameResult.HIGH_RUNG])
-                                result.endgame.state = EndgameResult.HIGH_RUNG;
-                            else
-                                result.endgame.state = EndgameResult.TRAVERSAL_RUNG;
-                        }
-                    }
-                }
-            } else {
-                let mostCommonEndgame = EndgameResult.NONE;
-                let occurrances = 0;
-                Object.keys(ef).forEach(endgame => {
-                    if (ef[endgame] >= occurrances) {
-                        mostCommonEndgame = endgame;
-                        occurrances = ef[endgame];
-                    }
-                });
-                result.endgame.state = mostCommonEndgame;
-            }
-
-            // Get defense tendencies
-            if (this.applyDefense) {
-                let defensivePlays = 0;
-                let strongDefensePlays = 0;
-                team.data.forEach(match => {
-                    if (match.performance.defense.played) {
-                        defensivePlays ++;
-                        if (match.performance.defense.rating == "Strong") strongDefensePlays ++;
-                    }
-                });
-                result.defense.tendency = defensivePlays / team.data.length;    // new property- only invoked in cases where more than 1 team says yes to play defense
-                result.defense.played = rng() < result.defense.tendency;        // TODO add option for this to not be random
-                result.defense.rating = rng() < (strongDefensePlays / defensivePlays) ? "Strong" : "Weak";
-            }
-
-            return result;
-        }
-
+        const getTeamContribution = (team, useRandom = true, biasMethod = "avg") => SimulationInformation.getTeamContribution({ getRange, biasedRandom, rng, config: this.config }, team, useRandom, biasMethod);
 
 
         // This is where each simulation is run
         let redWins = 0, blueWins = 0, ties = 0;
-        for (let progress = 0; progress < this.simulations; progress ++) {
+        for (let progress = 0; progress < this.config.simulations; progress ++) {
             let redPerformances = [
-                getTeamContribution(this.redTeams[0]),
-                getTeamContribution(this.redTeams[1]),
-                getTeamContribution(this.redTeams[2]),
+                getTeamContribution(this.redTeams[0], true, this.config.biasMethod),
+                getTeamContribution(this.redTeams[1], true, this.config.biasMethod),
+                getTeamContribution(this.redTeams[2], true, this.config.biasMethod),
             ];
             let bluePerformances = [
-                getTeamContribution(this.blueTeams[0]),
-                getTeamContribution(this.blueTeams[1]),
-                getTeamContribution(this.blueTeams[2]),
+                getTeamContribution(this.blueTeams[0], true, this.config.biasMethod),
+                getTeamContribution(this.blueTeams[1], true, this.config.biasMethod),
+                getTeamContribution(this.blueTeams[2], true, this.config.biasMethod),
             ];
-            let matchDetails = new MatchDetails(redPerformances, bluePerformances, this.applyDefense);
+            let matchDetails = new MatchDetails(redPerformances, bluePerformances, this.config.applyDefense);
             if (matchDetails.winner == "Red") redWins ++;
             else if (matchDetails.winner == "Blue") blueWins ++;
             else ties ++;
 
-            // Compile stats to running averages
-            this.results.redRPFreq[matchDetails.red.matchRP + (matchDetails.red.cargoRP ? 1 : 0) + (matchDetails.red.climbRP ? 1 : 0)] ++;
-            this.results.blueRPFreq[matchDetails.blue.matchRP + (matchDetails.blue.cargoRP ? 1 : 0) + (matchDetails.blue.climbRP ? 1 : 0)] ++;
-            this.results.red.cargoRPRate += matchDetails.red.cargoRP ? 1 : 0;
-            this.results.red.climbRPRate += matchDetails.red.climbRP ? 1 : 0;
-            this.results.blue.cargoRPRate += matchDetails.blue.cargoRP ? 1 : 0;
-            this.results.blue.climbRPRate += matchDetails.blue.climbRP ? 1 : 0;
+            // Compile stats to running averages and calculate team-specific insight data related to this match
+            const calcRunningAverages = color => {
+                // Game-agnostic running averages/ranges
+                this.results[color].scoreRange.avg += matchDetails[color].score;
+                this.results[color].scoreRange.min = Math.min(matchDetails[color].score, this.results[color].scoreRange.min);
+                this.results[color].scoreRange.max = Math.max(matchDetails[color].score, this.results[color].scoreRange.max);
+                if (matchDetails.winner.toLowerCase() == color) {
+                    let margin = matchDetails[color].score - matchDetails[color == "red" ? "blue" : "red"].score;
+                    this.results[color].marginRange.avg += margin;
+                    this.results[color].marginRange.min = Math.min(margin, this.results[color].marginRange.min);
+                    this.results[color].marginRange.max = Math.max(margin, this.results[color].marginRange.max);
+                }
+                SimulationInformation.calcRunningAverages(color, this.results, matchDetails);
+            };
 
-
-            this.results.red.scoreRange.avg += matchDetails.red.score;
-            this.results.red.scoreRange.min = Math.min(matchDetails.red.score, this.results.red.scoreRange.min);
-            this.results.red.scoreRange.max = Math.max(matchDetails.red.score, this.results.red.scoreRange.max);
-            this.results.blue.scoreRange.avg += matchDetails.blue.score;
-            this.results.blue.scoreRange.min = Math.min(matchDetails.blue.score, this.results.blue.scoreRange.min);
-            this.results.blue.scoreRange.max = Math.max(matchDetails.blue.score, this.results.blue.scoreRange.max);
-
-            if (matchDetails.winner == "Red") {
-                let margin = matchDetails.red.score - matchDetails.blue.score;
-                this.results.red.marginRange.avg += margin;
-                this.results.red.marginRange.min = Math.min(margin, this.results.red.marginRange.min);
-                this.results.red.marginRange.max = Math.max(margin, this.results.red.marginRange.max);
-            } else if (matchDetails.winner == "Blue") {
-                let margin = matchDetails.blue.score - matchDetails.red.score;
-                this.results.blue.marginRange.avg += margin;
-                this.results.blue.marginRange.min = Math.min(margin, this.results.blue.marginRange.min);
-                this.results.blue.marginRange.max = Math.max(margin, this.results.blue.marginRange.max);
-            }
+            calcRunningAverages("red");
+            calcRunningAverages("blue");
+            
+            // Calculate inter-team insights related to this match
+            SimulationInformation.calcInterAllianceAverages(this.results, matchDetails);
 
             this.results.data.push(matchDetails);
             status(progress);
         }
-        
 
 
         // Post-simulation calculations
@@ -267,21 +162,16 @@ export default class Simulator {
             this.results.red.marginRange.min = 0;
             this.results.blue.marginRange.max = 0;
         }
-        this.results.redWinRate = redWins / this.simulations;
-        this.results.blueWinRate = blueWins / this.simulations;
-        this.results.tieRate = ties / this.simulations;
-        this.results.red.scoreRange.avg /= this.simulations;
-        this.results.blue.scoreRange.avg /= this.simulations;
-        this.results.red.cargoRPRate /= this.simulations;
-        this.results.red.climbRPRate /= this.simulations;
-        this.results.blue.cargoRPRate /= this.simulations;
-        this.results.blue.climbRPRate /= this.simulations;
-
-
+        this.results.red.winRate = redWins / this.config.simulations;
+        this.results.blue.winRate = blueWins / this.config.simulations;
+        this.results.tieRate = ties / this.config.simulations;
+        this.results.red.scoreRange.avg /= this.config.simulations;
+        this.results.blue.scoreRange.avg /= this.config.simulations;
         for (let i = 0; i <= 4; i ++) {
-            this.results.redRPFreq[i] = this.results.redRPFreq[i] / this.simulations * 100;
-            this.results.blueRPFreq[i] = this.results.blueRPFreq[i] / this.simulations * 100;
+            this.results.red.RPFreq[i] = this.results.red.RPFreq[i] / this.config.simulations * 100;
+            this.results.blue.RPFreq[i] = this.results.blue.RPFreq[i] / this.config.simulations * 100;
         }
+        SimulationInformation.postSimulation(this.results, this.config);
 
         // Get instance of an average score for this match-up
         this.results.averageMatch = new MatchDetails(
@@ -295,7 +185,7 @@ export default class Simulator {
                 getTeamContribution(this.blueTeams[1], false),
                 getTeamContribution(this.blueTeams[2], false),
             ], 
-            this.applyDefense
+            this.config.applyDefense
         );
 
         console.log("SIMULATOR: Done.");
@@ -341,14 +231,13 @@ class MatchDetails {
 
     // Breaks a tie and declares a winner. Mostly exists for novelty but maybe it'd be useful
     getTiebreakWinner() {
-        if (this.red.endgameScore != this.blue.endgameScore) return this.red.endgameScore > this.blue.endgameScore ? this.red : this.blue;
-        if (this.red.autoScore + this.red.teleopScore != this.blue.autoScore + this.blue.teleopScore) return this.red.autoScore + this.red.teleopScore > this.blue.autoScore + this.blue.teleopScore ? this.red : this.blue;
-        return { color: "Tie" };
+        return SimulationInformation.getTiebreakWinner(this.red, this.blue);
     }
 }
 
 /**
- * Stores information about each alliance's performance and settles disputes over who can climb to where and who will defend
+ * Stores information about each alliance's performance and settles disputes over who can climb to where and who will defend.
+ * Only encapsulates data for a single match; the object that holds data for an alliance across the entire simulation is defined in the `Simulator` constructor.
  */
 class AllianceDetails {
     color;
@@ -357,10 +246,8 @@ class AllianceDetails {
     autoScore = 0;
     teleopScore = 0;
     endgameScore = 0;
-    quintet = false;
-    cargoRP = false;
-    climbRP = false;
     matchRP = 0;
+    gameStats = structuredClone(SimulationInformation.singleMatchAllianceDetails);
 
     constructor(performances, color, useDefense) {
         this.teamPerformances = performances;
@@ -378,27 +265,27 @@ class AllianceDetails {
                 if (team.defense.played) defenseTeams.push(index);
             });
             if (defenseTeams.length > 1) {
-                lowestOffense = 1000, lowestOffenseIndex = -1;
+                let lowestOffense = 1000, lowestOffenseIndex = -1;
                 defenseTeams.forEach(index => {
                     let team = this.teamPerformances[index];
                     let scoring = ScoreCalculator.Teleop.getScore({ performance: team });
                     if (scoring < lowestOffense) {
                         lowestOffense = scoring;
-                        lowestOffensiveIndex = index;
+                        lowestOffenseIndex = index;
                     }
                 });
                 this.teamPerformances.forEach((team, index) => {
-                    if (lowestOffensiveIndex == index) return;
+                    if (lowestOffenseIndex == index) return;
                     team.defense.played = false;
                     team.defense.rating = "";
                 });
             }
 
             // Deduct score of a defending team
-            this.teamPerformances.forEach((team, index) => {
+            this.teamPerformances.forEach((team) => {
                 if (team.defense.played) {
-                    team.teleop.cargoLow = Math.floor(team.teleop.cargoLow / 2);
-                    team.teleop.cargoHigh = Math.floor(team.teleop.cargoHigh / 2);
+                    //team.teleop.cargoLow = Math.floor(team.teleop.cargoLow / 2);
+                    //team.teleop.cargoHigh = Math.floor(team.teleop.cargoHigh / 2);
                 }
             });
         }
@@ -414,19 +301,16 @@ class AllianceDetails {
     }
 
     getRPs() {
-        // Check if quintet was successful
-        let autonCargo = 0;
-        this.teamPerformances.forEach(team => autonCargo += ScoreCalculator.Auto.getPieces({ performance: team }));
-        this.quintet = autonCargo >= 5;
-
-        // Check for cargo RP
-        let teleopCargo = 0;
-        this.teamPerformances.forEach(team => teleopCargo += ScoreCalculator.Teleop.getPieces({ performance: team }));
-        this.cargoRP = teleopCargo + autonCargo >= (this.quintet ? 18 : 20);
-
-        // Check for climb RP
-        let climbScore = 0;
-        this.teamPerformances.forEach(team => climbScore += ScoreCalculator.Endgame.getScore({ performance: team }));
-        this.climbRP = climbScore >= 16;
+        SimulationInformation.getRPs(this.teamPerformances, this.gameStats);
     }
 }
+
+/**
+ * Contains constant alliance statistics that would be relevant in ANY game
+ */
+const BaseAllianceSimulationResults = {
+    winRate: 0,
+    scoreRange: { min: 1000, max: -1000, avg: 0 },
+    marginRange: { min: 1000, max: -1000, avg: 0 },
+    RPFreq: [0, 0, 0, 0, 0]
+};

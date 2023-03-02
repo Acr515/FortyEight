@@ -1,17 +1,21 @@
 import React from 'react';
-import Input from '../../Input';
-import { EndgameResult } from '../../../data/game_specific/performanceObject/2022';
+import Input from 'components/Input';
+import { EndgameResult } from 'data/game_specific/performanceObject/2022';
 
 /**
  * An array that stores all categories as strings that have data
  */
 export const GameDataCategories = [
     "auto", "teleop", "endgame"
-]
+];
 
 /**
- * A collection of JSX elements that contain the input elements for the game. Also contains a property, `defenseFields`,
- * that is only true if the game allows defense to be played, warranting the display of the defense input fields
+ * A dictionary of form inputs that scouts fill with data. The HTML ID of each element is named very carefully:
+ *  * The first phrase should be "Form_"
+ *  * ... followed by the section of the performance object to populate which will generally be "auto," "teleop," or "endgame," and another score
+ *  * ... followed lastly by the scoring section to fill (i.e. if data should go into the "upperGoal" area, that should be the final section of the ID)
+ * 
+ * Additionally contains a boolean property `defenseFields` that decides whether or not the generic defense fields should appear.
  */
 export const GameDataInputs = {
     AutonomousSection: ({edit}) => <>
@@ -78,4 +82,4 @@ export const GameDataInputs = {
         />
     </>,
     defenseFields: true
-}
+};

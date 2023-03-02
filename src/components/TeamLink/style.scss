@@ -1,0 +1,11 @@
+._TeamLink {
+    transition: opacity .15s;
+}
+
+._TeamLink:hover {
+    opacity: .65;
+}
+
+._TeamLink:active {
+    opacity: .45;
+}

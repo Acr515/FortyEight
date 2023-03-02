@@ -1,5 +1,5 @@
 import React from "react";
-import ScoreCalculator from "../../../data/game_specific/ScoreCalculator/2022";
+import ScoreCalculator from "data/game_specific/ScoreCalculator/2022";
 
 export default function ViewTeamCells({team}) {
     // Calculate average pieces per game

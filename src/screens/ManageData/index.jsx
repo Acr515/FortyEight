@@ -12,11 +12,47 @@ import './style.scss';
 import { getTeamData, teamExists } from "../../data/SearchData";
 import verifyVersionNumbers from "../../util/verifyVersionNumbers";
 import { saveData } from "../../data/saveLoadData";
+import Input from "../../components/Input";
+import hitTBA from "../../util/hitTBA";
 
 export default function ManageData() {
     const modalFunctions = useContext(FeedbackModalContext);
     const dialogFunctions = useContext(DialogBoxContext);
     const navigate = useNavigate();
+
+    const getTBASchedule = eventCode => {
+        hitTBA("event/" + eventCode + "/matches/simple", data => {
+            let matches = [];
+            data.forEach(match => {
+                if (match.comp_level == "qm") {
+                    matches.push({
+                        n: match.match_number,
+                        b: match.alliances.blue.team_keys.map(str => Number(str.substr(3))),
+                        r: match.alliances.red.team_keys.map(str => Number(str.substr(3))),
+                    });
+                }
+            });
+            let existingSchedules = [];
+            if (localStorage.getItem("schedules") !== null) existingSchedules = JSON.parse(localStorage.getItem("schedules"));
+            existingSchedules.push({ code: eventCode, matches });
+            localStorage.setItem("schedules", JSON.stringify(existingSchedules));
+            
+            modalFunctions.setModal("Schedule downloaded successfully!");
+        }, () => {
+            modalFunctions.setModal("Failed to reach The Blue Alliance. Check the console for details.", true);
+        })
+    }
+
+    const deleteAllSchedules = () => {
+        dialogFunctions.setDialog({
+            body: "Any schedules in memory will be removed. They can easily be redownloaded using the controls above. Would you like to continue?",
+            useConfirmation: true,
+            confirmFunction: () => {
+                localStorage.removeItem("schedules");
+                modalFunctions.setModal("Deleted all schedules.", false);
+            }
+        });
+    }
 
     return (
         <div className="SCREEN _ManageData">
@@ -71,6 +107,33 @@ export default function ManageData() {
                             marginBottom={1}
                             style={{ maxWidth: 128 }}
                             action={ () => deleteData(modalFunctions.setModal, dialogFunctions.setDialog) }
+                        />
+                    </div>
+                </div>
+
+                <h2>Download Schedule from TBA</h2>
+                <div className="control-area">
+                    <div className="cell explanation">
+                        <p>Using the controls on the right, you can download a qualification match schedule for a full event that will allow you to simulate any of its matches simply by typing in its match number.</p>
+                    </div>
+                    <div className="cell">
+                        <Input
+                            label="Event Code"
+                            id="tba-event-code"
+                        />
+                        <Button
+                            text="Download"
+                            marginTop={1}
+                            marginBottom={1}
+                            style={{ maxWidth: 128 }}
+                            action={ () => getTBASchedule(document.getElementById("tba-event-code").value) }
+                        />
+                        <Button
+                            text="Delete All"
+                            marginTop={12}
+                            useBorder={true}
+                            style={{ maxWidth: 128 }}
+                            action={ deleteAllSchedules }
                         />
                     </div>
                 </div>

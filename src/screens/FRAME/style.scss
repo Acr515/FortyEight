@@ -14,17 +14,21 @@
     flex-grow: 1;
 }
 #navigation-bar {
+    display: flex;
+    flex-direction: column;
     background: #4941B1;
     color: #FFF;
     width: 100%;
     max-width: 220px;
     height: 100%;
-    padding: 20px 0 80px;
+    padding: 20px 0 40px;
     box-sizing: border-box;
     position: relative;
 
     .title-section {
         display: flex;
+        flex-grow: 0;
+        flex-shrink: 0;
         height: 80px;
         align-items: center;
         padding: 0 40px 0;
@@ -54,34 +58,53 @@
         opacity: .4;
     }
 
-    .navigation-link {
-        padding: 30px 40px;
-        font-weight: 400;
-        font-size: 18px;
-        color: #FFF;
-        text-decoration: none;
-        display: block;
-        transition: background-color .15s;
-    }
+    .links {
+        flex-basis: 100%;
+        flex-grow: 1;
+        overflow-y: auto;
 
-    .navigation-link:hover:not(.active) {
-        background-color: #6155BA;
-    }
+        .navigation-link {
+            padding: 30px 40px;
+            font-weight: 400;
+            font-size: 18px;
+            color: #FFF;
+            text-decoration: none;
+            display: block;
+            transition: background-color .15s;
+            cursor: pointer;
+            user-select: none;
+        }
+        .navigation-link:hover:not(.active) {
+            background-color: #6155BA;
+        }
+        .navigation-link.active {
+            background-color: #7670CA;
+            font-weight: 700;
+        }
 
-    .navigation-link.active {
-        background-color: #7670CA;
-        font-weight: 700;
+        .link-group {
+            transition: height .25s;
+            overflow: hidden;
+        }
+        .sublink {
+            padding: 20px 40px;
+            height: 57px;
+            box-sizing: border-box;
+            font-size: 15px;
+            background: #3e389b;
+        }
     }
 
     .footer-content {
-        position: absolute;
-        bottom: 0;
-        min-height: 100px;
-        left: 0;
-        right: 0;
-        padding: 8px 40px 18px;
+        flex-grow: 0;
+        flex-shrink: 0;
+        padding: 18px 40px 0;
         box-sizing: border-box;
         font-size: 13px;
         font-weight: 300;
+
+        p {
+            margin: 0;
+        }
     }
 }

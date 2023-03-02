@@ -1,4 +1,4 @@
-import { EndgameResult } from "../performanceObject/2022";
+import { EndgameResult } from "data/game_specific/performanceObject/2022";
 
 /**
  * Takes a match performance object and outputs scoring data related to certain parts of the game (auto, teleop, endgame scores)
@@ -41,6 +41,16 @@ const ScoreCalculator = {
                 case EndgameResult.HIGH_RUNG: return 3;
                 case EndgameResult.TRAVERSAL_RUNG: return 4;
                 default: return 0;
+            }
+        },
+        getLevelFromNumber: num => {
+            switch (num) {
+                case 0: return EndgameResult.NONE;
+                case 1: return EndgameResult.LOW_RUNG;
+                case 2: return EndgameResult.MID_RUNG;
+                case 3: return EndgameResult.HIGH_RUNG;
+                case 4: return EndgameResult.TRAVERSAL_RUNG;
+                default: return EndgameResult.NONE;
             }
         },
         didClimb: data => { return data.performance.endgame.state != EndgameResult.NONE }

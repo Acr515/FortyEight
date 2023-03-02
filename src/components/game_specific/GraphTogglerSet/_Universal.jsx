@@ -1,7 +1,7 @@
 import React from "react";
-import { getTeamData } from "../../../data/SearchData";
-import { Method, sortTeamData } from "../../../util/sortData";
-import { calculateSingleRPI } from "../../../data/game_specific/calculateRPI/2022";
+import { getTeamData } from "data/SearchData";
+import { Method, sortTeamData } from "util/sortData";
+import { calculateSingleRPI } from "data/game_specific/calculateRPI/GAME_YEAR";
 import "./style.scss"
 
 /**

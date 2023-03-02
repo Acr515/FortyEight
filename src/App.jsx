@@ -11,6 +11,7 @@ import FRAME from './screens/FRAME';
 import './GlobalStyle.css';
 import { loadData } from './data/saveLoadData';
 import SimulatorViewer from './screens/SimulatorViewer';
+import SimulatorAccuracy from './screens/SimulatorAccuracy';
 
 
 export default function App() {
@@ -28,8 +29,10 @@ export default function App() {
                     <Route path="edit/:edit" element={<Form />} />
                 </Route>
                 <Route path="teams/:number" element={<ViewTeam />} />
+                <Route path="teams/:number/:referral/:backtext" element={<ViewTeam />} />
                 <Route path="analysis">
                     <Route path="simulator" element={<SimulatorConfig />}/>
+                    <Route path="sim-accuracy" element={<SimulatorAccuracy />}/>
                     <Route path="viewer" element={ <SimulatorViewer />}/>
                 </Route>
             </Route>

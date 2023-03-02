@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import FeedbackModalContext from '../../context/FeedbackModalContext';
-import DialogBoxContext from '../../context/DialogBoxContext';
-import FeedbackModal from '../../components/FeedbackModal';
+import { DEVELOP_MODE, VERSION_NAME } from '../../config';
+import FeedbackModal from 'components/FeedbackModal';
+import DialogBox from 'components/DialogBox';
+import FeedbackModalContext from 'context/FeedbackModalContext';
+import DialogBoxContext from 'context/DialogBoxContext';
+import gameData from 'util/gameData';
 import './style.scss';
-import DialogBox from '../../components/DialogBox';
-import { VERSION_NAME } from '../../config';
 
 var modalHideTimer = null;
 
@@ -57,28 +58,43 @@ export default function FRAME() {
                             <span className="number">48</span>
                             <span className="title">FortyEight</span>
                         </Link>
-                        <NavigationLink
-                            link="/teams"
-                            text="Teams"
-                            location={location}
-                        />
-                        <NavigationLink
-                            link="/form"
-                            text="Create"
-                            location={location}
-                        />
-                        <NavigationLink
-                            link="/manage"
-                            text="Manage"
-                            location={location}
-                        />
-                        <NavigationLink
-                            link="/analysis/simulator"
-                            text="Simulator"
-                            location={location}
-                        />
+                        <div className="links">
+                            <NavigationLink
+                                link="/teams"
+                                text="Teams"
+                                location={location}
+                            />
+                            <NavigationLink
+                                link="/form"
+                                text="Create"
+                                location={location}
+                            />
+                            <NavigationLink
+                                link="/manage"
+                                text="Manage"
+                                location={location}
+                            />
+                            <NavigationGroup
+                                text="Analysis"
+                                links={[
+                                    <NavigationLink
+                                        link="/analysis/simulator"
+                                        text="Simulator"
+                                        location={location}
+                                        sublink={true}
+                                    />
+                                ].concat(DEVELOP_MODE ? [<NavigationLink
+                                        link="/analysis/sim-accuracy"
+                                        text="Sim. Accuracy"
+                                        location={location}
+                                        sublink={true}
+                                    />] : [])
+                                }
+                            />
+                        </div>
                         <div className="footer-content">
-                            v{VERSION_NAME}
+                            <p>{`${gameData.name}`}</p>
+                            <p>v{VERSION_NAME}</p>
                         </div>
                     </div>
                     <div id="content-container">
@@ -96,10 +112,32 @@ export default function FRAME() {
     );
 }
 
-function NavigationLink({link, text, location}) {
+function NavigationLink({link, text, location, sublink = false}) {
     return (
-        <Link to={link} className={location.pathname.includes(link) ? "navigation-link active" : "navigation-link"}>
+        <Link to={link} className={"navigation-link" + (location.pathname.includes(link) ? " active" : "") + (sublink ? " sublink" : "")}>
             {text}
         </Link>
+    )
+}
+
+function NavigationGroup({links, text}) {
+
+    const [opened, setOpened] = useState(false);
+
+    return (
+        <>
+            <div 
+                className="navigation-link"
+                onClick={() => setOpened(!opened)}
+            >
+                {text}
+            </div>
+            <div 
+                className={"link-group" + (opened ? "" : " hidden")}
+                style={{ height: opened ? 57 * links.length : 0 }}
+            >
+                {links}
+            </div>
+        </>
     )
 }

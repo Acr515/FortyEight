@@ -1,9 +1,10 @@
 import React from "react";
+import ScoreCalculator from "data/game_specific/ScoreCalculator/202X";
 
 export default function ViewTeamCells({team}) {
     // Calculate average pieces per game
     let pieces = 0;
-    team.data.forEach(match => pieces += match.performance.pieces);
+    team.data.forEach(match => pieces += ScoreCalculator.Auto.getPieces(match) + ScoreCalculator.Teleop.getPieces(match));
     pieces /= team.data.length;
     pieces = Math.round(pieces * 10) / 10;
 

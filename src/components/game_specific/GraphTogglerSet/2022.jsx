@@ -1,9 +1,12 @@
 import React from "react";
-import ScoreCalculator from "../../../data/game_specific/ScoreCalculator/2022";
 import GraphTogglerSet_Universal, { GraphToggler, GraphInfo } from "./_Universal";
-import { Method, sortTeamData } from "../../../util/sortData";
-import { getTeamData } from "../../../data/SearchData";
+import ScoreCalculator from "data/game_specific/ScoreCalculator/2022";
+import { getTeamData } from "data/SearchData";
+import { Method, sortTeamData } from "util/sortData";
 
+/**
+ * A set of buttons used to toggle which performance graph is being shown on a team's details page.
+ */
 export default function GraphTogglerSet({activeIndex, stateFuncs, teamNumber}) {
     let data = sortTeamData(getTeamData(teamNumber).data, Method.MatchAscending);
 
