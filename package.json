@@ -7,7 +7,7 @@
   "scripts": {
     "start": "webpack serve --mode development --env game_year=2022",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack"
+    "build": "webpack --env game_year=2022"
   },
   "keywords": [],
   "author": "",
