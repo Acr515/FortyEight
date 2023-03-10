@@ -26,3 +26,9 @@ export default function performanceObject() {
         notes: {}
     }
 }
+
+/**
+ * A set of fields that are present on forms, but do not exist as keys of the `performanceObject`. This is good to use when the fields
+ * of the game form undergo special calculations before being finalized.
+ */
+export const SpecialFields = {}

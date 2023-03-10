@@ -36,3 +36,24 @@ export default function performanceObject() {
         notes: {}
     }
 }
+
+/**
+ * A set of fields that are present on forms, but do not exist as keys of the `performanceObject`. This is good to use when the fields
+ * of the game form undergo special calculations before being finalized.
+ */
+export const SpecialFields = {
+    auto: {
+        state: (performance, value) => {
+            if (value == EndgameResult.DOCKED) {
+                performance.auto.docked = true;
+                performance.auto.engaged = false;
+            } else if (value == EndgameResult.DOCKED_AND_ENGAGED) {
+                performance.auto.docked = true;
+                performance.auto.engaged = true;
+            } else {
+                performance.auto.docked = false;
+                performance.auto.engaged = false;
+            }
+        }
+    }
+}
