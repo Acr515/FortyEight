@@ -17,19 +17,22 @@ export default function ViewTeamCells({team}) {
     // Calculate highest level of scoring per game
     let level = 0, levelString = "-";
     team.data.forEach(match => {
-        if (ScoreCalculator.Auto.getHigh(match) > 0 && ScoreCalculator.Teleop.getHigh(match) > 0) {
-            level = 3;
-        } else if (ScoreCalculator.Auto.getMid(match) > 0 && ScoreCalculator.Teleop.getMid(match) > 0) {
-            level = 2;
-        } else if (ScoreCalculator.Auto.getLow(match) > 0 && ScoreCalculator.Teleop.getLow(match) > 0) {
-            level = 1;
+        let matchLevel = 0;
+        if (ScoreCalculator.Auto.getHigh(match) + ScoreCalculator.Teleop.getHigh(match) > 0) {
+            matchLevel = 3;
+        } else if (ScoreCalculator.Auto.getMid(match) + ScoreCalculator.Teleop.getMid(match) > 0) {
+            matchLevel = 2;
+        } else if (ScoreCalculator.Auto.getLow(match) + ScoreCalculator.Teleop.getLow(match) > 0) {
+            matchLevel = 1;
         }
-        switch (level) {
-            case 1: levelString = "Low"; break;
-            case 2: levelString = "Mid"; break;
-            case 3: levelString = "Top"; break;
-        }
-    })
+        level = Math.max(level, matchLevel);
+    });
+    switch (level) {
+        case 1: levelString = "Low"; break;
+        case 2: levelString = "Mid"; break;
+        case 3: levelString = "Top"; break;
+        default: levelString = "---";
+    }
 
     // Calculate average auton points per game
     let autoPoints = 0;
