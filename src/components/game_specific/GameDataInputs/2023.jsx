@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Input from 'components/Input';
 import { EndgameResult } from 'data/game_specific/performanceObject/2023';
 import './2023.scss';
@@ -20,9 +20,6 @@ export const GameDataCategories = [
  */
 export const GameDataInputs = {
     AutonomousSection: ({edit}) => {
-
-        const [dockedIsChecked, setDockedIsChecked] = useState(edit.isEdit && edit.data.performance.auto.engaged);
-
         return <>
             <Input
                 label="Mobility"
@@ -31,18 +28,20 @@ export const GameDataInputs = {
                 prefill={edit.isEdit ? edit.data.performance.auto.mobility : undefined}
             />
             <Input
-                label="Docked to Charge Station"
-                id="Form_auto_docked"
-                isCheckbox={true}
-                prefill={edit.isEdit ? edit.data.performance.auto.docked : undefined}
-                onInput={e => setDockedIsChecked(e.target.checked)}
+                label="Charge Station"
+                id="Form_auto_state"
+                optionList={[
+                    { value: EndgameResult.NONE, label: EndgameResult.NONE },
+                    { value: EndgameResult.DOCKED, label: EndgameResult.DOCKED },
+                    { value: EndgameResult.DOCKED_AND_ENGAGED, label: EndgameResult.DOCKED_AND_ENGAGED },
+                ]}
+                required={true}
+                prefill={edit.isEdit ? (
+                    edit.data.performance.auto.engaged ? EndgameResult.DOCKED_AND_ENGAGED : (
+                        edit.data.performance.auto.docked ? EndgameResult.DOCKED : EndgameResult.NONE
+                    )
+                ) : undefined}
             />
-            { dockedIsChecked && <Input
-                label="Charge Station Engaged"
-                id="Form_auto_engaged"
-                isCheckbox={true}
-                prefill={edit.isEdit ? edit.data.performance.auto.engaged : undefined}
-            /> }
             <h3>Top Node Scoring</h3>
             <Input
                 label="Cone - Top"
