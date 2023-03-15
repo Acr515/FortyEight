@@ -192,12 +192,21 @@ const SimulationInformation = {
     },
 
     /**
+     * Runs BEFORE the match is decided and BEFORE the `postSimulationCalculations`, but AFTER
+     * the performance objects for a match are generated.
+     * @param {*} color The alliance color
+     * @param {*} performances An array of performance objects, agnostic to color
+     * @param {*} gameStats The `gameStats` property of the `AllianceDetails` class
+     */
+    preCompilationCalculations: (color, performances, gameStats) => {},
+
+    /**
      * Runs during every match of the simulator to tabulate certain running averages and insights.
      * @param {string} color The alliance color
      * @param {object} results The results object in the simulator
      * @param {MatchDetails} matchDetails The `MatchDetails` object
      */
-    calcRunningAverages: (color, results, matchDetails) => {
+    postSimulationCalculations: (color, results, matchDetails) => {
         // Game-specific running averages/rates
         results[color].RPFreq[matchDetails[color].matchRP + (matchDetails[color].gameStats.cargoRP ? 1 : 0) + (matchDetails[color].gameStats.climbRP ? 1 : 0)] ++;
         results[color].cargoRPRate += matchDetails[color].gameStats.cargoRP ? 1 : 0;
