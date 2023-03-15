@@ -9,14 +9,17 @@ const SimulationInformation = {
         gridRPRate: 0,
         climbRPRate: 0,
         endgameCeiling: 0,
+        autoCeiling: 0,
+        gridContributions: -1
     },
 
     /**
      * Injected into the simulator alliance objects under the key `insights` and is used accordingly in the Insights section
      */
     allianceInsights: {
-        endgameAboveThreshold: { threshold: 24, count: 0, wins: 0, string: "endgame" },
-        endgameBelowThreshold: { threshold: 18, count: 0, wins: 0, string: "endgame" },
+        endgameAboveThreshold: { threshold: 20, count: 0, wins: 0, string: "endgame" },
+        chargeStationAboveThreshold: { threshold: 28, count: 0, wins: 0, string: "charge station" },
+        endgameBelowThreshold: { threshold: 10, count: 0, wins: 0, string: "endgame" },
         autoAboveThreshold: { threshold: 18, count: 0, wins: 0, string: "autonomous" },
         outscoredEndgame: { count: 0, wins: 0, string: "endgame" },
         outscoredTeleop: { count: 0, wins: 0, string: "teleop" },
@@ -26,10 +29,11 @@ const SimulationInformation = {
     /**
      * A function that gets game-specific variables for a single match, typically for ranking point related tracking.
      * Injected into the `AllianceDetails` class.
-     * @returns An object with properties `gridRP`, `climbRP`, and `links`
+     * @returns An object with properties `gridRP`, `climbRP`, `links`, and `chargeScore`
      */
     singleMatchAllianceDetails: {
         links: 0,
+        chargeScore: 0,
         gridRP: false,
         climbRP: false
     },
@@ -45,7 +49,7 @@ const SimulationInformation = {
 
         // Check for climb RP
         let climbScore = 0;
-        teamPerformances.forEach(team => climbScore += ScoreCalculator.Auto.getGridScore({ performance: team }) + ScoreCalculator.Endgame.getGridScore({ performance: team }));
+        teamPerformances.forEach(team => climbScore += ScoreCalculator.Auto.getChargeStationScore({ performance: team }) + ScoreCalculator.Endgame.getChargeStationScore({ performance: team }));
         gameStats.climbRP = climbScore >= 26;
     },
 
@@ -152,7 +156,7 @@ const SimulationInformation = {
             let autoDockRange = getRange(team, "auto", "docked");
             let autoEngageRange = getRange(team, "auto", "engaged");
             autoDocked = biasedRandom(autoDockRange.min, autoDockRange.max, autoDockRange[biasMethod], config.defaultInfluence) >= .5;
-            autoEngaged = biasedRandom(autoEngageRange.min, autoEngageRange.max, autoEngageRange[biasMethod], config.defaultInfluence) >= .5;
+            autoEngaged = autoDocked && biasedRandom(autoEngageRange.min, autoEngageRange.max, autoEngageRange[biasMethod], config.defaultInfluence) >= .5;
         } else {
             let dockRate = 0, engageRate = 0;
             team.data.forEach(match => {
@@ -387,7 +391,7 @@ const SimulationInformation = {
         while (autoDockingTeams > 1) {
             // Pick a random team to undock
             let teamIndex = Math.round(rng() * 2);
-            if (performances[teamIndex].auto.docked) {
+            if (performances[teamIndex].auto.docked || performances[teamIndex].auto.engaged) {
                 performances[teamIndex].auto.docked = false;
                 performances[teamIndex].auto.engaged = false;
                 autoDockingTeams --;
@@ -414,27 +418,29 @@ const SimulationInformation = {
             });
 
             // 2 are docked, 1 is engaged. 60% chance for elevation
-            if (dockedCount == 2 && engagedCount == 1 && rng() > .6) {
+            if (dockedCount == 2 && engagedCount == 1 && rng() < .6) {
                 elevateAllToEngaged();
             } else {
                 lowerAllToDocked();
             }
 
-            // 3 are docked, 1 is engaged. 8% chance for elevation
-            if (dockedCount == 3 && engagedCount == 1 && rng() > .08) {
+            // 3 are docked, 1 is engaged. 4% chance for elevation
+            if (dockedCount == 3 && engagedCount == 1 && rng() < .04) {
                 elevateAllToEngaged();
             } else {
                 lowerAllToDocked();
             }
 
-            // 3 are docked, 2 are engaged. 40% chance for elevation
-            if (dockedCount == 3 && engagedCount == 2 && rng() > .4) {
+            // 3 are docked, 2 are engaged. 15% chance for elevation
+            if (dockedCount == 3 && engagedCount == 2 && rng() < .15) {
                 elevateAllToEngaged();
             } else {
                 lowerAllToDocked();
             }
         }
 
+        // Count up charge station points
+        performances.forEach(team => gameStats.chargeScore += ScoreCalculator.Auto.getChargeStationScore({ performance: team }) + ScoreCalculator.Endgame.getChargeStationScore({ performance: team }));
     },
 
     /**
@@ -449,11 +455,28 @@ const SimulationInformation = {
         results[color].gridRPRate += matchDetails[color].gameStats.gridRP ? 1 : 0;
         results[color].climbRPRate += matchDetails[color].gameStats.climbRP ? 1 : 0;
         results[color].endgameCeiling = Math.max(results[color].endgameCeiling, matchDetails[color].endgameScore);
+        results[color].autoCeiling = Math.max(results[color].autoCeiling, matchDetails[color].autoScore);
+
+        // Find the best grid scorer, but ensure the object is populated first
+        if (results[color].gridContributions == -1) {
+            results[color].gridContributions = {};
+            results[color].gridContributions[matchDetails[color].teamPerformances[0].teamNumber] = ScoreCalculator.Teleop.getScore({ performance: matchDetails[color].teamPerformances[0] });
+            results[color].gridContributions[matchDetails[color].teamPerformances[1].teamNumber] = ScoreCalculator.Teleop.getScore({ performance: matchDetails[color].teamPerformances[1] });
+            results[color].gridContributions[matchDetails[color].teamPerformances[2].teamNumber] = ScoreCalculator.Teleop.getScore({ performance: matchDetails[color].teamPerformances[2] });
+        } else {
+            results[color].gridContributions[matchDetails[color].teamPerformances[0].teamNumber] += ScoreCalculator.Teleop.getScore({ performance: matchDetails[color].teamPerformances[0] });
+            results[color].gridContributions[matchDetails[color].teamPerformances[1].teamNumber] += ScoreCalculator.Teleop.getScore({ performance: matchDetails[color].teamPerformances[1] });
+            results[color].gridContributions[matchDetails[color].teamPerformances[2].teamNumber] += ScoreCalculator.Teleop.getScore({ performance: matchDetails[color].teamPerformances[2] });
+        }
 
         // Insights that are independent of what the opposing alliance did
         if (matchDetails[color].endgameScore > results[color].insights.endgameAboveThreshold.threshold) {
             results[color].insights.endgameAboveThreshold.count ++;
             if (matchDetails.winner.toLowerCase() == color) results[color].insights.endgameAboveThreshold.wins ++
+        }
+        if (matchDetails[color].gameStats.chargeScore > results[color].insights.chargeStationAboveThreshold.threshold) {
+            results[color].insights.chargeStationAboveThreshold.count ++;
+            if (matchDetails.winner.toLowerCase() == color) results[color].insights.chargeStationAboveThreshold.wins ++
         }
         if (matchDetails[color].endgameScore < results[color].insights.endgameBelowThreshold.threshold) {
             results[color].insights.endgameBelowThreshold.count ++;

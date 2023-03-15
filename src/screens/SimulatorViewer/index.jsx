@@ -106,12 +106,12 @@ export default function SimulatorViewer() {
                 // Get loss rate when scoring below a threshold
                 let rate = (insight.count - insight.wins) / insight.count;
                 if (insight.count > 0 && (alliance.colorName == winner.colorName || winner.winRate < 80)) {    // we don't really need to calculate this for a losing alliance when the matchup is lopsided
-                    alliance.insights.push(createInsightObject(rate, "scoring below " + insight.threshold + " during " + insight.string, true));
+                    alliance.insights.push(createInsightObject(rate, `scoring below ${insight.threshold} ${insight.string == "charge station" ? "at the" : "during"} ${insight.string}`, true));
                 }
             } else if (insightKey.includes("AboveThreshold")) {
                 // Get win rate when scoring above a threshold
                 let rate = insight.wins / insight.count;
-                if (insight.count > 0) alliance.insights.push(createInsightObject(rate, "scoring above " + insight.threshold + " during " + insight.string));
+                if (insight.count > 0) alliance.insights.push(createInsightObject(rate, `scoring above ${insight.threshold} ${insight.string == "charge station" ? "at the" : "during"} ${insight.string}`));
 
             } else if (insightKey.includes("outscored")) {
                 // Get win rate when outscoring opponent

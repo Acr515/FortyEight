@@ -9,13 +9,13 @@ const ScoreCalculator = {
             (data.performance.auto.coneLow + data.performance.auto.cubeLow) * 3 + 
             (data.performance.auto.coneMid + data.performance.auto.cubeMid) * 4 + 
             (data.performance.auto.coneHigh + data.performance.auto.cubeHigh) * 6 + 
-            data.performance.auto.mobility ? 3 : 0 +
-            data.performance.auto.docked ? 8 : 0 +
-            data.performance.auto.docked && data.performance.auto.engaged ? 4 : 0,
-        getGridScore: data => {
+            (data.performance.auto.mobility ? 3 : 0) +
+            (data.performance.auto.docked ? 8 : 0) +
+            (data.performance.auto.docked && data.performance.auto.engaged ? 4 : 0),
+        getChargeStationScore: data => {
             let score = 0;
             if (data.performance.auto.docked) score += 8;
-            if (data.performance.auto.engaged) score += 8;
+            if (data.performance.auto.engaged) score += 4;
             return score;
         },
         getPieces: data => 
@@ -69,7 +69,7 @@ const ScoreCalculator = {
                 default: return 0;
             }
         },
-        getGridScore: data => {
+        getChargeStationScore: data => {
             switch (data.performance.endgame.state) {
                 case EndgameResult.NONE: return 0;
                 case EndgameResult.DOCKED: return 6;

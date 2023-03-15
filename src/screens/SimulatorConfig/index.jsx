@@ -73,7 +73,7 @@ export default function SimulatorConfig() {
                 console.log(results);
                 dialogFunctions.hideDialog();
                 modalFunctions.setModal("Simulation complete!", false)
-                //navigate("/analysis/viewer", {state: {results}});
+                navigate("/analysis/viewer", {state: {results}});
             });
         }
     }
