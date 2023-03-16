@@ -45,6 +45,20 @@ export default function ViewTeamCells({team}) {
     team.data.forEach(match => { 
         climbFails += match.performance.endgame.failedAttempt ? 1 : 0
         climbs += ScoreCalculator.Endgame.didClimb(match) || match.performance.endgame.failedAttempt ? 1 : 0
+    });
+
+    // Calculate ability to pick up off floor
+    let floorPickup = "No";
+    team.data.forEach(match => {
+        if (match.performance.notes.floorPickup == "cones") {
+            if (floorPickup == "No") floorPickup = "Cones";
+            if (floorPickup == "Cubes") floorPickup = "Both";
+        }
+        if (match.performance.notes.floorPickup == "cubes") {
+            if (floorPickup == "No") floorPickup = "Cubes";
+            if (floorPickup == "Cones") floorPickup = "Both";
+        }
+        if (match.performance.notes.floorPickup == "both") floorPickup = "Both";
     })
 
     return (
@@ -64,6 +78,10 @@ export default function ViewTeamCells({team}) {
             <div className="info-cell">
                 <div className="info-value">{autoPoints}</div>
                 <div className="info-label">Avg. Auto</div>
+            </div>
+            <div className="info-cell">
+                <div className="info-value">{floorPickup}</div>
+                <div className="info-label">Floor Pickup</div>
             </div>
             <div className="info-cell">
                 <div className="info-value">{climbs}/{climbs + climbFails}</div>

@@ -146,6 +146,17 @@ export const GameDataInputs = {
     </>,
     NotesSection: ({edit}) => <>
         <Input
+            label="Floor pickup"
+            id="Form_notes_floorPickup"
+            optionList={[
+                { value: false, label: "No" },
+                { value: "cones", label: "Cones" },
+                { value: "cubes", label: "Cubes" },
+                { value: "both", label: "Both" },
+            ]}
+            prefill={edit.isEdit ? edit.data.performance.notes.floorPickup : undefined}
+        />
+        <Input
             label="This team dropped a majority of the game pieces they grabbed"
             id="Form_notes_misses"
             isCheckbox={true}
