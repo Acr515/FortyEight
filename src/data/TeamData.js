@@ -2,6 +2,7 @@ import date from 'date-and-time';
 import { VERSION_NAME, VERSION_NUMBER } from '../config';
 import generateHexString from 'util/generateHexString';
 import getTeamName from 'data/getTeamName';
+import gameData from 'util/gameData';
 
 /**
  * A mutable array that holds every team object
@@ -35,12 +36,13 @@ export const createFormObject = () => {
     return {
         vnum: VERSION_NUMBER,
         vstr: VERSION_NAME,
+        game: gameData.year,
         timestamp: date.format(now, "M/D/YY, h:mm A"),
         id: generateHexString(8),
         name: "",
         teamNumber: -1,
         eventCode: "",
         matchNumber: -1,
-        performance: { pieces: 0 }
+        performance: {}
     }
 }

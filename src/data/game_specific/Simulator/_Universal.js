@@ -87,9 +87,10 @@ export default class Simulator {
          * @param {Team} team The team object
          * @param {string} key The part of the game (i.e. auto, teleop)
          * @param {string} subkey The scoring category (i.e. cargoLow)
+         * @param {function} method A function to use as a source for data, such as via the ScoreCalculator, instead of key-subkey pairs. -1 when not provided
          * @returns A object with keys for min, max, avg, and lowFreq
          */
-        const getRange = (team, key, subkey) => SimulationInformation.getRange(team, key, subkey);
+        const getRange = (team, key, subkey, method = -1) => SimulationInformation.getRange(team, key, subkey, method);
 
         /**
          * Gets all the match information for a team's contribution. Accounts for breakdowns, penalties, etc. Also calculates
@@ -118,13 +119,13 @@ export default class Simulator {
                 getTeamContribution(this.blueTeams[1], true, this.config.biasMethod),
                 getTeamContribution(this.blueTeams[2], true, this.config.biasMethod),
             ];
-            let matchDetails = new MatchDetails(redPerformances, bluePerformances, this.config.applyDefense);
+            let matchDetails = new MatchDetails(redPerformances, bluePerformances, this.config.applyDefense, rng);
             if (matchDetails.winner == "Red") redWins ++;
             else if (matchDetails.winner == "Blue") blueWins ++;
             else ties ++;
 
-            // Compile stats to running averages and calculate team-specific insight data related to this match
-            const calcRunningAverages = color => {
+            // Compile stats to running averages, run team-wide calculations, and calculate team-specific insight data related to this match
+            const postSimulationCalculations = color => {
                 // Game-agnostic running averages/ranges
                 this.results[color].scoreRange.avg += matchDetails[color].score;
                 this.results[color].scoreRange.min = Math.min(matchDetails[color].score, this.results[color].scoreRange.min);
@@ -135,11 +136,11 @@ export default class Simulator {
                     this.results[color].marginRange.min = Math.min(margin, this.results[color].marginRange.min);
                     this.results[color].marginRange.max = Math.max(margin, this.results[color].marginRange.max);
                 }
-                SimulationInformation.calcRunningAverages(color, this.results, matchDetails);
+                SimulationInformation.postSimulationCalculations(color, this.results, matchDetails);
             };
 
-            calcRunningAverages("red");
-            calcRunningAverages("blue");
+            postSimulationCalculations("red");
+            postSimulationCalculations("blue");
             
             // Calculate inter-team insights related to this match
             SimulationInformation.calcInterAllianceAverages(this.results, matchDetails);
@@ -185,7 +186,8 @@ export default class Simulator {
                 getTeamContribution(this.blueTeams[1], false),
                 getTeamContribution(this.blueTeams[2], false),
             ], 
-            this.config.applyDefense
+            this.config.applyDefense,
+            rng
         );
 
         console.log("SIMULATOR: Done.");
@@ -201,9 +203,9 @@ class MatchDetails {
     blue = {};
     winner;
 
-    constructor(redPerformances, bluePerformances, useDefense) {
-        this.red = new AllianceDetails(redPerformances, "Red", useDefense);
-        this.blue = new AllianceDetails(bluePerformances, "Blue", useDefense);
+    constructor(redPerformances, bluePerformances, useDefense, rng) {
+        this.red = new AllianceDetails(redPerformances, "Red", useDefense, rng);
+        this.blue = new AllianceDetails(bluePerformances, "Blue", useDefense, rng);
 
         // Apply defense
         if (useDefense) {
@@ -249,14 +251,11 @@ class AllianceDetails {
     matchRP = 0;
     gameStats = structuredClone(SimulationInformation.singleMatchAllianceDetails);
 
-    constructor(performances, color, useDefense) {
+    constructor(performances, color, useDefense, rng) {
         this.teamPerformances = performances;
         this.color = color;
 
-        // Check if all three robots are climbing to the same level
-        this.teamPerformances.forEach(team => {
-            // TODO implement
-        });
+        SimulationInformation.preCompilationCalculations(this.color, this.teamPerformances, this.gameStats, rng);
 
         // Check if two or more robots are trying to play defense
         if (useDefense) {

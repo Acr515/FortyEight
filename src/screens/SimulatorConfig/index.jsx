@@ -1,15 +1,15 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Button from "../../components/Button";
-import Input from "../../components/Input";
-import PageHeader from "../../components/PageHeader";
-import DialogBoxContext from "../../context/DialogBoxContext";
-import FeedbackModalContext from "../../context/FeedbackModalContext";
-import Simulator from "../../data/game_specific/Simulator/_Universal";
-import getTeamName from "../../data/getTeamName";
-import { getTeamNumberArray } from "../../data/SearchData";
-import TeamData from "../../data/TeamData";
-import sleep from "../../util/sleep";
+import Button from "components/Button";
+import Input from "components/Input";
+import PageHeader from "components/PageHeader";
+import DialogBoxContext from "context/DialogBoxContext";
+import FeedbackModalContext from "context/FeedbackModalContext";
+import Simulator from "data/game_specific/Simulator/_Universal";
+import getTeamName from "data/getTeamName";
+import { getTeamNumberArray } from "data/SearchData";
+import TeamData from "data/TeamData";
+import sleep from "util/sleep";
 import './style.scss';
 
 export default function SimulatorConfig() {

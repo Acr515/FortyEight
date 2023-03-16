@@ -30,6 +30,7 @@
         "no-unused-vars": 1,
         "no-extra-semi": 1,
         "no-unreachable": 1,
+        "react/no-unescaped-entities": 1,
         "no-empty": 1
     }
 }

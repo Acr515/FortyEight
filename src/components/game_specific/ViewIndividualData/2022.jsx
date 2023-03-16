@@ -66,7 +66,7 @@ export default function ViewIndividualData({data}) {
                 <div className="row-contents">
                     { p.defense.played ? (<>
                         <div>Played <span className="bold">{p.defense.rating.toUpperCase()}</span> defense</div>
-                        <div className="italic commentary">"{p.defense.explain}"</div>
+                        <div className="italic commentary">&quot;{p.defense.explain}&quot;</div>
                     </>) : (
                         <span className="italic commentary">Did not play defense</span>
                     )}

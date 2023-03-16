@@ -87,15 +87,16 @@ export default function SimulatorMatchViewer_Universal({sim}) {
                     </div>
                     <div className="rp-scores-row">
                         <div className="rps">
-                            <div className="total-rp">{match.red.matchRP + (match.red.cargoRP ? 1 : 0) + (match.red.climbRP ? 1 : 0)} RP</div>
-                            <div className={"rp-cell" + (match.red.cargoRP ? " win" : "")}>CARGO</div>
-                            <div className={"rp-cell" + (match.red.climbRP ? " win" : "")}>HANGAR</div>
+                            <div className="total-rp">{match.red.matchRP + (match.red.gameStats.gridRP ? 1 : 0) + (match.red.gameStats.climbRP ? 1 : 0)} RP</div>
+                            <div className={"rp-cell" + (match.red.gameStats.gridRP ? " win" : "")}>GRID</div>
+                            <div className={"rp-cell" + (match.red.gameStats.climbRP ? " win" : "")}>CHARGED</div>
                             <div className={"rp-cell" + (match.red.matchRP > 0 ? " win" : "")}>{match.red.score == match.blue.score ? "TIE" : "WIN"}</div>
                         </div>
                         <div className="scores">
                             <div className="row"><div className="label">AUTO</div><div className="score">{match.red.autoScore}</div></div>
                             <div className="row"><div className="label">TELEOP</div><div className="score">{match.red.teleopScore}</div></div>
-                            <div className="row"><div className="label">HANGAR</div><div className="score">{match.red.endgameScore}</div></div>
+                            <div className="row"><div className="label">CHARGING</div><div className="score">{match.red.gameStats.chargeScore}</div></div>
+                            <div className="row"><div className="label">ENDGAME</div><div className="score">{match.red.endgameScore}</div></div>
                         </div>
                     </div>
                 </div>
@@ -120,12 +121,13 @@ export default function SimulatorMatchViewer_Universal({sim}) {
                         <div className="scores">
                             <div className="row"><div className="score">{match.blue.autoScore}</div><div className="label">AUTO</div></div>
                             <div className="row"><div className="score">{match.blue.teleopScore}</div><div className="label">TELEOP</div></div>
-                            <div className="row"><div className="score">{match.blue.endgameScore}</div><div className="label">HANGAR</div></div>
+                            <div className="row"><div className="score">{match.blue.gameStats.chargeScore}</div><div className="label">CHARGING</div></div>
+                            <div className="row"><div className="score">{match.blue.endgameScore}</div><div className="label">ENDGAME</div></div>
                         </div>
                         <div className="rps">
-                            <div className="total-rp">{match.blue.matchRP + (match.blue.cargoRP ? 1 : 0) + (match.blue.climbRP ? 1 : 0)} RP</div>
-                            <div className={"rp-cell" + (match.blue.cargoRP ? " win" : "")}>CARGO</div>
-                            <div className={"rp-cell" + (match.blue.climbRP ? " win" : "")}>HANGAR</div>
+                            <div className="total-rp">{match.blue.matchRP + (match.blue.gameStats.gridRP ? 1 : 0) + (match.blue.gameStats.climbRP ? 1 : 0)} RP</div>
+                            <div className={"rp-cell" + (match.blue.gameStats.gridRP ? " win" : "")}>GRID</div>
+                            <div className={"rp-cell" + (match.blue.gameStats.climbRP ? " win" : "")}>CHARGED</div>
                             <div className={"rp-cell" + (match.blue.matchRP > 0 ? " win" : "")}>{match.red.score == match.blue.score ? "TIE" : "WIN"}</div>
                         </div>
                     </div>

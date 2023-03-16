@@ -4,7 +4,10 @@ import './style.scss';
 
 /**
  * Displays data about individual matches, including the unrandomized average match. Manages the state and rendering
- * of itself independent from the screen object
+ * of itself independent from the screen object.
+ * 
+ * Right now, this universal object is in a bit of a weird state and is a holdover from the 2022 simulator.
+ * Since I have other features that need work at this time, I'm not gonna modify this yet.
  * @param {object} sim Entire simulation object 
  */
 export default function SimulatorMatchViewer_Universal({sim}) {

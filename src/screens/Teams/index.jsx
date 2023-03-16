@@ -1,19 +1,19 @@
 import React, { useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
-import ImageButton from '../../components/ImageButton';
-import PageHeader from '../../components/PageHeader';
-import calculateRPI from '../../data/game_specific/calculateRPI/GAME_YEAR';
-import TeamData from '../../data/TeamData';
-import XImage from '../../assets/images/x.png';
-import Plus from '../../assets/images/plus.png';
-import NoDataImage from '../../assets/images/no-data-graphic.png';
+import Input from 'components/Input';
+import ImageButton from 'components/ImageButton';
+import PageHeader from 'components/PageHeader';
+import calculateRPI from 'data/game_specific/calculateRPI/GAME_YEAR';
+import TeamData from 'data/TeamData';
+import { saveData } from 'data/saveLoadData';
+import DialogBoxContext from 'context/DialogBoxContext';
+import FeedbackModalContext from 'context/FeedbackModalContext';
+import addLeadingZero from 'util/addLeadingZero';
+import { Method, sortTeams } from 'util/sortData';
+import XImage from 'assets/images/x.png';
+import Plus from 'assets/images/plus.png';
+import NoDataImage from 'assets/images/no-data-graphic.png';
 import './style.scss';
-import { saveData } from '../../data/saveLoadData';
-import DialogBoxContext from '../../context/DialogBoxContext';
-import FeedbackModalContext from '../../context/FeedbackModalContext';
-import addLeadingZero from '../../util/addLeadingZero';
-import { Method, sortTeams } from '../../util/sortData';
-import Input from '../../components/Input';
 
 
 function useForceUpdate() {

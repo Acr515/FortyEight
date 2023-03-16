@@ -4,6 +4,10 @@
 ._Form {
     display: flex;
 
+    h2:not(:first-child) {
+        margin-top: 56px;
+    }
+
     .constant-area {
         width: 100%;
         max-width: 400px;

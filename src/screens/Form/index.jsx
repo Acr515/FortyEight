@@ -10,7 +10,7 @@ import getTeamName from 'data/getTeamName';
 import TeamData, { createFormObject, createTeamObject } from 'data/TeamData';
 import { findMatchDataByID, getTeamData, teamExists } from 'data/SearchData';
 import { saveData } from 'data/saveLoadData';
-import performanceObject from 'data/game_specific/performanceObject/GAME_YEAR';
+import performanceObject, { SpecialFields } from 'data/game_specific/performanceObject/GAME_YEAR';
 import FeedbackModalContext from 'context/FeedbackModalContext';
 import './style.scss';
 
@@ -23,7 +23,7 @@ export default function Form() {
         edit.data = findMatchDataByID(typeof params.edit !== 'undefined' ? params.edit : "");
         if (edit.data !== false) {
             edit.isEdit = true;
-            edit.data = edit.data.match
+            edit.data = edit.data.match;
         }
     } 
 
@@ -33,11 +33,11 @@ export default function Form() {
 
     const getFullTeamName = e => {
         if (e.target.value !== "") setFullTeamName(getTeamName(e.target.value)); else setFullTeamName("Team name will show here");
-    }
+    };
 
     const getValue = id => {
         return typeof document.getElementById(id) === "undefined" ? null : document.getElementById(id).value;
-    }
+    };
 
     const submitForm = () => {
         // Validate the form
@@ -66,12 +66,20 @@ export default function Form() {
         document.querySelectorAll(".SCREEN._Form .input").forEach(elm => {
             let name = elm.id.split("_");
             if (name[1] != "base") {
+
+                // Discover value to be emitted
+                let value = null;
                 if (elm.classList.contains("numerical")) 
-                    performance[name[1]][name[2]] = Number(elm.value);
+                    value = Number(elm.value);
                 else if (elm.type == "checkbox")
-                    performance[name[1]][name[2]] = elm.checked;
+                    value = elm.checked;
                 else
-                    performance[name[1]][name[2]] = elm.value;
+                    value = elm.value;
+
+                // Decide where to use value
+                if (SpecialFields[name[1]] !== undefined && SpecialFields[name[1]][name[2]] !== undefined) {
+                    SpecialFields[name[1]][name[2]](performance, value);
+                } else performance[name[1]][name[2]] = value;
             }
         });
         form.performance = performance;
@@ -90,7 +98,7 @@ export default function Form() {
             saveData();
             navigate("/teams");
         }
-    }
+    };
 
     return (
         <form className="SCREEN _Form">
