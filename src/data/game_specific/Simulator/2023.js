@@ -300,13 +300,21 @@ const SimulationInformation = {
     preCompilationCalculations: (color, performances, gameStats, rng) => {
         // Calculate if scoring locations are depleted AND number of possible links
         let links = 0, midCubes = 0, midCones = 0, highCubes = 0, highCones = 0, totalLowPieces = 0;
+        let autoLow = 0, autoMidCubes = 0, autoMidCones = 0, autoHighCubes = 0, autoHighCones = 0;
         performances.forEach(p => {
             // Sum each scoring location individually
             midCubes += p.auto.cubeMid + p.teleop.cubeMid;
             midCones += p.auto.coneMid + p.teleop.coneMid;
             highCubes += p.auto.cubeHigh + p.teleop.cubeHigh;
             highCones += p.auto.coneHigh + p.teleop.coneHigh;
+
+            autoMidCubes += p.auto.cubeMid;
+            autoMidCones += p.auto.coneMid;
+            autoHighCubes += p.auto.cubeHigh;
+            autoHighCones += p.auto.coneHigh;
+
             totalLowPieces += ScoreCalculator.Auto.getLow({performance: p}) + ScoreCalculator.Teleop.getLow({performance: p});
+            autoLow += ScoreCalculator.Auto.getLow({performance: p});
         });
 
         // Reallocation
@@ -314,6 +322,15 @@ const SimulationInformation = {
             // There are too many high cubes; remove some from other teams and reallocate
             let index = 0;
             while (highCubes > 3) {
+                if (index > 2) {
+                    // Start deducting from auto instead
+                    if (performances[index - 3].auto.cubeHigh > 0) {
+                        performances[index - 3].auto.cubeHigh --;
+                        performances[index - 3].auto.cubeMid ++;
+                        highCubes --;
+                        midCubes ++;
+                    }
+                }
                 if (performances[index].teleop.cubeHigh > 0) {
                     performances[index].teleop.cubeHigh --;
                     performances[index].teleop.cubeMid ++;
@@ -327,6 +344,15 @@ const SimulationInformation = {
             // There are too many high cones; remove some from other teams and reallocate
             let index = 0;
             while (highCones > 6) {
+                if (index > 2) {
+                    // Start deducting from auto instead
+                    if (performances[index - 3].auto.coneHigh > 0) {
+                        performances[index - 3].auto.coneHigh --;
+                        performances[index - 3].auto.coneMid ++;
+                        highCones --;
+                        midCones ++;
+                    }
+                }
                 if (performances[index].teleop.coneHigh > 0) {
                     performances[index].teleop.coneHigh --;
                     performances[index].teleop.coneMid ++;
@@ -340,6 +366,13 @@ const SimulationInformation = {
             // There are too many mid cubes; remove some from other teams and reallocate
             let index = 0;
             while (midCubes > 3) {
+                if (index > 2) {
+                    // Start deducting from auto instead
+                    if (performances[index - 3].auto.cubeMid > 0) {
+                        performances[index - 3].auto.cubeMid --;
+                        midCubes --;
+                    }
+                }
                 if (performances[index].teleop.cubeMid > 0) {
                     performances[index].teleop.cubeMid --;
                     performances[index].teleop.cubeLow ++;
@@ -353,6 +386,13 @@ const SimulationInformation = {
             // There are too many mid cones; remove some from other teams and reallocate
             let index = 0;
             while (midCones > 6) {
+                if (index > 2) {
+                    // Start deducting from auto instead
+                    if (performances[index - 3].auto.coneMid > 0) {
+                        performances[index - 3].auto.coneMid --;
+                        midCones --;
+                    }
+                }
                 if (performances[index].teleop.coneMid > 0) {
                     performances[index].teleop.coneMid --;
                     performances[index].teleop.coneLow ++;
@@ -366,6 +406,17 @@ const SimulationInformation = {
             // There are too many low pieces; remove some from other teams
             let index = 0;
             while (totalLowPieces > 9) {
+                if (index > 2) {
+                    // Start deducting from auto instead
+                    if (performances[index - 3].auto.cubeLow > 0) {
+                        performances[index - 3].auto.cubeLow --;
+                        totalLowPieces --;
+                    }
+                    if (performances[index - 3].auto.coneLow > 0) {
+                        performances[index - 3].auto.coneLow --;
+                        totalLowPieces --;
+                    }
+                }
                 if (performances[index].teleop.coneLow > 0) {
                     performances[index].teleop.coneLow --;
                     totalLowPieces --;
