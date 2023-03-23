@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Input from 'components/Input';
 import ImageButton from 'components/ImageButton';
 import PageHeader from 'components/PageHeader';
@@ -62,6 +62,8 @@ export default function Teams() {
 }
 
 function Team({team, updateHook}) {
+    const navigate = useNavigate();
+
     const [openTab, setOpenTab] = useState(false);
 
     const toggleTab = () => {
@@ -118,6 +120,7 @@ function Team({team, updateHook}) {
                             top: -4,
                             marginLeft: 24
                         }}
+                        onClick={() => { navigate("/form", { state: { teamNumberPrefill: team.number } }) }}
                     />
                 </div>
             </div>
