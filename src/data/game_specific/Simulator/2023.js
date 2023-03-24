@@ -329,7 +329,7 @@ const SimulationInformation = {
                     highCubes --;
                     midCubes ++;
                 }
-                index ++;
+                if (index < 5) index ++; else index = 0;
             }
         }
         if (highCones > 6) {
@@ -350,7 +350,7 @@ const SimulationInformation = {
                     highCones --;
                     midCones ++;
                 }
-                index ++;
+                if (index < 5) index ++; else index = 0;
             }
         }
         if (midCubes > 3) {
@@ -369,7 +369,7 @@ const SimulationInformation = {
                     midCubes --;
                     totalLowPieces ++;
                 }
-                index ++;
+                if (index < 5) index ++; else index = 0;
             }
         }
         if (midCones > 6) {
@@ -388,7 +388,7 @@ const SimulationInformation = {
                     midCones --;
                     totalLowPieces ++;
                 }
-                index ++;
+                if (index < 5) index ++; else index = 0;
             }
         }
         if (totalLowPieces > 9) {
@@ -412,7 +412,7 @@ const SimulationInformation = {
                     performances[index].teleop.cubeLow --;
                     totalLowPieces --;
                 }
-                index ++;
+                if (index < 5) index ++; else index = 0;
             }
         }
 
