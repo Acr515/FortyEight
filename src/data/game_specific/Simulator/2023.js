@@ -300,7 +300,6 @@ const SimulationInformation = {
     preCompilationCalculations: (color, performances, gameStats, rng) => {
         // Calculate if scoring locations are depleted AND number of possible links
         let links = 0, midCubes = 0, midCones = 0, highCubes = 0, highCones = 0, totalLowPieces = 0;
-        let autoLow = 0, autoMidCubes = 0, autoMidCones = 0, autoHighCubes = 0, autoHighCones = 0;
         performances.forEach(p => {
             // Sum each scoring location individually
             midCubes += p.auto.cubeMid + p.teleop.cubeMid;
@@ -308,13 +307,7 @@ const SimulationInformation = {
             highCubes += p.auto.cubeHigh + p.teleop.cubeHigh;
             highCones += p.auto.coneHigh + p.teleop.coneHigh;
 
-            autoMidCubes += p.auto.cubeMid;
-            autoMidCones += p.auto.coneMid;
-            autoHighCubes += p.auto.cubeHigh;
-            autoHighCones += p.auto.coneHigh;
-
             totalLowPieces += ScoreCalculator.Auto.getLow({performance: p}) + ScoreCalculator.Teleop.getLow({performance: p});
-            autoLow += ScoreCalculator.Auto.getLow({performance: p});
         });
 
         // Reallocation
@@ -330,8 +323,7 @@ const SimulationInformation = {
                         highCubes --;
                         midCubes ++;
                     }
-                }
-                if (performances[index].teleop.cubeHigh > 0) {
+                } else if (performances[index].teleop.cubeHigh > 0) {
                     performances[index].teleop.cubeHigh --;
                     performances[index].teleop.cubeMid ++;
                     highCubes --;
@@ -352,8 +344,7 @@ const SimulationInformation = {
                         highCones --;
                         midCones ++;
                     }
-                }
-                if (performances[index].teleop.coneHigh > 0) {
+                } else if (performances[index].teleop.coneHigh > 0) {
                     performances[index].teleop.coneHigh --;
                     performances[index].teleop.coneMid ++;
                     highCones --;
@@ -372,8 +363,7 @@ const SimulationInformation = {
                         performances[index - 3].auto.cubeMid --;
                         midCubes --;
                     }
-                }
-                if (performances[index].teleop.cubeMid > 0) {
+                } else if (performances[index].teleop.cubeMid > 0) {
                     performances[index].teleop.cubeMid --;
                     performances[index].teleop.cubeLow ++;
                     midCubes --;
@@ -392,8 +382,7 @@ const SimulationInformation = {
                         performances[index - 3].auto.coneMid --;
                         midCones --;
                     }
-                }
-                if (performances[index].teleop.coneMid > 0) {
+                } else if (performances[index].teleop.coneMid > 0) {
                     performances[index].teleop.coneMid --;
                     performances[index].teleop.coneLow ++;
                     midCones --;
@@ -416,8 +405,7 @@ const SimulationInformation = {
                         performances[index - 3].auto.coneLow --;
                         totalLowPieces --;
                     }
-                }
-                if (performances[index].teleop.coneLow > 0) {
+                } else if (performances[index].teleop.coneLow > 0) {
                     performances[index].teleop.coneLow --;
                     totalLowPieces --;
                 } else if (performances[index].teleop.cubeLow > 0) {
