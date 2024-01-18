@@ -306,6 +306,7 @@ const SimulationInformation = {
             midCones += p.auto.coneMid + p.teleop.coneMid;
             highCubes += p.auto.cubeHigh + p.teleop.cubeHigh;
             highCones += p.auto.coneHigh + p.teleop.coneHigh;
+
             totalLowPieces += ScoreCalculator.Auto.getLow({performance: p}) + ScoreCalculator.Teleop.getLow({performance: p});
         });
 
@@ -314,66 +315,104 @@ const SimulationInformation = {
             // There are too many high cubes; remove some from other teams and reallocate
             let index = 0;
             while (highCubes > 3) {
-                if (performances[index].teleop.cubeHigh > 0) {
+                if (index > 2) {
+                    // Start deducting from auto instead
+                    if (performances[index - 3].auto.cubeHigh > 0) {
+                        performances[index - 3].auto.cubeHigh --;
+                        performances[index - 3].auto.cubeMid ++;
+                        highCubes --;
+                        midCubes ++;
+                    }
+                } else if (performances[index].teleop.cubeHigh > 0) {
                     performances[index].teleop.cubeHigh --;
                     performances[index].teleop.cubeMid ++;
                     highCubes --;
                     midCubes ++;
                 }
-                index ++;
+                if (index < 5) index ++; else index = 0;
             }
         }
         if (highCones > 6) {
             // There are too many high cones; remove some from other teams and reallocate
             let index = 0;
             while (highCones > 6) {
-                if (performances[index].teleop.coneHigh > 0) {
+                if (index > 2) {
+                    // Start deducting from auto instead
+                    if (performances[index - 3].auto.coneHigh > 0) {
+                        performances[index - 3].auto.coneHigh --;
+                        performances[index - 3].auto.coneMid ++;
+                        highCones --;
+                        midCones ++;
+                    }
+                } else if (performances[index].teleop.coneHigh > 0) {
                     performances[index].teleop.coneHigh --;
                     performances[index].teleop.coneMid ++;
                     highCones --;
                     midCones ++;
                 }
-                index ++;
+                if (index < 5) index ++; else index = 0;
             }
         }
         if (midCubes > 3) {
             // There are too many mid cubes; remove some from other teams and reallocate
             let index = 0;
             while (midCubes > 3) {
-                if (performances[index].teleop.cubeMid > 0) {
+                if (index > 2) {
+                    // Start deducting from auto instead
+                    if (performances[index - 3].auto.cubeMid > 0) {
+                        performances[index - 3].auto.cubeMid --;
+                        midCubes --;
+                    }
+                } else if (performances[index].teleop.cubeMid > 0) {
                     performances[index].teleop.cubeMid --;
                     performances[index].teleop.cubeLow ++;
                     midCubes --;
                     totalLowPieces ++;
                 }
-                index ++;
+                if (index < 5) index ++; else index = 0;
             }
         }
         if (midCones > 6) {
             // There are too many mid cones; remove some from other teams and reallocate
             let index = 0;
             while (midCones > 6) {
-                if (performances[index].teleop.coneMid > 0) {
+                if (index > 2) {
+                    // Start deducting from auto instead
+                    if (performances[index - 3].auto.coneMid > 0) {
+                        performances[index - 3].auto.coneMid --;
+                        midCones --;
+                    }
+                } else if (performances[index].teleop.coneMid > 0) {
                     performances[index].teleop.coneMid --;
                     performances[index].teleop.coneLow ++;
                     midCones --;
                     totalLowPieces ++;
                 }
-                index ++;
+                if (index < 5) index ++; else index = 0;
             }
         }
         if (totalLowPieces > 9) {
             // There are too many low pieces; remove some from other teams
             let index = 0;
             while (totalLowPieces > 9) {
-                if (performances[index].teleop.coneLow > 0) {
+                if (index > 2) {
+                    // Start deducting from auto instead
+                    if (performances[index - 3].auto.cubeLow > 0) {
+                        performances[index - 3].auto.cubeLow --;
+                        totalLowPieces --;
+                    }
+                    if (performances[index - 3].auto.coneLow > 0) {
+                        performances[index - 3].auto.coneLow --;
+                        totalLowPieces --;
+                    }
+                } else if (performances[index].teleop.coneLow > 0) {
                     performances[index].teleop.coneLow --;
                     totalLowPieces --;
                 } else if (performances[index].teleop.cubeLow > 0) {
                     performances[index].teleop.cubeLow --;
                     totalLowPieces --;
                 }
-                index ++;
+                if (index < 5) index ++; else index = 0;
             }
         }
 

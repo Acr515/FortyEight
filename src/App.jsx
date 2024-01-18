@@ -12,6 +12,7 @@ import './GlobalStyle.css';
 import { loadData } from './data/saveLoadData';
 import SimulatorViewer from './screens/SimulatorViewer';
 import SimulatorAccuracy from './screens/SimulatorAccuracy';
+import ImportConflicts from 'screens/ImportConflicts';
 
 
 export default function App() {
@@ -24,6 +25,7 @@ export default function App() {
                 <Route path="form" element={<Form />} />
                 <Route path="test" element={<Test />} />
                 <Route path="manage" element={<ManageData />}/>
+                <Route path="conflicts" element={<ImportConflicts />}/>
                 <Route path="teams">
                     <Route path="" element={<Teams />} />
                     <Route path="edit/:edit" element={<Form />} />

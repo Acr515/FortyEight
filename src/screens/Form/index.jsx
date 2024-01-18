@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import date from 'date-and-time';
 import GameDataSection from 'components/GameDataSection';
 import Button from 'components/Button';
@@ -27,9 +27,12 @@ export default function Form() {
         }
     } 
 
-    const [fullTeamName, setFullTeamName] = useState("Team name will show here");
+    const location = useLocation();
     const navigate = useNavigate();
+    const teamNumberPrefill = location.state == null ? null : location.state.teamNumberPrefill == null ? null : location.state.teamNumberPrefill
+    const [fullTeamName, setFullTeamName] = useState(teamNumberPrefill != null ? getTeamName(teamNumberPrefill) : "Team name will show here");
     const modalFunctions = useContext(FeedbackModalContext);
+
 
     const getFullTeamName = e => {
         if (e.target.value !== "") setFullTeamName(getTeamName(e.target.value)); else setFullTeamName("Team name will show here");
@@ -122,7 +125,7 @@ export default function Form() {
                         marginBottom={4}
                         onInput={getFullTeamName}
                         required={true}
-                        prefill={edit.isEdit ? edit.data.teamNumber : undefined}
+                        prefill={edit.isEdit ? edit.data.teamNumber : (teamNumberPrefill != null ? teamNumberPrefill : undefined)}
                         disabled={edit.isEdit}
                     />
                     <span className="team-name">{fullTeamName}</span>

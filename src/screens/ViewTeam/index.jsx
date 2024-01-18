@@ -9,29 +9,29 @@ import {
     LineElement,
     Tooltip,
 } from 'chart.js';
-import { findMatchDataByID, getTeamData, getTeamIndex } from "../../data/SearchData";
-import calculateRPI, { calculateSingleRPI, getRPIRating } from "../../data/game_specific/calculateRPI/GAME_YEAR";
-import ViewTeamCells from "../../components/game_specific/ViewTeamCells/GAME_YEAR";
-import ViewIndividualData from "../../components/game_specific/ViewIndividualData/GAME_YEAR";
-import FeedbackModalContext from '../../context/FeedbackModalContext';
-import DialogBoxContext from '../../context/DialogBoxContext';
-import EventCodeHolder from "../../components/EventCodeHolder";
-import ImageButton from "../../components/ImageButton";
-import EditImage from '../../assets/images/edit.png';
-import XImage from '../../assets/images/x.png';
-import FlagMisses from '../../assets/images/flag-misses.png';
-import FlagPenalties from '../../assets/images/flag-penalties.png';
-import FlagBreakdown from '../../assets/images/flag-breakdown.png';
-import addLeadingZero from '../../util/addLeadingZero';
-import '../../assets/fonts/transandina/index.css';
-import './style.scss';
-import GraphTogglerSet from "../../components/game_specific/GraphTogglerSet/GAME_YEAR";
-import { createDefaultData } from "../../components/game_specific/GraphTogglerSet/_Universal";
-import { Method, sortTeamData } from "../../util/sortData";
 import { Link, useNavigate } from "react-router-dom";
-import { BackButton } from "../../components/PageHeader";
-import TeamData from "../../data/TeamData";
-import { saveData } from "../../data/saveLoadData";
+import ViewTeamCells from "components/game_specific/ViewTeamCells/GAME_YEAR";
+import ViewIndividualData from "components/game_specific/ViewIndividualData/GAME_YEAR";
+import EventCodeHolder from "components/EventCodeHolder";
+import ImageButton from "components/ImageButton";
+import GraphTogglerSet from "components/game_specific/GraphTogglerSet/GAME_YEAR";
+import { createDefaultData } from "components/game_specific/GraphTogglerSet/_Universal";
+import { BackButton } from "components/PageHeader";
+import TeamData from "data/TeamData";
+import { saveData } from "data/saveLoadData";
+import { findMatchDataByID, getTeamData, getTeamIndex } from "data/SearchData";
+import calculateRPI, { calculateSingleRPI, getRPIRating } from "data/game_specific/calculateRPI/GAME_YEAR";
+import EditImage from 'assets/images/edit.png';
+import XImage from 'assets/images/x.png';
+import FlagMisses from 'assets/images/flag-misses.png';
+import FlagPenalties from 'assets/images/flag-penalties.png';
+import FlagBreakdown from 'assets/images/flag-breakdown.png';
+import FeedbackModalContext from 'context/FeedbackModalContext';
+import DialogBoxContext from 'context/DialogBoxContext';
+import addLeadingZero from 'util/addLeadingZero';
+import { Method, sortTeamData } from "util/sortData";
+import 'assets/fonts/transandina/index.css';
+import './style.scss';
 
 ChartJS.register(
     CategoryScale,
@@ -136,7 +136,7 @@ export default function ViewTeam() {
             <h2>Individual Matches</h2>
             <div className="match-holder">
                 {
-                    data.map(match =>  { return ( <MatchData 
+                    data.map(match =>  { return ( <SingleMatchDisplay 
                         match={match} 
                         forceRenderTeamScreen={{ rerender, rerenderPage }} 
                         key={match.id}
@@ -148,7 +148,7 @@ export default function ViewTeam() {
 }
 
 
-function MatchData({match, forceRenderTeamScreen}) {
+export function SingleMatchDisplay({match, forceRenderTeamScreen, showActions = true}) {
 
     const [expanded, setExpanded] = useState(false);
     const toggleExpansion = () => { setExpanded(!expanded); };
@@ -192,7 +192,7 @@ function MatchData({match, forceRenderTeamScreen}) {
                     </div>
                     <div className="match-info-row second">
                         <span className="match-cell-content">
-                            <ImageButton
+                            { showActions && <><ImageButton
                                 imageData={XImage}
                                 color="black"
                                 style={{
@@ -223,7 +223,7 @@ function MatchData({match, forceRenderTeamScreen}) {
                                         height: 18
                                     }}
                                 />
-                            </Link>
+                            </Link></> }
                         </span>
                     </div>
                     <div className="match-info-row third">

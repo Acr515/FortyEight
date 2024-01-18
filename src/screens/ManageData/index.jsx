@@ -1,19 +1,19 @@
 import React, { useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import Button from "../../components/Button";
-import PageHeader from "../../components/PageHeader";
-import { VERSION_NAME, VERSION_NUMBER } from "../../config";
-import DialogBoxContext from "../../context/DialogBoxContext";
-import FeedbackModalContext from "../../context/FeedbackModalContext";
-import TeamData, { createTeamObject } from "../../data/TeamData";
-import generateHexString from "../../util/generateHexString";
 import date from 'date-and-time';
+import Button from "components/Button";
+import PageHeader from "components/PageHeader";
+import Input from "components/Input";
+import DialogBoxContext from "context/DialogBoxContext";
+import FeedbackModalContext from "context/FeedbackModalContext";
+import TeamData, { createTeamObject } from "data/TeamData";
+import { getTeamData, teamExists } from "data/SearchData";
+import { saveData } from "data/saveLoadData";
+import generateHexString from "util/generateHexString";
+import verifyVersionNumbers from "util/verifyVersionNumbers";
+import hitTBA from "util/hitTBA";
+import { VERSION_NAME, VERSION_NUMBER } from "../../config";
 import './style.scss';
-import { getTeamData, teamExists } from "../../data/SearchData";
-import verifyVersionNumbers from "../../util/verifyVersionNumbers";
-import { saveData } from "../../data/saveLoadData";
-import Input from "../../components/Input";
-import hitTBA from "../../util/hitTBA";
 
 export default function ManageData() {
     const modalFunctions = useContext(FeedbackModalContext);
@@ -222,7 +222,7 @@ function importData(modalSetter, dialogSetter, navigate) {
         promises.push(filePromise);
     }
     Promise.all(promises).then(fileContents => {
-        let invalidFiles = 0, newTeams = 0, newMatches = 0, duplicates = 0, staleMatches = 0, conflicts = [];
+        let invalidFiles = 0, newTeams = 0, newMatches = 0, softDuplicates = [], hardDuplicates = 0, staleMatches = 0;
         for (let i = 0; i < fileContents.length; i ++) {
             let file = fileContents[i];
             console.log(file)
@@ -242,9 +242,15 @@ function importData(modalSetter, dialogSetter, navigate) {
                                     if (!verifyVersionNumbers(match.vnum, VERSION_NUMBER)) staleMatches ++; else {
                                         getTeamData(team.number).data.forEach(existingMatch => {
                                             if (existingMatch.id == match.id) {
-                                                // This is a duplicate
-                                                duplicates ++;
+                                                // This is a HARD duplicate because this form has the same ID as the other
+                                                hardDuplicates ++;
                                                 isDuplicate = true;
+                                                return;
+                                            }
+                                            if (existingMatch.eventCode == match.eventCode && existingMatch.matchNumber == match.matchNumber) {
+                                                // This is a SOFT duplicate because there are two different recollections of the same match.
+                                                // Don't set `isDuplicate` flag because we still want to add it to the data
+                                                softDuplicates.push({ existing: existingMatch, incoming: match });
                                                 return;
                                             }
                                         });
@@ -264,6 +270,14 @@ function importData(modalSetter, dialogSetter, navigate) {
                                 });
                                 team.data.forEach(match => {
                                     if (verifyVersionNumbers(match.vnum, VERSION_NUMBER)) {
+                                        // First check to see if there's a soft duplicate in the set that's been imported already
+                                        newTeam.data.every(existingMatch => {
+                                            if (existingMatch.eventCode == match.eventCode && existingMatch.matchNumber == match.matchNumber) {
+                                                softDuplicates.push({ existing: existingMatch, incoming: match });
+                                                return false;
+                                            }
+                                            return true;
+                                        });
                                         newTeam.data.push(match); 
                                         newMatches ++;
                                     } else staleMatches ++;
@@ -282,8 +296,8 @@ function importData(modalSetter, dialogSetter, navigate) {
                 }
 
                 // Pull up a dialog box, the operation was successful
-                dialogSetter({ 
-                    body: `Import was successful.\n\nTeams added: ${newTeams}, Matches added: ${newMatches}, Duplicates ignored: ${duplicates}\n\nInvalid files: ${invalidFiles}, Stale matches: ${staleMatches}. Click OK below to confirm your import, or Cancel to undo.`,
+                if (softDuplicates.length == 0) dialogSetter({ 
+                    body: `Import was successful. Click OK to continue or Cancel to abort the import.\n\nTeams added: ${newTeams}, Matches added: ${newMatches}, Duplicates ignored: ${hardDuplicates}\n\nInvalid files: ${invalidFiles}, Stale matches: ${staleMatches}.`,
                     useConfirmation: true,
                     confirmFunction: () => {
                         saveData();
@@ -292,7 +306,20 @@ function importData(modalSetter, dialogSetter, navigate) {
                     cancelFunction: () => {
                         location.reload();
                     }
-                });
+                }); else {
+                    // Ask if user wants to address soft duplicates
+                    dialogSetter({ 
+                        body: `You have ${softDuplicates.length} duplicates to address because two different forms were submitted for the same team, match, and event. Click OK to address the conflicts or Cancel to abort the import.\n\nTeams added: ${newTeams}, Matches added: ${newMatches}, Duplicates ignored: ${hardDuplicates}\n\nInvalid files: ${invalidFiles}, Stale matches: ${staleMatches}.`,
+                        useConfirmation: true,
+                        confirmFunction: () => {
+                            saveData();
+                            navigate("/conflicts", { state: { softDuplicates } });
+                        },
+                        cancelFunction: () => {
+                            location.reload();
+                        }
+                    });
+                }
                 fileBatch.files = null;
             } else {
                 // This is not a valid file
