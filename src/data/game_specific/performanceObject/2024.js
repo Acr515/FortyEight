@@ -24,7 +24,9 @@ export default function performanceObject() {
             trap: false
         },
         defense: {},
-        notes: {}
+        notes: {
+            floorPickup: false
+        }
     }
 }
 
