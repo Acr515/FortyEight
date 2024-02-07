@@ -51,7 +51,7 @@ export default function ViewIndividualData({data}) {
                         <div className="cell-data">{p.endgame.state}</div>
                         <div className="cell-label">Result</div>
                     </div>
-                    { p.endgame.state == EndgameResult.NONE && (
+                    { (p.endgame.state == EndgameResult.NONE || p.endgame.state == EndgameResult.PARKED) && (
                         <div className="content-cell">
                             <div className="cell-data">{p.endgame.failedAttempt ? "Yes" : "No"}</div>
                             <div className="cell-label">Climb attempted</div>

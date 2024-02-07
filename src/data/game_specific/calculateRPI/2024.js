@@ -36,7 +36,7 @@ export function getRPIRating(rpi) {
     else if (rpi <= 11) return "Poor";
     else if (rpi <= 17) return "Average";
     else if (rpi <= 25) return "Good";
-    else if (rpi <= 33) return "Very Good";
-    else if (rpi <= 43) return "Excellent";
+    else if (rpi <= 32) return "Very Good";
+    else if (rpi <= 41) return "Excellent";
     else return "Godly";
 }

@@ -9,12 +9,10 @@ export default function ViewTeamCells({team}) {
     pieces /= team.data.length;
     pieces = Math.round(pieces * 10) / 10;
 
-    // Calculate average, min and max auton points per game
-    let autoPointsAvg = 0, autoPointsMin = 999, autoPointsMax = -1;
+    // Calculate average auton points per game
+    let autoPointsAvg = 0;
     team.data.forEach(match => {
         autoPointsAvg += ScoreCalculator.Auto.getScore(match);
-        autoPointsMin = Math.min(autoPointsMin, ScoreCalculator.Auto.getScore(match));
-        autoPointsMax = Math.max(autoPointsMax, ScoreCalculator.Auto.getScore(match));
     });
     autoPointsAvg = Math.round((autoPointsAvg / team.data.length) * 10) / 10;
 
@@ -24,21 +22,21 @@ export default function ViewTeamCells({team}) {
         ampNotes += match.performance.auto.amp + match.performance.teleop.amp;
         speakerNotes += match.performance.auto.speaker + match.performance.teleop.speaker;
     });
-    let speakerRate = (ampNotes + speakerNotes <= 0) ? 0 : Math.round((speakerNotes / ampNotes + speakerNotes) * 100) / 10;
+    let speakerRate = (ampNotes + speakerNotes <= 0) ? 0 : Math.round((speakerNotes / (ampNotes + speakerNotes)) * 1000) / 10;
 
     // Count harmonized climbs
     let harmonizedClimbs = 0;
-    team.data.forEach(match => harmonizedClimbs += (match.performance.endgame == EndgameResult.HARMONIZED) );
+    team.data.forEach(match => harmonizedClimbs += (match.performance.endgame.state == EndgameResult.HARMONIZED) );
 
     // Count trap scores
     let trapScores = 0;
-    team.data.forEach(match => harmonizedClimbs += (match.performance.endgame == EndgameResult.HARMONIZED) );
+    team.data.forEach(match => trapScores += match.performance.endgame.trap );
 
     // Calculate climb rate
     let climbFails = 0, climbs = 0;
     team.data.forEach(match => { 
-        climbFails += match.performance.endgame.failedAttempt ? 1 : 0
-        climbs += ScoreCalculator.Endgame.didClimb(match) || match.performance.endgame.failedAttempt ? 1 : 0
+        climbFails += match.performance.endgame.failedAttempt;
+        climbs += ScoreCalculator.Endgame.didClimb(match);
     });
 
     // Calculate ability to pick up off floor
@@ -58,10 +56,6 @@ export default function ViewTeamCells({team}) {
                 <div className="info-label">Avg. Auto</div>
             </div>
             <div className="info-cell">
-                <div className="info-value">{autoPointsMin}/{autoPointsMax}</div>
-                <div className="info-label">Auto Min/Max</div>
-            </div>
-            <div className="info-cell">
                 <div className="info-value">{speakerRate}%</div>
                 <div className="info-label">% Speaker Notes</div>
             </div>
@@ -75,7 +69,7 @@ export default function ViewTeamCells({team}) {
             </div>
             <div className="info-cell">
                 <div className="info-value">{harmonizedClimbs}</div>
-                <div className="info-label">Harmonized Climbs</div>
+                <div className="info-label">Harmonized #</div>
             </div>
             <div className="info-cell">
                 <div className="info-value">{floorPickup}</div>
