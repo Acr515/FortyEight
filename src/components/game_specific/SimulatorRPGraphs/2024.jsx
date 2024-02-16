@@ -15,57 +15,57 @@ export default function SimulatorRPGraphs({ sim, winner, loser }) {
         chartData: {
             labels: ["Success", "Failed"],
             datasets: [{
-                data: [sim[winner.colorName].autoRPRate, 1 - sim[winner.colorName].autoRPRate],
+                data: [sim[winner.colorName].melodyRPRate, 1 - sim[winner.colorName].melodyRPRate],
                 backgroundColor: [
                     winner.color,
                     "transparent"
                 ]
             }]
         },
-        label: "Auto RP %",
-        value: Math.round(sim[winner.colorName].autoRPRate * 1000) / 10
+        label: "Melody RP %",
+        value: Math.round(sim[winner.colorName].melodyRPRate * 1000) / 10
     };
     const winnerTeleopRPData = {
         chartData: {
             labels: ["Success", "Failed"],
             datasets: [{
-                data: [sim[winner.colorName].teleopRPRate, 1 - sim[winner.colorName].teleopRPRate],
+                data: [sim[winner.colorName].ensembleRPRate, 1 - sim[winner.colorName].ensembleRPRate],
                 backgroundColor: [
                     winner.color,
                     "transparent"
                 ]
             }]
         },
-        label: "Teleop RP %",
-        value: Math.round(sim[winner.colorName].teleopRPRate * 1000) / 10
+        label: "Ensemble RP %",
+        value: Math.round(sim[winner.colorName].ensembleRPRate * 1000) / 10
     };
     const loserAutoRPData = {
         chartData: {
             labels: ["Success", "Failed"],
             datasets: [{
-                data: [sim[loser.colorName].autoRPRate, 1 - sim[loser.colorName].autoRPRate],
+                data: [sim[loser.colorName].melodyRPRate, 1 - sim[loser.colorName].melodyRPRate],
                 backgroundColor: [
                     loser.color,
                     "transparent"
                 ]
             }]
         },
-        label: "Auto RP %",
-        value: Math.round(sim[loser.colorName].autoRPRate * 1000) / 10
+        label: "Melody RP %",
+        value: Math.round(sim[loser.colorName].melodyRPRate * 1000) / 10
     };
     const loserTeleopRPData = {
         chartData: {
             labels: ["Success", "Failed"],
             datasets: [{
-                data: [sim[loser.colorName].teleopRPRate, 1 - sim[loser.colorName].teleopRPRate],
+                data: [sim[loser.colorName].ensembleRPRate, 1 - sim[loser.colorName].ensembleRPRate],
                 backgroundColor: [
                     loser.color,
                     "transparent"
                 ]
             }]
         },
-        label: "Teleop RP %",
-        value: Math.round(sim[loser.colorName].teleopRPRate * 1000) / 10
+        label: "Ensemble RP %",
+        value: Math.round(sim[loser.colorName].ensembleRPRate * 1000) / 10
     };
 
     // Putting it all together for the universal component
