@@ -217,6 +217,8 @@ class MatchDetails {
         this.blue.getScores();
         this.red.getRPs();
         this.blue.getRPs();
+        if (typeof SimulationInformation.runRPAdjustments !== 'undefined') SimulationInformation.runRPAdjustments(this.red, this.blue); // implement this function if alliance RPs have ANY cross-dependency
+        
         this.winner = this.getWinner();
         if (this.winner == "Red") this.red.matchRP = 2;
         else if (this.winner == "Blue") this.blue.matchRP = 2;
@@ -239,7 +241,7 @@ class MatchDetails {
 
 /**
  * Stores information about each alliance's performance and settles disputes over who can climb to where and who will defend.
- * Only encapsulates data for a single match; the object that holds data for an alliance across the entire simulation is defined in the `Simulator` constructor.
+ * Only encapsulates data for a single alliance in a single match; the object that holds data for an alliance across the entire simulation is defined in the `Simulator` constructor.
  */
 class AllianceDetails {
     color;
@@ -296,6 +298,7 @@ class AllianceDetails {
             this.teleopScore += ScoreCalculator.Teleop.getScore({ performance: team });
             this.endgameScore += ScoreCalculator.Endgame.getScore({ performance: team });
         });
+        if (typeof SimulationInformation.adjustScoring !== 'undefined') SimulationInformation.adjustScoring(this);  // apply predicted score boosting specific to game
         this.score = this.autoScore + this.teleopScore + this.endgameScore;
     }
 

@@ -1,5 +1,5 @@
 /**
- * Information about the 2022 FRC game.
+ * Information about the 2023 FRC game.
  */
 const gameDataObject = {
     name: "CHARGED UP",

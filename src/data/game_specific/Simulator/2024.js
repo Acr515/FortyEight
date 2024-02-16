@@ -23,13 +23,14 @@ const SimulationInformation = {
     /**
      * A function that gets game-specific variables for a single match, typically for ranking point related tracking.
      * Injected into the `AllianceDetails` class.
-     * @returns An object with properties `melodyRP` and `ensembleRP`
+     * @returns An object with properties `melodyRP` and `ensembleRP` along with other key properties related to RPs
      */
     singleMatchAllianceDetails: {
-        coopertitionPossible: false,
-        notesTowardsMelody: 0,
-        melodyRP: false,
-        ensembleRP: false
+        coopertitionPossible: false,    // whether or not the alliance scores quickly enough to use the co-opertition button
+        notesTowardsMelody: 0,          // total notes scored during the match for eligibility for the melody RP
+        amplifiedNotes: 0,              // total notes scored in the speaker that could be amplified using amp notes
+        melodyRP: false,                // RP for total game pieces scored
+        ensembleRP: false               // RP for total endgame points scored
     },
 
     /**
@@ -243,7 +244,7 @@ const SimulationInformation = {
     /**
      * Runs BEFORE the match is decided and BEFORE the `postSimulationCalculations`, but AFTER
      * the performance objects for a match are generated.
-     * @param {*} color The alliance color
+     * @param {*} color The alliance color (unused)
      * @param {*} performances An array of performance objects, agnostic to color
      * @param {*} gameStats The `gameStats` property of the `AllianceDetails` class
      * @param {*} rng The seeded random generator
@@ -262,10 +263,50 @@ const SimulationInformation = {
             // Start by isolating teams down to the one that has the best chance of being elevated to harmonized
             let otherIndeces = [0, 1, 2];
             otherIndeces.splice(otherIndeces.indexOf(harmonyIndex), 1);
-            let bestCandidate = performances[otherIndeces[0]].endgame.harmonyRate > performances[otherIndeces[1]].endgame.harmonyRate ? performances[otherIndeces[0]].endgame.harmonyRate : performances[otherIndeces[1]].endgame.harmonyRate;
+            let bestCandidate = performances[otherIndeces[0]].endgame.harmonyRate > performances[otherIndeces[1]].endgame.harmonyRate ? performances[otherIndeces[0]] : performances[otherIndeces[1]];
             
             // If their harmony rate beats RNG, elevate them- otherwise, de-elevate other robot
             if (rng() < bestCandidate.endgame.harmonyRate) bestCandidate.endgame.state = EndgameResult.HARMONIZED; else performances[harmonyIndex].endgame.state = EndgameResult.ONSTAGE;
+        }
+
+        // Simulate amplification bonuses
+        // For every TWO notes scored in the AMP, provide amplification of 1-4 SPEAKER notes, dependent on the rate of speaker scoring
+        // Count # of possible amplifications during the course of the game and the number of possible amplified speaker scores
+        let teleopAmpNotes = 0, speakerNotes = 0, maxAmplifications = 0;
+        const AMPLIFY_PERIOD = 120, AMPLIFY_COOLDOWN = 15; // assuming that amplification would only possibly happen during teleop and not during last 15 seconds, also assuming 15 seconds between amplifications
+        performances.forEach(p => {
+            teleopAmpNotes += p.teleop.amp;
+            speakerNotes += p.teleop.speaker;
+        });
+
+        maxAmplifications = Math.min(teleopAmpNotes / 2, AMPLIFY_PERIOD / AMPLIFY_COOLDOWN);  // there is a ceiling to the # of amplifications in a match
+        if (maxAmplifications > 1) maxAmplifications = Math.max(2, maxAmplifications - Math.round(rng()));          // randomly remove an amplification
+        let speakerRate = speakerNotes / AMPLIFY_PERIOD;                                                            // # of notes in speaker per second
+        gameStats.amplifiedNotes = Math.min(maxAmplifications * 4, Math.ceil(10 * maxAmplifications * speakerRate));// 10 seconds of amplification * # of amplifications * speaker notes per second = # of amplified notes
+    },
+
+    /**
+     * An optional function that runs IMMEDIATELY after an alliance's scores are tabulated, i.e. after defense and
+     * all other adjustments are accounted for, but BEFORE a winner is determined.
+     * Created for the purpose of boosting scores (for example, power ups), executed inside the `getScores` method of `AllianceDetails`.
+     * @param {AllianceDetails} allianceDetails The `AllianceDetails` object
+     */
+    adjustScoring: (allianceDetails) => {
+        allianceDetails.teleopScore += allianceDetails.gameStats.amplifiedNotes * 3;    // bonus for amplified notes is +3 on top of the 2 points received already
+    },
+
+    /**
+     * An optional function that runs IMMEDIATELY before the winner of a match is determined in `MatchDetails`.
+     * It should be used to adjust RPs or apply any game-specific mechanics.
+     * @param {AllianceDetails} red The red alliance object
+     * @param {AllianceDetails} blue The blue alliance object
+     */
+    runRPAdjustments: (red, blue) => {
+        // Determine co-opertition bonus
+        if (red.gameStats.coopertitionPossible && blue.gameStats.coopertitionPossible) {
+            // We have co-opertition! Threshold is now only 15 for melody RP
+            if (red.gameStats.notesTowardsMelody >= 15) red.gameStats.melodyRP = true;
+            if (blue.gameStats.notesTowardsMelody >= 15) blue.gameStats.melodyRP = true;
         }
     },
 

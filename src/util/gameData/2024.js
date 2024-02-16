@@ -1,5 +1,5 @@
 /**
- * Information about the test game.
+ * Information about the 2024 FRC game.
  */
 const gameDataObject = {
     name: "CRESCENDO",
