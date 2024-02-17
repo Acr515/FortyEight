@@ -33,7 +33,7 @@ export default function SimulatorConfig() {
     const [useTextboxes, setUseTextboxes] = useState(false);
     const [useMatchImport, setUseMatchImport] = useState(false);
     const [simulations, setSimulations] = useState(configPrefill ? prefill.sims : 1000);
-    const [importEventCode, setImportEventCode] = useState("");
+    const [importEventCode, setImportEventCode] = useState(localStorage.getItem("EventCodePrefill") || "");
     const [importMatch, setImportMatch] = useState("");
 
     const teamNumbers = getTeamNumberArray(TeamData);
@@ -179,6 +179,7 @@ export default function SimulatorConfig() {
                     { useMatchImport && <>
                         <Input
                             label="Event code"
+                            prefill={ localStorage.getItem("EventCodePrefill") || "" }
                             onInput={ e => { setImportEventCode(e.target.value); } }
                         />
                         <Input

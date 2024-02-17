@@ -12,7 +12,7 @@ const ScoreCalculator = {
         getScore: data => data.performance.teleop.pieces * 2,
         getPieces: data => data.performance.teleop.pieces,
     },
-    // For more details on the intended usage of the Endgame property, refer to the 2022 ScoreCalculator
+    // For more details on the typical usage of the Endgame property, refer to the 2022 ScoreCalculator
     Endgame: {
         getScore: data => 0,
         getScoreOfConstant: result => 0,

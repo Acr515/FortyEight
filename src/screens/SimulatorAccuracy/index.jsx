@@ -1,11 +1,11 @@
 import React, { useState, useContext } from 'react';
-import Button from '../../components/Button';
-import Input from '../../components/Input';
-import PageHeader from '../../components/PageHeader';
-import FeedbackModalContext from '../../context/FeedbackModalContext';
-import Simulator from '../../data/game_specific/Simulator/_Universal';
-import TeamData from '../../data/TeamData';
-import hitTBA from '../../util/hitTBA';
+import Button from 'components/Button';
+import Input from 'components/Input';
+import PageHeader from 'components/PageHeader';
+import FeedbackModalContext from 'context/FeedbackModalContext';
+import Simulator from 'data/game_specific/Simulator/_Universal';
+import TeamData from 'data/TeamData';
+import hitTBA from 'util/hitTBA';
 
 
 export default function SimulatorAccuracy() {
@@ -45,10 +45,10 @@ export default function SimulatorAccuracy() {
                     <strong>Wins Correct: </strong>{resultsState.winCorrectRate}
                 </p>
                 <p>
-                    <strong>Cargo RP Correct: </strong>{resultsState.RP1CorrectRate}
+                    <strong>Grid RP Correct: </strong>{resultsState.RP1CorrectRate}
                 </p>
                 <p>
-                    <strong>Hangar RP Correct: </strong>{resultsState.RP2CorrectRate}
+                    <strong>Charge Station RP Correct: </strong>{resultsState.RP2CorrectRate}
                 </p>
                 <p>
                     <em>Hangar RP % Won When Guessed No: </em>{resultsState.RP2Underestimate}
@@ -58,10 +58,10 @@ export default function SimulatorAccuracy() {
                     <strong>Wins: </strong>{resultsState.winPS}
                 </p>
                 <p>
-                    <strong>Cargo RP: </strong>{resultsState.RP1PS}
+                    <strong>Grid RP: </strong>{resultsState.RP1PS}
                 </p>
                 <p>
-                    <strong>Hangar RP: </strong>{resultsState.RP2PS}
+                    <strong>Charge Station RP: </strong>{resultsState.RP2PS}
                 </p>
             </div>
         </div>
@@ -80,12 +80,12 @@ function testSimulatorAccuracy(eventCode, modalFunctions, stateUpdate) {
                 winner: match.winning_alliance,
                 number: match.match_number,
                 red: { 
-                    RP1: match.score_breakdown.red.cargoBonusRankingPoint,
-                    RP2: match.score_breakdown.red.hangarBonusRankingPoint,
+                    RP1: match.score_breakdown.red.sustainabilityBonusAchieved,
+                    RP2: match.score_breakdown.red.activationBonusAchieved,
                 },
                 blue: { 
-                    RP1: match.score_breakdown.blue.cargoBonusRankingPoint,
-                    RP2: match.score_breakdown.blue.hangarBonusRankingPoint,
+                    RP1: match.score_breakdown.blue.sustainabilityBonusAchieved,
+                    RP2: match.score_breakdown.blue.activationBonusAchieved,
                 }
             });
         });
@@ -108,17 +108,17 @@ function testSimulatorAccuracy(eventCode, modalFunctions, stateUpdate) {
                         winner: sim.red.winRate > sim.blue.winRate ? "red" : "blue",
                         number: match.match_number,
                         red: {
-                            RP1: sim.red.cargoRPRate > .5,
+                            RP1: sim.red.gridRPRate > .5,
                             RP2: sim.red.climbRPRate > .5,
                             winRate: sim.red.winRate,
-                            RP1Rate: sim.red.cargoRPRate,
+                            RP1Rate: sim.red.gridRPRate,
                             RP2Rate: sim.red.climbRPRate
                         },
                         blue: {
-                            RP1: sim.blue.cargoRPRate > .5,
+                            RP1: sim.blue.gridRPRate > .5,
                             RP2: sim.blue.climbRPRate > .5,
                             winRate: sim.blue.winRate,
-                            RP1Rate: sim.blue.cargoRPRate,
+                            RP1Rate: sim.blue.gridRPRate,
                             RP2Rate: sim.blue.climbRPRate
                         }
                     });

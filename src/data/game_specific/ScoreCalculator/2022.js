@@ -13,6 +13,7 @@ const ScoreCalculator = {
         getPieces: data => data.performance.teleop.cargoLow + data.performance.teleop.cargoHigh,
     },
     Endgame: {
+        // Given a performance object, gets the score
         getScore: data => {
             switch (data.performance.endgame.state) {
                 case EndgameResult.NONE: return 0;
@@ -23,6 +24,7 @@ const ScoreCalculator = {
                 default: return 0;
             }
         },
+        // Given ONLY the EndgameResult value (i.e. no performance object), gets the score
         getScoreOfConstant: result => {
             switch (result) {
                 case EndgameResult.NONE: return 0;
@@ -33,6 +35,7 @@ const ScoreCalculator = {
                 default: return 0;
             }
         },
+        // Given ONLY the EndgameResult value (i.e. no performance object), gets a numerical index of the climb (i.e. 0 for worst climb, n-1 for best climb). Used for team's endgame graph
         getNumericalLevel: data => {
             switch (data.performance.endgame.state) {
                 case EndgameResult.NONE: return 0;
@@ -43,6 +46,7 @@ const ScoreCalculator = {
                 default: return 0;
             }
         },
+        // Given ONLY a numerical index of the climb (i.e. 0 for worst climb, n-1 for best climb), gets the EndgameResult value
         getLevelFromNumber: num => {
             switch (num) {
                 case 0: return EndgameResult.NONE;
@@ -53,6 +57,7 @@ const ScoreCalculator = {
                 default: return EndgameResult.NONE;
             }
         },
+        // Given a performance object, returns true if robot climbed, false if no endgame state OR if robot parked
         didClimb: data => { return data.performance.endgame.state != EndgameResult.NONE }
     }
 }

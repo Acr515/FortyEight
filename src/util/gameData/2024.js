@@ -1,9 +1,9 @@
 /**
- * Information about the 2023 FRC game.
+ * Information about the 2024 FRC game.
  */
 const gameDataObject = {
-    name: "CHARGED UP",
-    year: "2023",
+    name: "CRESCENDO",
+    year: "2024",
     league: "FRC"
 }
 
