@@ -60,7 +60,7 @@ const SimulationInformation = {
 
         // Ensemble RP qualification (endgame climbing points)
         let totalEndgameScore = 0;
-        teamPerformances.forEach(team => totalEndgameScore += ScoreCalculator.Teleop.getPieces({ performance: team }));
+        teamPerformances.forEach(team => totalEndgameScore += ScoreCalculator.Endgame.getScore({ performance: team }));
         gameStats.ensembleRP = totalEndgameScore >= 10; // TODO: RNG a random chance that a team is spotlit?
     },
 
