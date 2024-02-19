@@ -1,0 +1,140 @@
+._PlayoffHelperTeam {
+    display: flex;
+    flex-direction: column;
+    width: 340px;
+    height: 210px;
+    padding: 20px 16px;
+    border: 2px solid #4941B1;
+    border-radius: 16px;
+    box-sizing: border-box;
+
+    .headline-row {
+        display: flex;
+        flex-direction: row;
+        margin-bottom: 4px;
+
+        .number-record {
+            display: flex;
+            flex-direction: row;
+            gap: 6px;
+
+            div {
+                margin-top: auto;
+            }
+
+            .team-number {
+                font-family: 'industry';
+                font-weight: 700;
+                font-size: 33px;
+            }
+            .record {
+                font-family: 'industry';
+                font-weight: 500;
+                font-size: 18px;
+            }
+        }
+        
+        .grade-info {
+            display: flex;
+            flex-direction: row;
+            margin-left: auto;
+            gap: 6px;
+
+            div {
+                margin-top: auto;
+            }
+
+            .letter-grade {
+                font-family: 'industry';
+                color: #4941B1;
+                font-weight: 600;
+                font-size: 28px;
+            }
+            .info-button {
+                width: 24px;
+                height: 18px;
+                padding: 3px 0;
+                background-color: #4941B1;
+                border-radius: 32px;
+                color: white;
+                text-align: center;
+                margin-bottom: 3px;
+            }
+        }
+    }
+
+    .label-row {
+        .team-name {
+            font-family: 'trasandina';
+            font-size: 20px;
+            font-weight: 500;
+        }
+        .best-available {
+            font-family: 'trasandina';
+            font-size: 14px;
+            font-weight: 700;
+        }
+    }
+
+    .cell-row {
+        display: flex;
+        width: 100%;
+        gap: 12px;
+        flex-direction: row;
+        margin-top: auto;
+        overflow-x: scroll;
+        padding-bottom: 8px;
+    }
+
+    .rpi-row {
+        margin-top: auto;
+        font-family: 'trasandina';
+        font-size: 16px;
+        font-weight: 500;
+    }
+}
+
+._PlayoffHelperTeam.on-the-clock {
+    background-color: #4941B1;
+    border: none;
+    color: white;
+}
+._PlayoffHelperTeam.consolidated {
+    background-color: transparent;
+    border: none;
+    height: 140px;
+}
+._PlayoffHelperTeam.consolidated.captain {
+    background-color: rgba(73, 65, 177, 0.2);
+}
+
+._PlayoffHelperTeamCell {
+    display: flex;
+    flex-direction: column;
+
+    .value-holder {
+        display: flex;
+        flex-direction: row;
+        gap: 4px;
+
+        .inline-entry {
+            margin-top: auto;
+        }
+        .value {
+            font-family: 'industry';
+            font-weight: 500;
+            font-size: 27px;
+        }
+        .place {
+            font-family: 'industry';
+            font-weight: 500;
+            font-size: 16px;
+        }
+    }
+    .label {
+        font-family: 'trasandina';
+        font-size: 16px;
+        font-weight: 300;
+        white-space: nowrap;
+    }
+}

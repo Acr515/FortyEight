@@ -95,7 +95,7 @@ const PlayoffHelperFunctions = {
                     Number(team.team_key.replace("frc", "")),
                     team.rank,
                     [ team.record.wins, team.record.losses, team.record.ties ],
-                    Math.round(team.extra_stats[0] / team.matches_played * 100) / 100
+                    // Math.round(team.extra_stats[0] / team.matches_played * 100) / 100 // Formerly RP score
                 ));
             })
             playoffHelper.config.fullTBAData = true;
@@ -112,13 +112,17 @@ const PlayoffHelperFunctions = {
      * @param {Array} teams An array of team numbers in order of ranking
      */
     setManualRankings(ph, phSetter, teams) {
+        let playoffHelper = clonePlayoffHelper(ph);
+
         teams.forEach((team, ind) => {
-            this.teams.push(new PlayoffTeam(
+            playoffHelper.teams.push(new PlayoffTeam(
                 team,
                 ind + 1
             ));
         });
-        this.state = PlayoffHelperState.READY;
+        playoffHelper.state = PlayoffHelperState.READY;
+
+        phSetter(playoffHelper);
     }
 };
 
@@ -130,28 +134,26 @@ export default PlayoffHelperFunctions;
 export class PlayoffTeam {
     teamNumber;
     qualRanking;
-    rankingScore;
     wins;
     losses;
     ties = 0;
     captain = false;
     selected = false;
     declined = false;
+    powerScores = {};
 
     /**
      * Creates a PlayoffTeam for use in PlayoffHelperData. The constructor also runs calculations for aggregate stats immediately upon creation.
      * @param {Number} teamNumber The team number of the robot
      * @param {Number} qualRanking The team's qualification round ranking
      * @param {Array} wlt Optional. Wins, losses, ties in qualification round
-     * @param {Number} rankingScore Optional. Average RPs per match
      */
-    constructor(teamNumber, qualRanking, wlt = [-1, -1, -1], rankingScore = -1) {
+    constructor(teamNumber, qualRanking, wlt = [-1, -1, -1]) {
         this.teamNumber = teamNumber;
         this.qualRanking = qualRanking;
         this.wins = wlt[0];
         this.losses = wlt[1];
         this.ties = wlt[2];
-        this.rankingScore = rankingScore;
     }
 
     /**
@@ -159,4 +161,9 @@ export class PlayoffTeam {
      * @returns Readable string of the team's qualifying record
      */
     getRecord() { return this.wins == -1 ? "" : `${ this.wins }-${ this.losses }${ this.ties > 0 ? `-${ this.ties }` : "" }` }
+
+
+    calculateStrengths(weights) {
+
+    }
 }

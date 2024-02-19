@@ -6,6 +6,7 @@ import PlayoffHelperContext from "context/PlayoffHelperContext";
 import { PlayoffHelperState } from "data/PlayoffHelperData";
 import FeedbackModalContext from "context/FeedbackModalContext";
 import DialogBoxContext from "context/DialogBoxContext";
+import PlayoffHelperTeam from "components/PlayoffHelperTeam";
 import "./style.scss";
 
 /**
@@ -21,6 +22,7 @@ export default function PlayoffHelper() {
             <div className="content-area">
                 { ( playoffHelper.data.state == PlayoffHelperState.INACTIVE || playoffHelper.data.state == PlayoffHelperState.READY ) && <RankingInput /> }
             </div>
+            <PlayoffHelperTeam />
         </div>
     )
 }
