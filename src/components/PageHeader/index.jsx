@@ -4,13 +4,14 @@ import Chevron from "../../assets/images/chevron.png";
 import './style.scss';
 import { useNavigate } from "react-router-dom";
 
-export default function PageHeader({text, showBack, backText, location}) {
+export default function PageHeader({text, showBack, backText, location, children}) {
     return (
         <div className="_PageHeader">
             {
                 showBack && <BackButton text={backText} location={location} />
             }
             <h1>{text}</h1>
+            <div className="right-aligned-elements">{children}</div>
         </div>
     )
 }

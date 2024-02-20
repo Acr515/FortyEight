@@ -1,5 +1,6 @@
 ._PlayoffHelper {
-
+    overflow-y: auto;
+    
     .content-area {
         padding: 0 32px;
     }
@@ -25,6 +26,45 @@
 
         .input-area.inactive {
             opacity: 0.5;
+        }
+    }
+
+    ._AllianceRow {
+        display: flex;
+        gap: 10px;
+
+        .alliance-labels {
+            display: flex;
+            flex-direction: column;
+            padding-top: 25px;
+            margin-right: 8px;
+
+            .ranking {
+                font-family: 'industry';
+                font-weight: 700;
+                font-size: 28px;
+                margin-bottom: 6px;
+            }
+            .rpi {
+                font-family: 'industry';
+                font-weight: 600;
+                font-size: 20px;
+            }
+            .rpi-label {
+                font-family: 'transandina';
+                font-weight: 400;
+                font-size: 15px;
+                white-space: nowrap;
+            }
+        }
+    }    
+
+    ._LiveDraft {
+
+        .alliance-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
     }
 }

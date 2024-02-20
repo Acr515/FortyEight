@@ -17,22 +17,20 @@ import "./style.scss";
 export default function PlayoffHelper() {
     
     const playoffHelper = useContext(PlayoffHelperContext);
+    const state = playoffHelper.data.state;
 
     return (
         <div className="SCREEN _PlayoffHelper">
             <PageHeader text="Playoff Helper" />
             <div className="content-area">
-                { ( playoffHelper.data.state == PlayoffHelperState.INACTIVE || playoffHelper.data.state == PlayoffHelperState.READY ) && <RankingInput /> }
+                { ( state == PlayoffHelperState.INACTIVE || state == PlayoffHelperState.READY ) && <RankingInput /> }
+                { ( state == PlayoffHelperState.LIVE_DRAFT ) && <LiveDraft /> }
             </div>
-            <Button
-                text="Test Team Weights"
-                action={ () => console.log(weighTeam(getTeamData(5050), WeightSets.WellRounded)) }
-            />
-            <PlayoffHelperTeam />
         </div>
     )
 }
 
+// Screen that shows initial configuration inputs
 function RankingInput() {
 
     const feedbackModal = useContext(FeedbackModalContext);
@@ -120,6 +118,7 @@ function RankingInput() {
                 { playoffHelper.data.state == PlayoffHelperState.READY && <>
                     <Button
                         text="Begin live playoff draft"
+                        action={ startLiveDraft }
                     />
                     <Button
                         text="Simulate playoff draft"
@@ -130,6 +129,51 @@ function RankingInput() {
                         useBorder
                     />
                 </> }
+            </div>
+        </div>
+    )
+}
+
+// A component of screens showing an alliance as a row
+function AllianceRow({ teams, isOnTheClock = false, seed = 0, rpi = 10.5, rpiLabel = "Good" }) {
+    return (
+        <div className="_AllianceRow">
+            <div className="alliance-labels">
+                <div className="ranking">#{seed}</div>
+                <div className="rpi">{rpi}</div>
+                <div className="rpi-label">RPI ({rpiLabel})</div>
+            </div>
+            <div className="alliance-teams">
+                { teams.map((team, index) => <PlayoffHelperTeam 
+                    key={index}
+                    team={team}
+                    isOnTheClock={isOnTheClock && index == 0}
+                    captain={index == 0}
+                    partners={teams.slice(1)}
+                    consolidated={!isOnTheClock}
+                    visible={!isOnTheClock || index == 0}
+                /> )}
+            </div>
+        </div>
+    )
+}
+
+// Screen that shows while alliance selection is taking place
+function LiveDraft() {
+
+    const playoffHelper = useContext(PlayoffHelperContext);
+
+    return (
+        <div className="_LiveDraft">
+            <div className="alliance-list">
+                { playoffHelper.data.alliances.map(((alliance, seed) => {
+                    return <AllianceRow 
+                        key={seed}
+                        seed={seed + 1}
+                        teams={ alliance.map(team => playoffHelper.getTeam(team)) }
+                        isOnTheClock={playoffHelper.data.draftState.alliance == seed}
+                    />
+                })) }
             </div>
         </div>
     )

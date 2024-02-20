@@ -34,7 +34,7 @@ export const PlayoffHelperData = {
     state: PlayoffHelperState.INACTIVE,
     draftState: {
         round: 1,
-        alliance: 1
+        alliance: 0
     },
     config: {
         fullTBAData: false,
@@ -58,7 +58,7 @@ const PlayoffHelperFunctions = {
         playoffHelper.state = PlayoffHelperState.READY;
         playoffHelper.draftState = {
             round: 1,
-            alliance: 1
+            alliance: 0
         };
 
         phSetter(playoffHelper);
@@ -92,7 +92,7 @@ const PlayoffHelperFunctions = {
         if (emptyTeams.length > 0) {
             // Throw error
             phSetter(playoffHelper);
-            console.error("Analysis was halted- the following teams don't have data in memory: " + emptyTeams);
+            console.error("Analysis was halted- the following teams don't have data in memory: " + emptyTeams.toString());
             return;
         }
 
@@ -246,7 +246,7 @@ export class PlayoffTeam {
     calculatePowerScores() {
 
         // Check if team exists or not
-        if (getTeamData(this.teamNumber) === null) {
+        if (getTeamData(this.teamNumber) == null) {
             // Team doesn't exist; pitch a fit if we aren't in development mode
             if (DEVELOP_MODE) {
                 // Fill with fake data
@@ -260,6 +260,8 @@ export class PlayoffTeam {
 
                 this.bestCompositeScore = 10;
                 this.bestCompositeType = "WellRounded";
+
+                return null;
             } else {
                 return this.teamNumber; // incident will be logged and reported
             }

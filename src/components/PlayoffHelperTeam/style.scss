@@ -65,12 +65,12 @@
 
     .label-row {
         .team-name {
-            font-family: 'trasandina';
+            font-family: 'transandina';
             font-size: 20px;
-            font-weight: 500;
+            font-weight: 600;
         }
         .best-available {
-            font-family: 'trasandina';
+            font-family: 'transandina';
             font-size: 14px;
             font-weight: 700;
         }
@@ -88,7 +88,7 @@
 
     .rpi-row {
         margin-top: auto;
-        font-family: 'trasandina';
+        font-family: 'transandina';
         font-size: 16px;
         font-weight: 500;
     }
@@ -102,10 +102,14 @@
 ._PlayoffHelperTeam.consolidated {
     background-color: transparent;
     border: none;
+    width: 280px;
     height: 140px;
 }
 ._PlayoffHelperTeam.consolidated.captain {
     background-color: rgba(73, 65, 177, 0.2);
+}
+._PlayoffHelperTeam.hidden {
+    display: none;
 }
 
 ._PlayoffHelperTeamCell {
@@ -132,7 +136,7 @@
         }
     }
     .label {
-        font-family: 'trasandina';
+        font-family: 'transandina';
         font-size: 16px;
         font-weight: 300;
         white-space: nowrap;
