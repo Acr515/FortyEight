@@ -52,12 +52,10 @@ export default function FRAME() {
         data: playoffHelper,
         flush: () => PlayoffHelperFunctions.flush(playoffHelper, setPlayoffHelper),
         reset: () => PlayoffHelperFunctions.reset(playoffHelper, setPlayoffHelper),
-
-        /**
-         * Retrieves ranking information from The Blue Alliance and saves it to memory.
-         * @param {string} eventKey The event key to pull from TBA
-         * @param {function} failureCallback The function to run in case the API can't be reached
-         */
+        getTeam: (teamNumber) => PlayoffHelperFunctions.getTeam(playoffHelper, teamNumber),
+        pickTeam: (teamNumber) => PlayoffHelperFunctions.pickTeam(playoffHelper, setPlayoffHelper, teamNumber),
+        declineTeam: (teamNumber) => PlayoffHelperFunctions.declineTeam(playoffHelper, setPlayoffHelper, teamNumber),
+        setup: (mode, backupSelections) => PlayoffHelperFunctions.setup(playoffHelper, setPlayoffHelper, mode, backupSelections),
         getTBARankings: (eventKey, failureCallback) => PlayoffHelperFunctions.getTBARankings(playoffHelper, setPlayoffHelper, eventKey, failureCallback),
     };
     

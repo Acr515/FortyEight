@@ -7,6 +7,8 @@ import { PlayoffHelperState } from "data/PlayoffHelperData";
 import FeedbackModalContext from "context/FeedbackModalContext";
 import DialogBoxContext from "context/DialogBoxContext";
 import PlayoffHelperTeam from "components/PlayoffHelperTeam";
+import weighTeam, { WeightSets } from "data/game_specific/weighTeam/GAME_YEAR";
+import { getTeamData } from "data/SearchData";
 import "./style.scss";
 
 /**
@@ -22,6 +24,10 @@ export default function PlayoffHelper() {
             <div className="content-area">
                 { ( playoffHelper.data.state == PlayoffHelperState.INACTIVE || playoffHelper.data.state == PlayoffHelperState.READY ) && <RankingInput /> }
             </div>
+            <Button
+                text="Test Team Weights"
+                action={ () => console.log(weighTeam(getTeamData(5050), WeightSets.WellRounded)) }
+            />
             <PlayoffHelperTeam />
         </div>
     )

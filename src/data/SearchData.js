@@ -17,7 +17,7 @@ export function teamExists(num) {
  * actual match data for this team, use `getTeamData(num).data`.
  * @param {number} num The team number to search
  * @param {Team[]} dataset Optionally, use a custom dataset. Defaults to TeamData
- * @returns The team object with the corresponding number
+ * @returns The team object with the corresponding number. If team can't be found, returns null
  */
 export function getTeamData(num, dataset = TeamData) {
     let returnTeam = null;

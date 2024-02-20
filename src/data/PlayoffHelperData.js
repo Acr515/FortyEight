@@ -1,4 +1,7 @@
+import { DEVELOP_MODE } from "/src/config";
 import hitTBA from "util/hitTBA";
+import weighTeam, { WeightSets } from "./game_specific/weighTeam/GAME_YEAR";
+import { getTeamData } from "./SearchData";
 
 /**
  * Converts an immutable state object to a mutable dictionary with the exact same values- in this case, used to
@@ -29,6 +32,10 @@ export const PlayoffHelperData = {
     teams: [],
     alliances: [],
     state: PlayoffHelperState.INACTIVE,
+    draftState: {
+        round: 1,
+        alliance: 1
+    },
     config: {
         fullTBAData: false,
         backupSelections: false
@@ -49,6 +56,10 @@ const PlayoffHelperFunctions = {
 
         playoffHelper.alliances = [];
         playoffHelper.state = PlayoffHelperState.READY;
+        playoffHelper.draftState = {
+            round: 1,
+            alliance: 1
+        };
 
         phSetter(playoffHelper);
     },
@@ -63,7 +74,7 @@ const PlayoffHelperFunctions = {
     },
 
     /**
-     * Readies the playoff helper for selection, real-time or simulated.
+     * Readies the playoff helper for alliance selection, real-time or simulated.
      * @param {PlayoffHelperData} ph The state object containing the playoff helper data
      * @param {function} phSetter The state setter from the FRAME screen
      * @param {PlayoffHelperState} mode Either `SIMULATED_DRAFT` or `LIVE_DRAFT` based on user input
@@ -71,7 +82,27 @@ const PlayoffHelperFunctions = {
      */
     setup: (ph, phSetter, mode, backupSelections) => {
         let playoffHelper = clonePlayoffHelper(ph);
+        
+        // Run calculations on playoff teams
+        let emptyTeams = [];
+        playoffHelper.teams.forEach(team => {
+            let returnValue = team.calculatePowerScores();
+            if (returnValue !== null) emptyTeams.push(returnValue);
+        });
+        if (emptyTeams.length > 0) {
+            // Throw error
+            phSetter(playoffHelper);
+            console.error("Analysis was halted- the following teams don't have data in memory: " + emptyTeams);
+            return;
+        }
 
+        // Setup the draft and initial alliances
+        playoffHelper.teams.sort((a, b) => a.qualRanking - b.qualRanking);
+        for (let i = 0; i < 8; i ++) {
+            playoffHelper.alliances.push([playoffHelper.teams[i].teamNumber]);
+        }
+
+        // Setup config and state
         playoffHelper.state = mode;
         playoffHelper.config.backupSelections = backupSelections;
 
@@ -123,7 +154,52 @@ const PlayoffHelperFunctions = {
         playoffHelper.state = PlayoffHelperState.READY;
 
         phSetter(playoffHelper);
-    }
+    },
+
+    /**
+     * Gets playoff information from a given team number.
+     * @param {PlayoffHelperData} ph The state object containing the playoff helper data
+     * @param {number} teamNumber The team number of the `PlayoffTeam` to retrieve
+     * @returns A `PlayoffTeam` object, null if the team can't be found
+     */
+    getTeam(ph, teamNumber) {
+        let returnTeam = null;
+        ph.teams.forEach(team => {
+            if (team.teamNumber == teamNumber) {
+                returnTeam = team;
+                return;
+            }
+        });
+        return returnTeam;
+    },
+
+    /**
+     * Picks a team and advances the playoff selection process.
+     * @param {PlayoffHelperData} ph The state object containing the playoff helper data
+     * @param {function} phSetter The state setter from the FRAME screen
+     * @param {number} teamNumber The team number to pick
+     */
+    pickTeam(ph, phSetter, teamNumber) {
+        let playoffHelper = clonePlayoffHelper(ph);
+
+        // implementation
+
+        phSetter(playoffHelper);
+    },
+
+    /**
+     * Sets a team's status to declined, exempting them from being picked.
+     * @param {PlayoffHelperData} ph The state object containing the playoff helper data
+     * @param {function} phSetter The state setter from the FRAME screen
+     * @param {number} teamNumber The team number that is declining
+     */
+    decline(ph, phSetter, teamNumber) {
+        let playoffHelper = clonePlayoffHelper(ph);
+
+        // implementation
+
+        phSetter(playoffHelper);
+    },
 };
 
 export default PlayoffHelperFunctions;
@@ -141,6 +217,8 @@ export class PlayoffTeam {
     selected = false;
     declined = false;
     powerScores = {};
+    bestCompositeScore = -1;
+    bestCompositeType = null;
 
     /**
      * Creates a PlayoffTeam for use in PlayoffHelperData. The constructor also runs calculations for aggregate stats immediately upon creation.
@@ -162,8 +240,39 @@ export class PlayoffTeam {
      */
     getRecord() { return this.wins == -1 ? "" : `${ this.wins }-${ this.losses }${ this.ties > 0 ? `-${ this.ties }` : "" }` }
 
+    /**
+     * Calculates and stores weighted scores. Should be run before any analysis begins.
+     */
+    calculatePowerScores() {
 
-    calculateStrengths(weights) {
+        // Check if team exists or not
+        if (getTeamData(this.teamNumber) === null) {
+            // Team doesn't exist; pitch a fit if we aren't in development mode
+            if (DEVELOP_MODE) {
+                // Fill with fake data
+                this.powerScores.WellRounded = WeightSets.WellRounded;
+                this.powerScores.WellRounded.Defense = { instances: 0, compositeStrength: 0 };
+                this.powerScores.WellRounded.Composite = 10;
+                
+                this.powerScores.Defensive = WeightSets.Defensive;
+                this.powerScores.Defensive.Defense = { instances: 0, compositeStrength: 0 };
+                this.powerScores.Defensive.Composite = 10;
 
+                this.bestCompositeScore = 10;
+                this.bestCompositeType = "WellRounded";
+            } else {
+                return this.teamNumber; // incident will be logged and reported
+            }
+        }
+
+        Object.keys(WeightSets).forEach(setName => {
+            let scores = weighTeam(getTeamData(this.teamNumber), WeightSets[setName]);
+            this.powerScores[setName] = scores;
+            if (scores.Composite > this.bestCompositeScore) {
+                this.bestCompositeScore = scores.Composite;
+                this.bestCompositeType = setName;
+            }
+        });
+        return null;
     }
 }
