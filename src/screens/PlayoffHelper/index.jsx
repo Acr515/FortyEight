@@ -135,7 +135,7 @@ function RankingInput() {
 }
 
 // A component of screens showing an alliance as a row
-function AllianceRow({ teams, isOnTheClock = false, seed = 0, rpi = 10.5, rpiLabel = "Good" }) {
+function AllianceRow({ teams, isOnTheClock = false, seed = 0, rpi = 10.5, rpiLabel = "Good", pickList = [] }) {
     return (
         <div className="_AllianceRow">
             <div className="alliance-labels">
@@ -143,7 +143,7 @@ function AllianceRow({ teams, isOnTheClock = false, seed = 0, rpi = 10.5, rpiLab
                 <div className="rpi">{rpi}</div>
                 <div className="rpi-label">RPI ({rpiLabel})</div>
             </div>
-            <div className="alliance-teams">
+            { !isOnTheClock ? <div className="alliance-teams">
                 { teams.map((team, index) => <PlayoffHelperTeam 
                     key={index}
                     team={team}
@@ -153,7 +153,23 @@ function AllianceRow({ teams, isOnTheClock = false, seed = 0, rpi = 10.5, rpiLab
                     consolidated={!isOnTheClock}
                     visible={!isOnTheClock || index == 0}
                 /> )}
-            </div>
+            </div> 
+            : <div className="alliance-container">
+                <PlayoffHelperTeam
+                    team={teams[0]}
+                    isOnTheClock
+                    captain
+                    partners={teams.slice(1)}
+                    consolidated={false}
+                />
+                <div className="alliance-teams">
+                    { pickList.map((team, index) => <PlayoffHelperTeam 
+                        key={index}
+                        team={team}
+                        consolidated={false}
+                    /> )}
+                </div>
+            </div>}
         </div>
     )
 }

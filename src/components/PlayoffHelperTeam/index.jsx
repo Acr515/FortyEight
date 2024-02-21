@@ -1,11 +1,16 @@
 import React from "react";
-import "./style.scss";
 import getTeamName from "data/getTeamName";
 import { getOrdinalSuffix } from "util/getOrdinalSuffix";
+import "./style.scss";
 
 /**
  * Creates a team card to be used on the playoff helper screen.
- * @param {*} param0 
+ * @param {PlayoffTeam} team The `PlayoffTeam` object to display
+ * @param {boolean} isOnTheClock Optional. Whether or not the team is a captain who is currently picking. Defaults to false
+ * @param {boolean} captain Optional. Whether or not the team is the captain of their alliance. Defaults to false 
+ * @param {boolean} consolidated Optional. Whether to show the full description of a team in a large card or to only show their RPI in a smaller card. Defaults to true
+ * @param {Array} partners Optional. Any `PlayoffTeam` instances in this array will render in a single card along with the captain. `isOnTheClock` must be true for this value to have any affect. Defaults to an empty array 
+ * @param {boolean} visible Optional. Defaults to true
  */
 export default function PlayoffHelperTeam({ team, isOnTheClock = false, captain = false, consolidated = true, partners = [], visible = true }) {
 
@@ -20,7 +25,7 @@ export default function PlayoffHelperTeam({ team, isOnTheClock = false, captain 
         <div className={`_PlayoffHelperTeam${ isOnTheClock ? " on-the-clock" : "" }${ consolidated ? " consolidated" : "" }${ consolidated && captain ? " captain" : "" }${ !visible ? " hidden" : "" }`}>
             <div className="headline-row">
                 <div className="number-record">
-                    <div className="inline-entry team-number">{partners.length == 0 ? teamNumber : "TODO"}</div>
+                    <div className="inline-entry team-number">{(partners.length == 0 || !isOnTheClock) ? teamNumber : "TODO"}</div>
                     { partners.length == 0 && <div className="inline-entry record">{place} {record}</div> }
                 </div>
                 { (!isOnTheClock && !consolidated) && <div className="inline-entry grade-info">
@@ -35,7 +40,7 @@ export default function PlayoffHelperTeam({ team, isOnTheClock = false, captain 
             { consolidated ? <div className="rpi-row">{tempRPIData}</div>
             : 
                 <div className="cell-row">
-                    <PlayoffHelperTeamCell value={38.2} place={"1st"} label={"RPI (Excellent)"} />
+                    <PlayoffHelperTeamCell value={team.rpi.RPI} place={"1st"} label={`RPI (${team.rpi.rating})`} />
                     <PlayoffHelperTeamCell value={12.5} place={"2nd"} label={"Autonomous"} />
                     <PlayoffHelperTeamCell value={5.2} place={"14th"} label={"Amp Scoring"} />
                     <PlayoffHelperTeamCell value={8.3} place={"4th"} label={"Speaker Scoring"} />

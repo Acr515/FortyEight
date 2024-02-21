@@ -2,6 +2,7 @@ import { DEVELOP_MODE } from "/src/config";
 import hitTBA from "util/hitTBA";
 import weighTeam, { WeightSets } from "./game_specific/weighTeam/GAME_YEAR";
 import { getTeamData } from "./SearchData";
+import calculateRPI from "./game_specific/calculateRPI/2024";
 
 /**
  * Converts an immutable state object to a mutable dictionary with the exact same values- in this case, used to
@@ -86,6 +87,7 @@ const PlayoffHelperFunctions = {
         // Run calculations on playoff teams
         let emptyTeams = [];
         playoffHelper.teams.forEach(team => {
+            team.flush();
             let returnValue = team.calculatePowerScores();
             if (returnValue !== null) emptyTeams.push(returnValue);
         });
@@ -96,11 +98,12 @@ const PlayoffHelperFunctions = {
             return;
         }
 
-        // Setup the draft and initial alliances
+        // Setup the draft and initial alliance captains
         playoffHelper.teams.sort((a, b) => a.qualRanking - b.qualRanking);
         for (let i = 0; i < 8; i ++) {
             playoffHelper.alliances.push([playoffHelper.teams[i].teamNumber]);
         }
+        playoffHelper.teams[0].captain = true;
 
         // Setup config and state
         playoffHelper.state = mode;
@@ -193,12 +196,35 @@ const PlayoffHelperFunctions = {
      * @param {function} phSetter The state setter from the FRAME screen
      * @param {number} teamNumber The team number that is declining
      */
-    decline(ph, phSetter, teamNumber) {
+    declineTeam(ph, phSetter, teamNumber) {
         let playoffHelper = clonePlayoffHelper(ph);
 
         // implementation
 
         phSetter(playoffHelper);
+    },
+
+    /**
+     * Generates a list of teams in descending order of value that may be picked.
+     * Automatically takes into account which alliance is picking, what round it is, 
+     * and which teams are still available.
+     * @param {PlayoffHelperData} ph The state object containing the playoff helper data
+     */
+    generatePicklist(ph) {
+        let picklist = [...ph.teams];
+        let pickingAllianceNumbers = ph.alliances[ph.draftState.alliance];
+        let pickingAlliance = pickingAllianceNumbers.map(team => PlayoffHelperFunctions.getTeam(team));
+
+        // First, remove any teams who are unavailable for any reason
+        for (let i = picklist.length - 1; i >= 0; i--) {
+            let team = picklist[i];
+            if (team.captain || team.selected || team.declined) { 
+                picklist.splice(i, 1);
+            }
+        }
+
+        // I can think of a number of ways to do this, just don't know what the "best" way is:
+        // Sort teams by their best composite score; if their composite score is the best available in its category, show the label
     },
 };
 
@@ -219,6 +245,7 @@ export class PlayoffTeam {
     powerScores = {};
     bestCompositeScore = -1;
     bestCompositeType = null;
+    rpi = { score: -1, rating: "???" };
 
     /**
      * Creates a PlayoffTeam for use in PlayoffHelperData. The constructor also runs calculations for aggregate stats immediately upon creation.
@@ -239,6 +266,22 @@ export class PlayoffTeam {
      * @returns Readable string of the team's qualifying record
      */
     getRecord() { return this.wins == -1 ? "" : `${ this.wins }-${ this.losses }${ this.ties > 0 ? `-${ this.ties }` : "" }` }
+
+    /**
+     * Runs the calculateRPI() function on itself and stores the value in the `rpi` class member.
+     */
+    calculateRPI() {
+        this.rpi = calculateRPI(getTeamData(this.teamNumber));
+    }
+
+    /**
+     * Sets all playoff selection related variables to their default values.
+     */
+    flush() {
+        this.captain = false;
+        this.selected = false;
+        this.declined = false;
+    }
 
     /**
      * Calculates and stores weighted scores. Should be run before any analysis begins.
@@ -267,6 +310,7 @@ export class PlayoffTeam {
             }
         }
 
+        this.calculateRPI();
         Object.keys(WeightSets).forEach(setName => {
             let scores = weighTeam(getTeamData(this.teamNumber), WeightSets[setName]);
             this.powerScores[setName] = scores;

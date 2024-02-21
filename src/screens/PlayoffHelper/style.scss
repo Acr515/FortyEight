@@ -57,6 +57,11 @@
                 white-space: nowrap;
             }
         }
+
+        .alliance-teams {
+            width: 100%;
+            overflow-x: auto;
+        }
     }    
 
     ._LiveDraft {

@@ -93,14 +93,14 @@ export default function FRAME() {
                                 />
                                 <NavigationGroup
                                     text="Analysis"
-                                    links={[<>
+                                    links={[
                                             <NavigationLink
                                                 link="/analysis/simulator"
                                                 text="Simulator"
                                                 location={location}
                                                 sublink={true}
                                                 key={1}
-                                            />
+                                            />,
                                             <NavigationLink
                                                 link="/analysis/playoffs"
                                                 text="Playoff Helper"
@@ -108,7 +108,6 @@ export default function FRAME() {
                                                 sublink={true}
                                                 key={2}
                                             />
-                                        </>
                                     ].concat(DEVELOP_MODE ? [<NavigationLink
                                             link="/analysis/sim-accuracy"
                                             text="Sim. Accuracy"
