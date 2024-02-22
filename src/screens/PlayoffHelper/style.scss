@@ -1,11 +1,15 @@
 ._PlayoffHelper {
     overflow-y: auto;
+    box-sizing: border-box;
     
     .content-area {
-        padding: 0 32px;
+        padding: 0 0 0 32px;
+        box-sizing: border-box;
+        width: 100%;
     }
 
     ._RankingInput {
+        padding-right: 32px;
         h2 {
             margin-top: 0;
         }
@@ -31,6 +35,7 @@
 
     ._AllianceRow {
         display: flex;
+        width: 100%;
         gap: 10px;
 
         .alliance-labels {
@@ -57,15 +62,27 @@
                 white-space: nowrap;
             }
         }
-
+        .alliance-container {
+            display: flex;
+            width: 100%;
+            min-width: 0;
+        }
         .alliance-teams {
             width: 100%;
+            min-width: 0;
             overflow-x: auto;
+            display: flex;
+            flex-direction: row;
+            gap: 10px;
+        }
+        .alliance-teams.on-clock {
+            padding: 0 16px;
         }
     }    
 
     ._LiveDraft {
-
+        width: 100%;
+        
         .alliance-list {
             display: flex;
             flex-direction: column;

@@ -46,7 +46,7 @@ export default function FRAME() {
         hideDialog: hideDialog
     };
 
-    // Sets up context for the playoff helper - not the best way of doing this, but only way to integrate ES6 classes
+    // Sets up context for the playoff helper - not the best way of doing this, but only way for a complex object
     const [playoffHelper, setPlayoffHelper] = useState(clonePlayoffHelper(PlayoffHelperData));
     const playoffHelperContextObject = {
         data: playoffHelper,
@@ -57,6 +57,8 @@ export default function FRAME() {
         declineTeam: (teamNumber) => PlayoffHelperFunctions.declineTeam(playoffHelper, setPlayoffHelper, teamNumber),
         setup: (mode, backupSelections) => PlayoffHelperFunctions.setup(playoffHelper, setPlayoffHelper, mode, backupSelections),
         getTBARankings: (eventKey, failureCallback) => PlayoffHelperFunctions.getTBARankings(playoffHelper, setPlayoffHelper, eventKey, failureCallback),
+        convertNumberToLetter: (number) => PlayoffHelperFunctions.convertNumberToLetter(number),
+        generatePicklist: () => PlayoffHelperFunctions.generatePicklist(playoffHelper),
     };
     
 

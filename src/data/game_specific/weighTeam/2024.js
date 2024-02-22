@@ -11,9 +11,11 @@ export const Weights = {
 }
 
 /**
- * A set of well-rounded, tuned weights to use
+ * Sets of tuned weights to use. Adding another weight set here will add another category
+ * for a team to be ranked "the best" in
  */
 export const WeightSets = {
+    // Every year should have a `WellRounded` set, which uses a wholistic approach to analyze a team
     WellRounded: {
         Autonomous: 1.2,
         Speaker: 1.5,
@@ -22,6 +24,7 @@ export const WeightSets = {
         Defense: 1,
         Flags: 1
     },
+    // Composite score focuses on reliable defenders with good supporting traits
     Defensive: {
         Autonomous: 1.25,
         Speaker: 0.5,
@@ -31,6 +34,14 @@ export const WeightSets = {
         Flags: 2
     }
 };
+
+/**
+ * Converts the above weight sets into readable names.
+ */
+export const WeightSetNames = {
+    WellRounded: "well-rounded",
+    Defensive: "defensive",
+}
 
 /**
  * Weighs a team and outputs a composite score for it.
@@ -77,13 +88,12 @@ export default function weighTeam(team, weights) {
             score.Defense.compositeStrength *= (score.Defense.instances * .25) * 8;
             
             score[key].compositeStrength *= weights[key];
-            composite += score[key].compositeStrength;
+            score[key] = score[key].compositeStrength;  // remove object structure & replace with single number
         }
-        if (key != Weights.Defense) {
-            score[key] /= team.data.length;
-            score[key] *= weights[key];
-            composite += score[key];
-        }
+        score[key] /= team.data.length;
+        score[key] *= weights[key];
+        score[key] = Math.round(score[key] * 10) / 10;
+        composite += score[key];
     });
 
     score.Composite = composite;

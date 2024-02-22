@@ -1,4 +1,6 @@
 import React from "react";
+import PlayoffHelperTeamCell from "components/game_specific/PlayoffHelperTeamCell/_Universal";
+import PlayoffHelperTeamCellSet from "components/game_specific/PlayoffHelperTeamCell/2024";
 import getTeamName from "data/getTeamName";
 import { getOrdinalSuffix } from "util/getOrdinalSuffix";
 import "./style.scss";
@@ -18,7 +20,6 @@ export default function PlayoffHelperTeam({ team, isOnTheClock = false, captain 
     const place = getOrdinalSuffix(team.qualRanking);
     const record = `(${team.getRecord()})`;
     const bestAvailable = false;
-    const tempRPIData = "38.2 RPI (1st)";
     const letterGrade = "A-";
 
     return (
@@ -37,27 +38,13 @@ export default function PlayoffHelperTeam({ team, isOnTheClock = false, captain 
                 <div className="team-name">{ isOnTheClock ? ( partners.length > 0 ? "are on the clock..." : "is on the clock..." ) : getTeamName(teamNumber) }</div>
                 { (bestAvailable && !consolidated) && <div className="best-available">Best available</div> }
             </div>
-            { consolidated ? <div className="rpi-row">{tempRPIData}</div>
+            { consolidated ? <div className="rpi-row">{team.rpi.RPI} RPI ({getOrdinalSuffix(team.rpi.ranking)})</div>
             : 
                 <div className="cell-row">
-                    <PlayoffHelperTeamCell value={team.rpi.RPI} place={"1st"} label={`RPI (${team.rpi.rating})`} />
-                    <PlayoffHelperTeamCell value={12.5} place={"2nd"} label={"Autonomous"} />
-                    <PlayoffHelperTeamCell value={5.2} place={"14th"} label={"Amp Scoring"} />
-                    <PlayoffHelperTeamCell value={8.3} place={"4th"} label={"Speaker Scoring"} />
+                    <PlayoffHelperTeamCell value={team.rpi.RPI} place={getOrdinalSuffix(team.rpi.ranking)} label={`RPI (${team.rpi.rating})`} />
+                    <PlayoffHelperTeamCellSet team={team} />
                 </div>
             }
-        </div>
-    )
-}
-
-function PlayoffHelperTeamCell({ value, place, label }) {
-    return (
-        <div className="_PlayoffHelperTeamCell">
-            <div className="value-holder">
-                <div className="inline-entry value">{value}</div>
-                <div className="inline-entry place">{place}</div>
-            </div>
-            <div className="label">{label}</div>
         </div>
     )
 }

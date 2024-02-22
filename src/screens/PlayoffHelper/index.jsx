@@ -7,8 +7,6 @@ import { PlayoffHelperState } from "data/PlayoffHelperData";
 import FeedbackModalContext from "context/FeedbackModalContext";
 import DialogBoxContext from "context/DialogBoxContext";
 import PlayoffHelperTeam from "components/PlayoffHelperTeam";
-import weighTeam, { WeightSets } from "data/game_specific/weighTeam/GAME_YEAR";
-import { getTeamData } from "data/SearchData";
 import "./style.scss";
 
 /**
@@ -135,7 +133,10 @@ function RankingInput() {
 }
 
 // A component of screens showing an alliance as a row
-function AllianceRow({ teams, isOnTheClock = false, seed = 0, rpi = 10.5, rpiLabel = "Good", pickList = [] }) {
+function AllianceRow({ teams, isOnTheClock = false, seed = 0, rpi = 10.5, rpiLabel = "Good" }) {
+
+    const playoffHelper = useContext(PlayoffHelperContext);
+
     return (
         <div className="_AllianceRow">
             <div className="alliance-labels">
@@ -162,8 +163,8 @@ function AllianceRow({ teams, isOnTheClock = false, seed = 0, rpi = 10.5, rpiLab
                     partners={teams.slice(1)}
                     consolidated={false}
                 />
-                <div className="alliance-teams">
-                    { pickList.map((team, index) => <PlayoffHelperTeam 
+                <div className="alliance-teams on-clock">
+                    { isOnTheClock && playoffHelper.generatePicklist().map((team, index) => <PlayoffHelperTeam 
                         key={index}
                         team={team}
                         consolidated={false}

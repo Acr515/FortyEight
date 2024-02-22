@@ -3,6 +3,7 @@ import hitTBA from "util/hitTBA";
 import weighTeam, { WeightSets } from "./game_specific/weighTeam/GAME_YEAR";
 import { getTeamData } from "./SearchData";
 import calculateRPI from "./game_specific/calculateRPI/2024";
+import { WeightSetNames, Weights } from "./game_specific/weighTeam/2024";
 
 /**
  * Converts an immutable state object to a mutable dictionary with the exact same values- in this case, used to
@@ -97,6 +98,16 @@ const PlayoffHelperFunctions = {
             console.error("Analysis was halted- the following teams don't have data in memory: " + emptyTeams.toString());
             return;
         }
+
+        // Rank every attribute of every team
+        let sortedTeams = [...playoffHelper.teams];
+        Object.keys(Weights).forEach(weight => {
+            sortedTeams.sort((a, b) => b.powerScores.WellRounded[weight] - a.powerScores.WellRounded[weight]);  // sort by well-rounded scores (WellRounded should always exist)
+            sortedTeams.forEach((team, ranking) => { team.powerScoreRankings[weight] = ranking + 1 });
+        });
+        // Also do the same for RPI
+        sortedTeams.sort((a, b) => b.rpi.RPI - a.rpi.RPI);
+        sortedTeams.forEach((team, ranking) => { team.rpi.ranking = ranking + 1 });
 
         // Setup the draft and initial alliance captains
         playoffHelper.teams.sort((a, b) => a.qualRanking - b.qualRanking);
@@ -205,6 +216,23 @@ const PlayoffHelperFunctions = {
     },
 
     /**
+     * Given a number, returns a letter grade. Used to convert numerical draft grades to a letter.
+     * @param {number} number The number to convert
+     * @returns A string letter grade
+     */
+    convertNumberToLetter(number) {
+        if (number > 3.7) return "A";
+        if (number > 3.3) return "A-";
+        if (number > 3.0) return "B+";
+        if (number > 2.7) return "B";
+        if (number > 2.4) return "C+";
+        if (number > 2) return "C";
+        if (number > 1.7) return "C-";
+        if (number > 1.3) return "D";
+        return "F";
+    },
+
+    /**
      * Generates a list of teams in descending order of value that may be picked.
      * Automatically takes into account which alliance is picking, what round it is, 
      * and which teams are still available.
@@ -213,7 +241,7 @@ const PlayoffHelperFunctions = {
     generatePicklist(ph) {
         let picklist = [...ph.teams];
         let pickingAllianceNumbers = ph.alliances[ph.draftState.alliance];
-        let pickingAlliance = pickingAllianceNumbers.map(team => PlayoffHelperFunctions.getTeam(team));
+        let pickingAlliance = pickingAllianceNumbers.map(team => PlayoffHelperFunctions.getTeam(ph, team));
 
         // First, remove any teams who are unavailable for any reason
         for (let i = picklist.length - 1; i >= 0; i--) {
@@ -223,8 +251,23 @@ const PlayoffHelperFunctions = {
             }
         }
 
-        // I can think of a number of ways to do this, just don't know what the "best" way is:
-        // Sort teams by their best composite score; if their composite score is the best available in its category, show the label
+        // Then, sort by best composite scores
+        picklist.sort((a, b) => b.bestCompositeScore - a.bestCompositeScore);
+
+        // Then, add flags for which teams have the best score in each weight group; must remove them first though
+        picklist.forEach(team => team.bestCompositeType = null);
+        let categories = [...Object.keys(WeightSets)];
+        let bestTeams = {};
+        categories.forEach(category => {
+            bestTeams[category] = picklist[0];
+            picklist.forEach(team => {
+                if (team.powerScores[category].Composite > bestTeams[category].powerScores[category].Composite) bestTeams[category] = team;
+            });
+        });
+        Object.keys(bestTeams).forEach(category => bestTeams[category].bestCompositeType = WeightSetNames[category]);
+
+        // Return the picklist
+        return picklist;
     },
 };
 
@@ -243,9 +286,11 @@ export class PlayoffTeam {
     selected = false;
     declined = false;
     powerScores = {};
-    bestCompositeScore = -1;
+    powerScoreRankings = {};
+    bestCompositeScore = -1000;
     bestCompositeType = null;
-    rpi = { score: -1, rating: "???" };
+    pickGrade = null;
+    rpi = { RPI: -1, rating: "???" };
 
     /**
      * Creates a PlayoffTeam for use in PlayoffHelperData. The constructor also runs calculations for aggregate stats immediately upon creation.
@@ -268,10 +313,11 @@ export class PlayoffTeam {
     getRecord() { return this.wins == -1 ? "" : `${ this.wins }-${ this.losses }${ this.ties > 0 ? `-${ this.ties }` : "" }` }
 
     /**
-     * Runs the calculateRPI() function on itself and stores the value in the `rpi` class member.
+     * Runs the calculateRPI() function on itself and stores the value in the `rpi` class member. This will reset the team's RPI ranking.
      */
     calculateRPI() {
         this.rpi = calculateRPI(getTeamData(this.teamNumber));
+        this.rpi.ranking = 0;
     }
 
     /**
@@ -294,11 +340,9 @@ export class PlayoffTeam {
             if (DEVELOP_MODE) {
                 // Fill with fake data
                 this.powerScores.WellRounded = WeightSets.WellRounded;
-                this.powerScores.WellRounded.Defense = { instances: 0, compositeStrength: 0 };
                 this.powerScores.WellRounded.Composite = 10;
                 
                 this.powerScores.Defensive = WeightSets.Defensive;
-                this.powerScores.Defensive.Defense = { instances: 0, compositeStrength: 0 };
                 this.powerScores.Defensive.Composite = 10;
 
                 this.bestCompositeScore = 10;
@@ -316,7 +360,6 @@ export class PlayoffTeam {
             this.powerScores[setName] = scores;
             if (scores.Composite > this.bestCompositeScore) {
                 this.bestCompositeScore = scores.Composite;
-                this.bestCompositeType = setName;
             }
         });
         return null;

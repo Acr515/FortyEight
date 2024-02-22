@@ -26,6 +26,7 @@
                 font-family: 'industry';
                 font-weight: 700;
                 font-size: 33px;
+                line-height: 0.98em;
             }
             .record {
                 font-family: 'industry';
@@ -68,6 +69,9 @@
             font-family: 'transandina';
             font-size: 20px;
             font-weight: 600;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
         }
         .best-available {
             font-family: 'transandina';
@@ -110,35 +114,4 @@
 }
 ._PlayoffHelperTeam.hidden {
     display: none;
-}
-
-._PlayoffHelperTeamCell {
-    display: flex;
-    flex-direction: column;
-
-    .value-holder {
-        display: flex;
-        flex-direction: row;
-        gap: 4px;
-
-        .inline-entry {
-            margin-top: auto;
-        }
-        .value {
-            font-family: 'industry';
-            font-weight: 500;
-            font-size: 27px;
-        }
-        .place {
-            font-family: 'industry';
-            font-weight: 500;
-            font-size: 16px;
-        }
-    }
-    .label {
-        font-family: 'transandina';
-        font-size: 16px;
-        font-weight: 300;
-        white-space: nowrap;
-    }
 }
