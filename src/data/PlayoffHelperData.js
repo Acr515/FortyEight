@@ -4,6 +4,7 @@ import weighTeam, { WeightSets } from "./game_specific/weighTeam/GAME_YEAR";
 import { getTeamData } from "./SearchData";
 import calculateRPI from "./game_specific/calculateRPI/2024";
 import { WeightSetNames, Weights } from "./game_specific/weighTeam/2024";
+import Simulator from "./game_specific/Simulator/_Universal";
 
 /**
  * Converts an immutable state object to a mutable dictionary with the exact same values- in this case, used to
@@ -40,7 +41,10 @@ export const PlayoffHelperData = {
     },
     config: {
         fullTBAData: false,
-        backupSelections: false
+        backupSelections: false,
+        useSimulation: true,
+        numberOfSimulatedFillerOptions: 2,
+        simualtedMatches: 300,
     }
 };
 
@@ -196,7 +200,34 @@ const PlayoffHelperFunctions = {
     pickTeam(ph, phSetter, teamNumber) {
         let playoffHelper = clonePlayoffHelper(ph);
 
-        // implementation
+        // Add the team to the alliance
+        let teamObj = PlayoffHelperFunctions.getTeam(ph, teamNumber);
+        playoffHelper.alliances[playoffHelper.draftState.alliance].push(teamNumber);
+
+        // Set team to unavailable
+        teamObj.selected = true;
+
+        // Advance to the next pick, but keep track of when to serpentine the other direction or end the draft
+        if (playoffHelper.draftState.alliance == 7) {
+            // Alliance 8 has chosen
+            if (playoffHelper.draftState.round == 1) {
+                playoffHelper.draftState.round = 2; 
+            } else if (playoffHelper.config.backupSelections && playoffHelper.draftState.round == 3) {
+                // The draft is over (round 3)
+                // TODO IMPLEMENT
+            } else playoffHelper.draftState.alliance = 7;
+        } else if (playoffHelper.draftState.alliance == 0) {
+            // Alliance 1 has chosen
+            if (playoffHelper.draftState.round == 1 || playoffHelper.config.backupSelections) {
+                playoffHelper.draftState.alliance = 1;
+            } else {
+                // The draft is over (round 2)
+                // TODO IMPLEMENT
+            }
+        } else {
+            // Any other alliance has chosen
+            playoffHelper.draftState.alliance += (playoffHelper.draftState.round % 2 == 1 ? 1 : -1);
+        }
 
         phSetter(playoffHelper);
     },
@@ -210,7 +241,9 @@ const PlayoffHelperFunctions = {
     declineTeam(ph, phSetter, teamNumber) {
         let playoffHelper = clonePlayoffHelper(ph);
 
-        // implementation
+        // Set team to unavailable
+        let teamObj = PlayoffHelperFunctions.getTeam(ph, teamNumber);
+        teamObj.declined = true;
 
         phSetter(playoffHelper);
     },
@@ -237,11 +270,10 @@ const PlayoffHelperFunctions = {
      * Automatically takes into account which alliance is picking, what round it is, 
      * and which teams are still available.
      * @param {PlayoffHelperData} ph The state object containing the playoff helper data
+     * @param {boolean} useSimulation Optional. Defaults to true. When true AND the first round is over, simulates matches to find the best fit for the alliance
      */
-    generatePicklist(ph) {
+    async generatePicklist(ph, useSimulation = false) {   // CHANGE useSimulation TO TRUE ONCE PICKTEAM() IS DEFINED
         let picklist = [...ph.teams];
-        let pickingAllianceNumbers = ph.alliances[ph.draftState.alliance];
-        let pickingAlliance = pickingAllianceNumbers.map(team => PlayoffHelperFunctions.getTeam(ph, team));
 
         // First, remove any teams who are unavailable for any reason
         for (let i = picklist.length - 1; i >= 0; i--) {
@@ -265,6 +297,66 @@ const PlayoffHelperFunctions = {
             });
         });
         Object.keys(bestTeams).forEach(category => bestTeams[category].bestCompositeType = WeightSetNames[category]);
+
+        // Apply simulated percentages to picklist robots, only after round 1 and if flag is true
+        if (ph.draftState.round > 1 && useSimulation) {
+            // Make a temporary playoff helper and determine method to proceed
+            let simulatedPh = clonePlayoffHelper(ph);
+            let fillerTeams = [];
+            let pickingAllianceNumbers = ph.alliances[ph.draftState.alliance];
+            let opponentSeed = 7 - ph.draftState.alliance;
+
+            // Check if we need to simulate a few picks because the alliance on the clock faces an opponent who hasn't finished picking yet
+            if (ph.draftState.alliance > 3) {
+                let picksAwayFromOpponent = ph.draftState.alliance - 4; // 5 seed (index 4) is 1 (5 minus 4) picks away from their opponent picking
+
+                while (picksAwayFromOpponent > 0) {
+                    // Pick teams and advance the simulatedPh
+                    let chalkPicklist = PlayoffHelperFunctions.generatePicklist(simulatedPh, false);            // shouldn't use simulations at this point to prevent infinite loop
+                    PlayoffHelperFunctions.pickTeam(simulatedPh, nph => simulatedPh = nph, chalkPicklist[0]);   // skim off the top team from the picklist, also advances our "mock draft" at the same time
+                    picksAwayFromOpponent --;
+                }
+
+                // Put the top X (see config) picklist teams into the fillerTeams array and cycle back-and-forth between them during the following trials
+                let opponentPicklist = PlayoffHelperFunctions.generatePicklist(simulatedPh, false);
+                let picksAdded = 0;
+                while (picksAdded < ph.config.numberOfSimulatedFillerOptions) {
+                    fillerTeams.push(opponentPicklist[picksAdded]);
+                    picksAdded ++;
+                }
+            }
+
+            // Begin running simulations
+            for (let candidateTeam in picklist) {
+                // Creates and runs the simulator, returns a win rate with those teams in the match
+                const runSim = async (candidate, filler = null) => {
+                    let sim = new Simulator(
+                        [...pickingAllianceNumbers, candidate.teamNumber],                                                      // red alliance, always the picking team
+                        (filler === null ? simulatedPh.alliances[opponentSeed] : [...simulatedPh.alliances[opponentSeed]]), {   // blue alliance, always 1st round opponent
+                            simulations: (ph.config.simualtedMatches / ph.config.numberOfSimulatedFillerOptions),
+                            applyDefense: false,    // TODO SET THIS TO TRUE
+                        }
+                    );
+                    await sim.run((results) => {
+                        return results.red.winRate;
+                    });
+                };
+
+                if (fillerTeams.length > 0) {
+                    let winRate = 0;
+                    for (let fillerTeam in fillerTeams) {
+                        let addedWinRate = await runSim(candidateTeam, fillerTeam);
+                        winRate += addedWinRate;
+                    }
+                    candidateTeam.simulatedWinRate = 0.5 + (winRate / fillerTeams.length);
+                } else {
+                    candidateTeam.simulatedWinRate = 0.5 + (await runSim(candidateTeam));
+                }
+            }
+
+            // Finally, re-score the old set of rankings using simulated win rates
+            picklist.sort((a, b) => (b.bestCompositeScore * b.simulatedWinRate) - (a.bestCompositeScore * a.simulatedWinRate));
+        }
 
         // Return the picklist
         return picklist;
@@ -290,6 +382,7 @@ export class PlayoffTeam {
     bestCompositeScore = -1000;
     bestCompositeType = null;
     pickGrade = null;
+    simulatedWinRate = 1;   // 1.5 = 100%, 0.5 = 0%
     rpi = { RPI: -1, rating: "???" };
 
     /**
