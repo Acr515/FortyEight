@@ -103,6 +103,26 @@
             font-size: 16px;
             font-weight: 500;
         }
+
+        .number-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 4px;
+
+            .number {
+                font-family: 'transandina';
+                font-size: 14px;
+                font-weight: 400;
+            }
+            .number:hover:not(.active) {
+                opacity: .7;
+                cursor: pointer;
+            }
+            .number.active {
+                font-weight: 600;
+                text-decoration: underline;
+            }
+        }
     }
 
     .team-card.on-the-clock {

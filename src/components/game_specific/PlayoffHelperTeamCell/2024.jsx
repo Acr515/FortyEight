@@ -9,6 +9,7 @@ import { getOrdinalSuffix } from "util/getOrdinalSuffix";
 export default function PlayoffHelperTeamCellSet({ team }) { 
     return (
         <>
+            <PlayoffHelperTeamCell value={team.rpi.RPI} place={getOrdinalSuffix(team.rpi.ranking)} label={`RPI (${team.rpi.rating})`} />
             <PlayoffHelperTeamCell value={team.powerScores.WellRounded.Autonomous} place={getOrdinalSuffix(team.powerScoreRankings.Autonomous)} label={"Autonomous"} />
             <PlayoffHelperTeamCell value={team.powerScores.WellRounded.Speaker} place={getOrdinalSuffix(team.powerScoreRankings.Speaker)} label={"Speaker Scoring"} />
             <PlayoffHelperTeamCell value={team.powerScores.WellRounded.Amp} place={getOrdinalSuffix(team.powerScoreRankings.Amp)} label={"Amp Scoring"} />
