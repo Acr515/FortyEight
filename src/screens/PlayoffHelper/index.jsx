@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Input from "components/Input";
 import Button from "components/Button";
 import PageHeader from "components/PageHeader";
@@ -8,6 +8,7 @@ import FeedbackModalContext from "context/FeedbackModalContext";
 import DialogBoxContext from "context/DialogBoxContext";
 import PlayoffHelperTeam from "components/PlayoffHelperTeam";
 import "./style.scss";
+import sleep from "util/sleep";
 
 /**
  * A series of screens related to setting up the playoff helper and using it.
@@ -133,9 +134,22 @@ function RankingInput() {
 }
 
 // A component of screens showing an alliance as a row
-function AllianceRow({ teams, isOnTheClock = false, seed = 0, rpi = 10.5, rpiLabel = "Good" }) {
+function AllianceRow({ teams, isOnTheClock = false, seed = 0, rpi = 0, rpiLabel = "???" }) {
 
     const playoffHelper = useContext(PlayoffHelperContext);
+    const [picklist, setPicklist] = useState([]);
+
+    useEffect(() => {
+        getNewPicklist();
+    }, [playoffHelper]);
+
+    const getNewPicklist = async () => {
+        setPicklist([]);
+        if (!isOnTheClock) return;
+
+        let pl = await playoffHelper.generatePicklist();
+        setPicklist(pl);
+    };
 
     return (
         <div className="_AllianceRow">
@@ -164,10 +178,11 @@ function AllianceRow({ teams, isOnTheClock = false, seed = 0, rpi = 10.5, rpiLab
                     consolidated={false}
                 />
                 <div className="alliance-teams on-clock">
-                    { isOnTheClock && playoffHelper.generatePicklist().map((team, index) => <PlayoffHelperTeam 
+                    { isOnTheClock && picklist.map((team, index) => <PlayoffHelperTeam 
                         key={index}
                         team={team}
                         consolidated={false}
+                        showPickButtons
                     /> )}
                 </div>
             </div>}

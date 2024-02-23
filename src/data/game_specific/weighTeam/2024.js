@@ -17,20 +17,20 @@ export const Weights = {
 export const WeightSets = {
     // Every year should have a `WellRounded` set, which uses a wholistic approach to analyze a team
     WellRounded: {
-        Autonomous: 1.2,
-        Speaker: 1.5,
-        Amp: 1.8,
-        Endgame: 1.2,
+        Autonomous: 2,
+        Speaker: 2.8,
+        Amp: 2.2,
+        Endgame: 1.5,
         Defense: 1,
         Flags: 1
     },
     // Composite score focuses on reliable defenders with good supporting traits
     Defensive: {
-        Autonomous: 1.25,
+        Autonomous: 1,
         Speaker: 0.5,
-        Amp: 1.5,
+        Amp: 1.25,
         Endgame: 1.5,
-        Defense: 3.5,
+        Defense: 2.75,
         Flags: 2
     }
 };
@@ -89,7 +89,7 @@ export default function weighTeam(team, weights) {
             
             score[key].compositeStrength *= weights[key];
             score[key] = score[key].compositeStrength;  // remove object structure & replace with single number
-        }
+        } else if (key == Weights.Defense && score.Defense.instances == 0) score.Defense = 0;
         score[key] /= team.data.length;
         score[key] *= weights[key];
         score[key] = Math.round(score[key] * 10) / 10;
