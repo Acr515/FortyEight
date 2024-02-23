@@ -2,8 +2,8 @@ import { DEVELOP_MODE } from "/src/config";
 import hitTBA from "util/hitTBA";
 import weighTeam, { WeightSets } from "./game_specific/weighTeam/GAME_YEAR";
 import { getTeamData } from "./SearchData";
-import calculateRPI from "./game_specific/calculateRPI/2024";
-import { WeightSetNames, Weights } from "./game_specific/weighTeam/2024";
+import calculateRPI, { getRPIRating } from "./game_specific/calculateRPI/GAME_YEAR";
+import { WeightSetNames, Weights } from "./game_specific/weighTeam/GAME_YEAR";
 import Simulator from "./game_specific/Simulator/_Universal";
 
 /**
@@ -289,6 +289,25 @@ const PlayoffHelperFunctions = {
         if (number > 1.7) return "C-";
         if (number > 1.3) return "D";
         return "F";
+    },
+
+    /**
+     * Gets the RPI information of a full alliance.
+     * @param {PlayoffHelperData} ph The state object containing the playoff helper data
+     * @param {number} seed The seed # of the alliance to calculate
+     * @returns An RPI object with keys RPI and rating
+     */
+    getAllianceRPI(ph, seed) {
+        let playoffHelper = clonePlayoffHelper(ph);
+
+        let teams = playoffHelper.alliances[seed].map(team => getTeamData(team));
+        let totalRPI = 0;
+
+        teams.forEach(team => {
+            if (team !== null) totalRPI += calculateRPI(team).RPI;
+        });
+        
+        return { RPI: Math.round(totalRPI * 10) / 10, rating: getRPIRating(totalRPI / teams.length) }
     },
 
     /**

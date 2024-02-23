@@ -41,6 +41,7 @@
         .alliance-labels {
             display: flex;
             flex-direction: column;
+            width: 80px;
             padding-top: 25px;
             margin-right: 8px;
 
@@ -60,6 +61,11 @@
                 font-weight: 400;
                 font-size: 15px;
                 white-space: nowrap;
+            }
+            .rpi-rating {
+                font-family: 'transandina';
+                font-weight: 400;
+                font-size: 12px;
             }
         }
         .alliance-container {

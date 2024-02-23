@@ -59,6 +59,7 @@ export default function FRAME() {
         getTBARankings: (eventKey, failureCallback) => PlayoffHelperFunctions.getTBARankings(playoffHelper, setPlayoffHelper, eventKey, failureCallback),
         convertNumberToLetter: (number) => PlayoffHelperFunctions.convertNumberToLetter(number),
         generatePicklist: () => PlayoffHelperFunctions.generatePicklist(playoffHelper),
+        getAllianceRPI: (seed) => PlayoffHelperFunctions.getAllianceRPI(playoffHelper, seed),
     };
     
 

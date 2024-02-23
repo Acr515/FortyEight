@@ -134,13 +134,15 @@ function RankingInput() {
 }
 
 // A component of screens showing an alliance as a row
-function AllianceRow({ teams, isOnTheClock = false, seed = 0, rpi = 0, rpiLabel = "???" }) {
+function AllianceRow({ teams, isOnTheClock = false, seed = 0 }) {
 
     const playoffHelper = useContext(PlayoffHelperContext);
     const [picklist, setPicklist] = useState([]);
+    const [rpi, setRpi] = useState(playoffHelper.getAllianceRPI(seed - 1));
 
     useEffect(() => {
         getNewPicklist();
+        setRpi(playoffHelper.getAllianceRPI(seed - 1));
     }, [playoffHelper]);
 
     const getNewPicklist = async () => {
@@ -155,8 +157,9 @@ function AllianceRow({ teams, isOnTheClock = false, seed = 0, rpi = 0, rpiLabel 
         <div className="_AllianceRow">
             <div className="alliance-labels">
                 <div className="ranking">#{seed}</div>
-                <div className="rpi">{rpi}</div>
-                <div className="rpi-label">RPI ({rpiLabel})</div>
+                <div className="rpi">{rpi.RPI}</div>
+                <div className="rpi-label">RPI</div>
+                <div className="rpi-rating">({rpi.rating})</div>
             </div>
             { !isOnTheClock ? <div className="alliance-teams">
                 { teams.map((team, index) => <PlayoffHelperTeam 
@@ -204,6 +207,7 @@ function LiveDraft() {
                         seed={seed + 1}
                         teams={ alliance.map(team => playoffHelper.getTeam(team)) }
                         isOnTheClock={playoffHelper.data.draftState.alliance == seed}
+
                     />
                 })) }
             </div>
