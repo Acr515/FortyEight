@@ -1,9 +1,9 @@
 import React, { useContext, useState } from "react";
 import Button from "components/Button";
-import PlayoffHelperTeamCell from "components/game_specific/PlayoffHelperTeamCell/_Universal";
 import PlayoffHelperTeamCellSet from "components/game_specific/PlayoffHelperTeamCell/GAME_YEAR";
 import PlayoffHelperContext from "context/PlayoffHelperContext";
 import getTeamName from "data/getTeamName";
+import { Weights } from "data/game_specific/weighTeam/GAME_YEAR";
 import { getOrdinalSuffix } from "util/getOrdinalSuffix";
 import "./style.scss";
 
@@ -21,6 +21,7 @@ export default function PlayoffHelperTeam({ team, isOnTheClock = false, captain 
 
     const playoffHelper = useContext(PlayoffHelperContext);
     const [activeTeam, setActiveTeam] = useState(team);
+    const [infoBox, setInfoBox] = useState(false);
 
     // Tells playoff helper to pick this team after confirmation dialog
     const pickTeam = () => {
@@ -30,6 +31,30 @@ export default function PlayoffHelperTeam({ team, isOnTheClock = false, captain 
     // Tells playoff helper that this team declined after a confirmation dialog
     const declineTeam = () => {
         playoffHelper.declineTeam(team.teamNumber);
+    };
+
+    // Gets the text content to write in the info box
+    const InfoBoxInnerContent = () => {
+        // TODO ADD FLAGS HERE TOO (number of breakdowns, number of high penalty games)
+
+        let bestAttribute = { rank: 1000, weight: "---" };
+        let estimatedWinRate = Math.round((team.simulatedWinRate - playoffHelper.data.config.weightOfSimulations) * 1000) / 10;
+        if (estimatedWinRate < 1) estimatedWinRate = ">1";
+
+        Object.keys(Weights).forEach(weight => {
+            if (team.powerScoreRankings[weight] < bestAttribute.rank) bestAttribute = { rank: team.powerScoreRankings[weight], weight };
+        });
+        
+        return <>
+            <div className="row">Base score used to rank team: <span className="strong">{Math.round(team.bestCompositeScore * 10) / 10}</span></div>
+            <div className="row">Best strength: <span className="strong">{bestAttribute.weight}</span> ({getOrdinalSuffix(bestAttribute.rank)} at event)</div>
+            { team.uniqueStrengthAdded != -1 &&
+                <div className="row">Ranks <span className="strong">{getOrdinalSuffix(team.uniqueStrengthAddedRank)}</span> against remaining teams in improving the alliance&apos;s weaknesses ({Math.round(team.uniqueStrengthAdded * playoffHelper.data.config.weightOfUniqueStrengths * 10) / 10} points added to base score above)</div>
+            }
+            { team.simulatedWinRate != -1 &&
+                <div className="row">Simulator estimates a <span className="strong">{estimatedWinRate}%</span> win rate against alliance&apos;s first round opponent ({getOrdinalSuffix(team.simulatedWinRateRank)} among remaining teams)</div>
+            }
+        </>
     };
 
     const teamNumber = team.teamNumber;
@@ -48,7 +73,10 @@ export default function PlayoffHelperTeam({ team, isOnTheClock = false, captain 
                     </div>
                     { (!isOnTheClock && !consolidated) && <div className="inline-entry grade-info">
                         <div className="letter-grade">{letterGrade}</div>
-                        <div className="info-button">i</div>
+                        <div className="info-button" onClick={() => setInfoBox(!infoBox)}>{infoBox ? "X" : "i"}</div>
+                        <div className={`info-box${infoBox ? " visible" : ""}`}>
+                            <InfoBoxInnerContent />
+                        </div>
                     </div> }
                 </div>
                 <div className="label-row">

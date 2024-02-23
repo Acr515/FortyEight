@@ -40,11 +40,13 @@ export const PlayoffHelperData = {
         alliance: 0
     },
     config: {
-        fullTBAData: false,
-        backupSelections: false,
-        useSimulation: true,
-        numberOfSimulatedFillerOptions: 2,
-        simualtedMatches: 300,
+        fullTBAData: false,                 // Whether or not ranking data was supplied by TBA
+        backupSelections: false,            // Whether or not to add a third round of selections to the draft (i.e. world championship style selection)
+        useSimulation: true,                // Whether to use simulation to inform the picklist generator
+        numberOfSimulatedFillerOptions: 2,  // Number of different "fill-in" options used when the opponent alliance in the simulator hasn't filled their alliance yet
+        simulatedMatches: 300,              // Number of matches to simulate with each available team
+        weightOfSimulations: 0.5,           // The factor used to change team value based on simulated outcomes. Must be greater than 0
+        weightOfUniqueStrengths: 1,         // The factor used to change team value based on how much better it is than its partners in different scoring categories
     }
 };
 
@@ -123,6 +125,23 @@ const PlayoffHelperFunctions = {
         // Setup config and state
         playoffHelper.state = mode;
         playoffHelper.config.backupSelections = backupSelections;
+
+        phSetter(playoffHelper);
+    },
+
+    /**
+     * Finishes the draft.
+     */
+    finishDraft: (ph, phSetter) => {
+        let playoffHelper = clonePlayoffHelper(ph);
+
+        playoffHelper.draftState = {
+            round: 1,
+            alliance: 0
+        };
+
+        if (playoffHelper.state == PlayoffHelperState.LIVE_DRAFT) playoffHelper.state = PlayoffHelperState.LIVE_PLAYOFFS;
+        if (playoffHelper.state == PlayoffHelperState.SIMULATED_DRAFT) playoffHelper.state = PlayoffHelperState.SIMULATED_PLAYOFFS;
 
         phSetter(playoffHelper);
     },
@@ -214,7 +233,8 @@ const PlayoffHelperFunctions = {
                 playoffHelper.draftState.round = 2; 
             } else if (playoffHelper.config.backupSelections && playoffHelper.draftState.round == 3) {
                 // The draft is over (round 3)
-                // TODO IMPLEMENT
+                PlayoffHelperFunctions.finishDraft(playoffHelper, phSetter);
+                return;
             } else playoffHelper.draftState.alliance = 6;   // Alliance 7 is up
         } else if (playoffHelper.draftState.alliance == 0) {
             // Alliance 1 has chosen
@@ -222,7 +242,8 @@ const PlayoffHelperFunctions = {
                 playoffHelper.draftState.alliance = 1;
             } else {
                 // The draft is over (round 2)
-                // TODO IMPLEMENT
+                PlayoffHelperFunctions.finishDraft(playoffHelper, phSetter);
+                return;
             }
         } else {
             // Any other alliance has chosen
@@ -328,9 +349,27 @@ const PlayoffHelperFunctions = {
             }
         }
 
+        // Then, calculate uniqueStrengthAdded (also resets whatever the last value was)
+        if (ph.config.weightOfUniqueStrengths > 0) {
+            let pickingAlliance = ph.alliances[ph.draftState.alliance].map(num => PlayoffHelperFunctions.getTeam(ph, num));
+            picklist.forEach(candidate => {
+                candidate.uniqueStrengthAdded = 0;
+                Object.keys(Weights).forEach(weight => {
+                    let candidateScore = candidate.powerScores.WellRounded[weight];
+                    let bestAllianceScore = Math.max(...pickingAlliance.map( team => team.powerScores.WellRounded[weight]))
+                    if (candidateScore > bestAllianceScore) {
+                        // This team has a better power score than the best of the alliance, so it should be logged
+                        candidate.uniqueStrengthAdded += (candidateScore - bestAllianceScore) * ph.config.weightOfUniqueStrengths;
+                    }
+                });
+            });
+            // Rank teams by this attribute
+            picklist.sort((a, b) => b.uniqueStrengthAdded - a.uniqueStrengthAdded);
+            picklist.forEach((team, ranking) => { team.uniqueStrengthAddedRank = ranking + 1 });
+        }
+
         // Then, sort by best composite scores
-        // Could also be a good idea (for round 1) to add favor to robots based on their complements (get composite score using maximum value from each category between the two robots)
-        picklist.sort((a, b) => b.bestCompositeScore - a.bestCompositeScore);
+        picklist.sort((a, b) => (b.bestCompositeScore + b.uniqueStrengthAdded) - (a.bestCompositeScore + a.uniqueStrengthAdded));
 
         // Then, add flags for which teams have the best score in each weight group; must remove them first though
         picklist.forEach(team => team.bestCompositeType = null);
@@ -385,7 +424,7 @@ const PlayoffHelperFunctions = {
                     let sim = new Simulator(
                         [...pickingAllianceNumbers, candidate.teamNumber],                                                                         // red alliance, always the picking team
                         (filler === null ? simulatedPh.alliances[opponentSeed] : [...simulatedPh.alliances[opponentSeed], filler.teamNumber]), {   // blue alliance, always 1st round opponent
-                            simulations: (ph.config.simualtedMatches / ph.config.numberOfSimulatedFillerOptions),
+                            simulations: (ph.config.simulatedMatches / ph.config.numberOfSimulatedFillerOptions),
                             applyDefense: false,    // TODO SET THIS TO TRUE
                         }
                     );
@@ -402,12 +441,16 @@ const PlayoffHelperFunctions = {
                         let simulation = await runSim(candidateTeam, fillerTeam);
                         winRate += simulation.red.winRate;
                     }
-                    candidateTeam.simulatedWinRate = 0.5 + (winRate / fillerTeams.length);
+                    candidateTeam.simulatedWinRate = ph.config.weightOfSimulations + (winRate / fillerTeams.length);
                 } else {
                     let simulation = await runSim(candidateTeam);
-                    candidateTeam.simulatedWinRate = 0.5 + simulation.red.winRate;
+                    candidateTeam.simulatedWinRate = ph.config.weightOfSimulations + simulation.red.winRate;
                 }
             }
+
+            // Add rankings for teams based on this attribute
+            picklist.sort((a, b) => b.simulatedWinRate - a.simulatedWinRate);
+            picklist.forEach((team, ranking) => { team.simulatedWinRateRank = ranking + 1 });
 
             // Finally, re-score the old set of rankings using simulated win rates
             picklist.sort((a, b) => (b.bestCompositeScore * b.simulatedWinRate) - (a.bestCompositeScore * a.simulatedWinRate));
@@ -416,6 +459,21 @@ const PlayoffHelperFunctions = {
         // Return the picklist
         return picklist;
     },
+
+    /**
+     * Simulates the entire alliance selection process and advances to the next state. State must be set to SIMULATED_DRAFT before execution.
+     */
+    simulateDraft: async (ph, phSetter) => {
+        let playoffHelper = clonePlayoffHelper(ph);
+
+        // Picks the best available team for each selection until the draft state changes
+        while (playoffHelper.state == PlayoffHelperState.SIMULATED_DRAFT) {
+            let picklist = await PlayoffHelperFunctions.generatePicklist(playoffHelper, true);
+            PlayoffHelperFunctions.pickTeam(playoffHelper, phSetter, picklist[0].teamNumber);
+        }
+
+        phSetter(playoffHelper);
+    }
 };
 
 export default PlayoffHelperFunctions;
@@ -429,15 +487,18 @@ export class PlayoffTeam {
     wins;
     losses;
     ties = 0;
-    captain = false;
-    selected = false;
-    declined = false;
-    powerScores = {};
-    powerScoreRankings = {};
-    bestCompositeScore = -1000;
-    bestCompositeType = null;
-    pickGrade = null;
-    simulatedWinRate = 1;   // 1.5 = 100%, 0.5 = 0%
+    captain = false;                // whether or not this team is an alliance captain
+    selected = false;               // whether or not this team has been selected by an alliance
+    declined = false;               // whether or not this team has declined a request to be selected (still eligible to be a captain)
+    powerScores = {};               // a dictionary produced by each available WeightSet plugged into the weighTeams() function
+    powerScoreRankings = {};        // how the team ranks against the field in each weight category available
+    bestCompositeScore = -1000;     // the best composite score from each WweightSet composite (for example, team is a 40 in WellRounded and a 50 in Defensive- this value will be 50)
+    bestCompositeType = null;       // if this team has the best composite score available in a certain WeightSet group, the name of that group will populate here
+    pickGrade = null;               // estimated letter grade of how good this pick would be given the rest of the teams available
+    simulatedWinRate = -1;          // win rate as determined by simulations- by default, 1.5 = 100%, 0.5 = 0%. See config object of playoff helper
+    simulatedWinRateRank = 0;       // ranking against the picklist for the above attribute
+    uniqueStrengthAdded = -1;       // quantifies the unique value that this team would bring to the alliance- the higher the number, the stronger this team is in a category that its prospective partners are weaker in
+    uniqueStrengthAddedRank = 0;    // ranking against the picklist for the above attribute
     rpi = { RPI: -1, rating: "???" };
 
     /**

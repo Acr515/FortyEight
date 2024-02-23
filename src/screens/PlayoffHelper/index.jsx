@@ -24,6 +24,7 @@ export default function PlayoffHelper() {
             <div className="content-area">
                 { ( state == PlayoffHelperState.INACTIVE || state == PlayoffHelperState.READY ) && <RankingInput /> }
                 { ( state == PlayoffHelperState.LIVE_DRAFT ) && <LiveDraft /> }
+                { ( state == PlayoffHelperState.LIVE_PLAYOFFS || state == PlayoffHelperState.SIMULATED_PLAYOFFS ) && <FinishedDraft /> }
             </div>
         </div>
     )
@@ -207,7 +208,26 @@ function LiveDraft() {
                         seed={seed + 1}
                         teams={ alliance.map(team => playoffHelper.getTeam(team)) }
                         isOnTheClock={playoffHelper.data.draftState.alliance == seed}
+                    />
+                })) }
+            </div>
+        </div>
+    )
+}
 
+// Screen that shows after alliance selection is done
+function FinishedDraft() {
+
+    const playoffHelper = useContext(PlayoffHelperContext);
+
+    return (
+        <div className="_LiveDraft">
+            <div className="alliance-list">
+                { playoffHelper.data.alliances.map(((alliance, seed) => {
+                    return <AllianceRow 
+                        key={seed}
+                        seed={seed + 1}
+                        teams={ alliance.map(team => playoffHelper.getTeam(team)) }
                     />
                 })) }
             </div>
