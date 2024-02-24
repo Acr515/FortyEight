@@ -42,7 +42,13 @@ export default function PlayoffHelper() {
 
     return (
         <div className="SCREEN _PlayoffHelper">
-            <PageHeader text={`Playoff Helper${state == PlayoffHelperState.SIMULATED_DRAFT ? " (Simulated)" : ""}`}>
+            <PageHeader text="Playoff Helper">
+                { (state == PlayoffHelperState.LIVE_DRAFT && subpageState == SUBPAGE.DraftBoard) && 
+                    <div className="pick-status">
+                        <div className="alliance-seed">#{playoffHelper.data.draftState.alliance + 1}</div>
+                        <div className="on-the-clock">is on the clock...</div>
+                    </div>
+                }
                 { (state == PlayoffHelperState.LIVE_PLAYOFFS || state == PlayoffHelperState.SIMULATED_PLAYOFFS) && <div className="header-buttons"> 
                     <div className={`button ${ subpageState == SUBPAGE.Alliances ? "active" : "" }`} onClick={ () => setSubpageState(SUBPAGE.Alliances) }>Alliances</div>
                     <div className={`button ${ subpageState == SUBPAGE.SimulatedBracket ? "active" : "" }`} onClick={ () => setSubpageState(SUBPAGE.SimulatedBracket) }>Simulated Bracket</div>
@@ -264,7 +270,7 @@ function AllianceRow({ teams, isOnTheClock = false, seed = 0 }) {
 }
 
 // Screen that shows while alliance selection is taking place
-function LiveDraft({ subpageState, setSubpageState }) {
+function LiveDraft({ subpageState }) {
 
     const playoffHelper = useContext(PlayoffHelperContext);
 

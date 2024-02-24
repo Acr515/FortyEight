@@ -36,6 +36,29 @@
         }
     }
 
+    .pick-status {
+        background-color: #4941B1;
+        border-radius: 16px;
+        display: flex;
+        gap: 8px;
+        padding: 12px;
+        color: white;
+        margin-right: 20px;
+        
+        .alliance-seed {
+            font-family: 'industry';
+            font-weight: 600;
+            font-size: 24px;
+        }
+
+        .on-the-clock {
+            font-family: 'transandina';
+            font-weight: 500;
+            font-size: 18px;
+            margin-top: auto;
+        }
+    }
+
     ._RankingInput {
         padding-right: 32px;
         h2 {

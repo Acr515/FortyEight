@@ -78,8 +78,17 @@ const PlayoffHelperFunctions = {
      * @param {function} phSetter The state setter from the FRAME screen
      */
     reset: (ph, phSetter) => {
+        let playoffHelper = clonePlayoffHelper(PlayoffHelperData);
+
         localStorage.removeItem("playoffHelper");
-        phSetter(clonePlayoffHelper(PlayoffHelperData));
+        playoffHelper.teams = [];
+        playoffHelper.alliances = [];
+        playoffHelper.draftState = {
+            round: 1,
+            alliance: 0
+        };
+
+        phSetter(playoffHelper);
     },
 
     /**
