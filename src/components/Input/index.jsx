@@ -18,10 +18,11 @@ import Chevron from '../../assets/images/chevron.png';
  * @param disabled If true, disables the input for changes by adding the disabled HTML attribute to the element
  * @param warning If true, flags the element by outlining the input element in red to resemble an input error
  * @param style Any custom CSS styles to apply to the parent element of the input/label pair
+ * @param labelStyle Any custom CSS styles to apply to the label
  * @param externalUpdate If you wish to have control over this input's values using state from its parent, its state should be set using this property. A `useEffect()` hook will run when it changes
  * @param getExternalUpdate This function should return a value that will be used to set the value state of this input component
  */
-export default function Input({label, prefill, id, onInput, isCheckbox, isNumerical, optionList, marginBottom, alignLabel = "middle", textArea = false, required = false, disabled = false, warning = false, style = {}, externalUpdate = null, getExternalUpdate = null}) {
+export default function Input({label, prefill, id, onInput, isCheckbox, isNumerical, optionList, marginBottom, alignLabel = "middle", textArea = false, required = false, disabled = false, warning = false, style = {}, labelStyle = {}, externalUpdate = null, getExternalUpdate = null}) {
     
     optionList = typeof optionList !== "undefined" ? optionList : false;
 
@@ -57,7 +58,7 @@ export default function Input({label, prefill, id, onInput, isCheckbox, isNumeri
             { typeof label !== 'undefined' && (
                 <label 
                     htmlFor={id}
-                    style={{ marginTop: alignLabel == "top" || alignLabel == "middle" ? "auto" : 0 , marginBottom: alignLabel == "bottom" || alignLabel == "middle" ? "auto" : 0 }}
+                    style={{ marginTop: alignLabel == "top" || alignLabel == "middle" ? "auto" : 0 , marginBottom: alignLabel == "bottom" || alignLabel == "middle" ? "auto" : 0, ...labelStyle }}
                 >
                     {label}
                 </label>

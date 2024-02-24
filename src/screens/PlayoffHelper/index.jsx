@@ -32,7 +32,7 @@ export default function PlayoffHelper() {
 
     const resetData = () => {
         dialogFunctions.setDialog({
-            body: "Team ranking data will be deleted from the system. This will not affect any of your scouting data. Would you like to proceed?",
+            body: "All playoff-related data will be deleted from the system. This will not affect any of your scouting data. Would you like to proceed?",
             useConfirmation: true,
             confirmFunction: () => { playoffHelper.reset(true); feedbackModal.setModal("Successfully reset the playoff helper.", false) },
             confirmLabel: "Yes",

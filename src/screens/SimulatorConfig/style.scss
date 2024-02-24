@@ -54,6 +54,40 @@
             ._TeamNumberInput:last-child {
                 margin-bottom: 0;
             }
+
+            ._PlayoffTeamNumber {
+                display: flex;
+                margin-bottom: 16px;
+                .number {
+                    font-family: 'industry';
+                    font-weight: 600;
+                    font-size: 18px;
+
+                    &.benched {
+                        font-style: italic;
+                        color: #999;
+                    }
+                }
+                .team-name {
+                    font-family: 'usual';
+                    font-weight: 300;
+                    font-size: 16px;
+                }
+                .bench-button {
+                    margin-left: auto;
+                    color: #4941B1;
+                    font-weight: 600;
+                    font-size: 15px;
+                    cursor: pointer;
+
+                    &:hover {
+                        opacity: .75;
+                    }
+                }
+            }
+            ._PlayoffTeamNumber:last-child {
+                margin-bottom: 0;
+            }
         }
         .settings-column {
             flex-grow: 1;

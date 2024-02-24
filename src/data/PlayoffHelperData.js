@@ -272,13 +272,13 @@ const PlayoffHelperFunctions = {
             } else playoffHelper.draftState.alliance = 6;   // Alliance 7 is up
         } else if (playoffHelper.draftState.alliance == 0) {
             // Alliance 1 has chosen
-            if (playoffHelper.draftState.round == 1 || playoffHelper.config.backupSelections) {
-                playoffHelper.draftState.alliance = 1;
-            } else {
+            if (playoffHelper.draftState.round == 2 && playoffHelper.config.backupSelections) {
+                playoffHelper.draftState.round = 3;
+            } else if (playoffHelper.draftState.round == 2) {
                 // The draft is over (round 2)
                 PlayoffHelperFunctions.finishDraft(playoffHelper, phSetter);
                 return;
-            }
+            } else playoffHelper.draftState.alliance = 1;   // Alliance 2 is up
         } else {
             // Any other alliance has chosen
             playoffHelper.draftState.alliance += (playoffHelper.draftState.round % 2 == 1 ? 1 : -1);
@@ -418,8 +418,8 @@ const PlayoffHelperFunctions = {
         });
         Object.keys(bestTeams).forEach(category => bestTeams[category].bestCompositeType = WeightSetNames[category]);
 
-        // Apply simulated percentages to picklist robots, only after round 1 and if flag is true
-        if (ph.draftState.round > 1 && useSimulation) {
+        // Apply simulated percentages to picklist robots, only in round 2 and if flag is true
+        if (ph.draftState.round == 2 && useSimulation) {
             // Make a temporary playoff helper and determine method to proceed
             let simulatedPh = clonePlayoffHelper(ph);
             let fillerTeams = [];
