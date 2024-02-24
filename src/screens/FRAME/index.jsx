@@ -50,6 +50,7 @@ export default function FRAME() {
     const [playoffHelper, setPlayoffHelper] = useState(clonePlayoffHelper(PlayoffHelperData));
     const playoffHelperContextObject = {
         data: playoffHelper,
+        setter: setPlayoffHelper,
         flush: () => PlayoffHelperFunctions.flush(playoffHelper, setPlayoffHelper),
         reset: () => PlayoffHelperFunctions.reset(playoffHelper, setPlayoffHelper),
         getTeam: (teamNumber) => PlayoffHelperFunctions.getTeam(playoffHelper, teamNumber),
@@ -60,6 +61,8 @@ export default function FRAME() {
         convertNumberToLetter: (number) => PlayoffHelperFunctions.convertNumberToLetter(number),
         generatePicklist: () => PlayoffHelperFunctions.generatePicklist(playoffHelper),
         getAllianceRPI: (seed) => PlayoffHelperFunctions.getAllianceRPI(playoffHelper, seed),
+        simulateDraft: async () => PlayoffHelperFunctions.simulateDraft(playoffHelper, setPlayoffHelper),
+        loadDraftResults: () => PlayoffHelperFunctions.loadDraftResults(playoffHelper, setPlayoffHelper),
     };
     
 

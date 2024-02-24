@@ -6,6 +6,7 @@ import getTeamName from "data/getTeamName";
 import { Weights } from "data/game_specific/weighTeam/GAME_YEAR";
 import { getOrdinalSuffix } from "util/getOrdinalSuffix";
 import "./style.scss";
+import DialogBoxContext from "context/DialogBoxContext";
 
 /**
  * Creates a team card to be used on the playoff helper screen.
@@ -20,17 +21,24 @@ import "./style.scss";
 export default function PlayoffHelperTeam({ team, isOnTheClock = false, captain = false, consolidated = true, partners = [], showPickButtons = false, visible = true }) {
 
     const playoffHelper = useContext(PlayoffHelperContext);
+    const dialogFunctions = useContext(DialogBoxContext)
     const [activeTeam, setActiveTeam] = useState(team);
     const [infoBox, setInfoBox] = useState(false);
 
-    // Tells playoff helper to pick this team after confirmation dialog
+    // Tells playoff helper to pick this team
     const pickTeam = () => {
         playoffHelper.pickTeam(team.teamNumber);
     };
 
     // Tells playoff helper that this team declined after a confirmation dialog
     const declineTeam = () => {
-        playoffHelper.declineTeam(team.teamNumber);
+        dialogFunctions.setDialog({
+            body: "This team will no longer be eligible for selection, but they may still become an alliance captain. Would you like to continue?",
+            useConfirmation: true,
+            confirmFunction: () => { playoffHelper.declineTeam(team.teamNumber) },
+            confirmLabel: "Yes",
+            cancelLabel: "No"
+        });
     };
 
     // Gets the text content to write in the info box
@@ -59,7 +67,7 @@ export default function PlayoffHelperTeam({ team, isOnTheClock = false, captain 
 
     const teamNumber = team.teamNumber;
     const place = getOrdinalSuffix(team.qualRanking);
-    const record = `(${team.getRecord()})`;
+    const record = `(${typeof team.getRecord !== 'undefined' ? team.getRecord() : ""})`;
     const letterGrade = "A-";
     const partnerTeamNumbers = partners.map(p => p.teamNumber);
 

@@ -1,0 +1,19 @@
+._LoadingSpinner {
+    border-radius: 200px;
+    width: 64px;
+    height: 64px;
+    border-left: 5px solid #4941B1;
+    border-top: 5px solid #4941B1;
+    border-right: 5px solid rgba(0,0,0,0);
+    border-bottom: 5px solid rgba(0,0,0,0);
+
+    animation-name: spin;
+    animation-duration: 1000ms;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+}
+
+@keyframes spin {
+    from {transform:rotate(0deg);}
+    to {transform:rotate(360deg);}
+}

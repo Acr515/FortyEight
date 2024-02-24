@@ -78,6 +78,7 @@ const PlayoffHelperFunctions = {
      * @param {function} phSetter The state setter from the FRAME screen
      */
     reset: (ph, phSetter) => {
+        localStorage.removeItem("playoffHelper");
         phSetter(clonePlayoffHelper(PlayoffHelperData));
     },
 
@@ -143,6 +144,29 @@ const PlayoffHelperFunctions = {
         if (playoffHelper.state == PlayoffHelperState.LIVE_DRAFT) playoffHelper.state = PlayoffHelperState.LIVE_PLAYOFFS;
         if (playoffHelper.state == PlayoffHelperState.SIMULATED_DRAFT) playoffHelper.state = PlayoffHelperState.SIMULATED_PLAYOFFS;
 
+        // Save to localStorage
+        //let savedTeams = playoffHelper.alliances.map(alliance => alliance.map(team => PlayoffHelperFunctions.getTeam(playoffHelper, team)));
+        localStorage.setItem("playoffHelper", JSON.stringify({ state: playoffHelper.state, teams: playoffHelper.teams, alliances: playoffHelper.alliances }));
+        
+        phSetter(playoffHelper);
+    },
+
+    /**
+     * Loads a finished draft into the system from localStorage.
+     * @param {PlayoffHelperData} ph The state object containing the playoff helper data
+     * @param {function} phSetter The state setter from the FRAME screen
+     */
+    loadDraftResults: (ph, phSetter) => {
+        let playoffHelper = clonePlayoffHelper(ph);
+
+        let savedData = localStorage.getItem("playoffHelper");
+        if (savedData != null) {
+            savedData = JSON.parse(savedData);
+            playoffHelper.teams = savedData.teams;
+            playoffHelper.alliances = savedData.alliances;
+            playoffHelper.state = savedData.state;
+        }
+
         phSetter(playoffHelper);
     },
 
@@ -155,6 +179,7 @@ const PlayoffHelperFunctions = {
      */
     getTBARankings(ph, phSetter, eventKey, failureCallback) {
         let playoffHelper = clonePlayoffHelper(ph);
+        localStorage.removeItem("playoffHelper");
 
         hitTBA(`event/${eventKey}/rankings`, data => {
             data.rankings.forEach(team => {
@@ -467,12 +492,15 @@ const PlayoffHelperFunctions = {
         let playoffHelper = clonePlayoffHelper(ph);
 
         // Picks the best available team for each selection until the draft state changes
-        while (playoffHelper.state == PlayoffHelperState.SIMULATED_DRAFT) {
+        let picks = playoffHelper.config.backupSelections ? 24 : 16;
+        while (picks > 0) {
+            console.log(`Alliance ${playoffHelper.draftState.alliance + 1} is picking...`);
             let picklist = await PlayoffHelperFunctions.generatePicklist(playoffHelper, true);
             PlayoffHelperFunctions.pickTeam(playoffHelper, phSetter, picklist[0].teamNumber);
+            picks --;
         }
-
-        phSetter(playoffHelper);
+        console.log("Simulated draft was terminated");
+        PlayoffHelperFunctions.finishDraft(playoffHelper, phSetter);
     }
 };
 

@@ -2,10 +2,38 @@
     overflow-y: auto;
     box-sizing: border-box;
     
+    .sub-headline {
+        margin-left: 32px;
+        margin-top: 8px;
+        font-size: 20px;
+    }
+
     .content-area {
         padding: 0 0 0 32px;
         box-sizing: border-box;
         width: 100%;
+    }
+
+    .header-buttons {
+        display: flex;
+        gap: 20px;
+
+        .button {
+            font-family: 'transandina';
+            font-weight: 400;
+            font-size: 22px;
+            color: #4941B1;
+
+            &:hover:not(.active) {
+                opacity: .75;
+                cursor: pointer;
+            }
+
+            &.active {
+                font-weight: 700;
+                color: #000;
+            }
+        }
     }
 
     ._RankingInput {
@@ -95,6 +123,20 @@
             flex-direction: column;
             gap: 20px;
             padding-bottom: 48px;
+        }
+    }
+
+    ._SimulatingDraft {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        .spinner {
+            margin-top: 20vh;
+        }
+        .caption {
+            margin-top: 32px;
+            color: #888;
         }
     }
 }
