@@ -496,6 +496,8 @@ const PlayoffHelperFunctions = {
 
     /**
      * Simulates the entire alliance selection process and advances to the next state. State must be set to SIMULATED_DRAFT before execution.
+     * @param {PlayoffHelperData} ph The state object containing the playoff helper data
+     * @param {function} phSetter The state setter from the FRAME screen
      */
     simulateDraft: async (ph, phSetter) => {
         let playoffHelper = clonePlayoffHelper(ph);
@@ -510,6 +512,100 @@ const PlayoffHelperFunctions = {
         }
         console.log("Simulated draft was terminated");
         PlayoffHelperFunctions.finishDraft(playoffHelper, phSetter);
+    },
+
+    /**
+     * Simulates the entire event based on playoff draft outcome. Defaults to the 
+     * @param {PlayoffHelperData} ph The state object containing the playoff helper data
+     */
+    simulateBracket: async (ph) => {
+        class PlayoffMatch {
+            redTeams;
+            blueTeams;
+            redSeed;
+            blueSeed;
+            redWinRate;
+            blueWinRate;
+            winningSeed;
+            losingSeed;
+            matchNumber;
+
+            constructor(matchNumber, redSeed, blueSeed) {
+                this.matchNumber = matchNumber;
+                this.redSeed = redSeed;
+                this.blueSeed = blueSeed;
+                this.redTeams = ph.alliances[redSeed];
+                this.blueTeams = ph.alliances[blueSeed];
+            }
+
+            // Runs the simulator and stores win rate information about the match
+            async runSim() {
+                let sim = new Simulator(
+                    this.redTeams.length > 3 ? this.redTeams.slice(0, 3) : this.redTeams,
+                    this.blueTeams.length > 3 ? this.blueTeams.slice(0, 3) : this.blueTeams, {
+                        applyDefense: false // TODO SET TO TRUE
+                    }
+                );
+                await sim.run((outcome) => {
+                    this.redWinRate = outcome.red.winRate;
+                    this.blueWinRate = outcome.blue.winRate;
+                    this.winningSeed = this.redWinRate < this.blueWinRate ? this.blueSeed : this.redSeed;
+                    this.losingSeed = this.redWinRate < this.blueWinRate ? this.redSeed : this.blueSeed;
+
+                    this.redWinRate = Math.round(this.redWinRate * 1000) / 10;
+                    this.blueWinRate = Math.round(this.blueWinRate * 1000) / 10;
+                });
+                return;
+            }
+        }
+
+        let matches = [];   // two-dimensional array of rounds, broken up into matches
+
+        // Round 1: 1v8, 4v5, 2v7, 3v6
+        matches[0] = [
+            new PlayoffMatch(1, 0, 7), // Match 1
+            new PlayoffMatch(2, 3, 4), // Match 2
+            new PlayoffMatch(3, 1, 6), // Match 3
+            new PlayoffMatch(4, 2, 5), // Match 4
+        ];
+        for (let match of matches[0]) { await match.runSim(); }
+
+        // Round 2: L1 vs L2, L3 vs L4, W1 vs W2, W3 vs W4
+        matches[1] = [
+            new PlayoffMatch( 5, matches[0][0].losingSeed, matches[0][1].losingSeed ), // Match 5 (Lower)
+            new PlayoffMatch( 6, matches[0][2].losingSeed, matches[0][3].losingSeed ), // Match 6 (Lower)
+            new PlayoffMatch( 7, matches[0][0].winningSeed, matches[0][1].winningSeed ), // Match 7
+            new PlayoffMatch( 8, matches[0][2].winningSeed, matches[0][3].winningSeed ), // Match 8
+        ];
+        for (let match of matches[1]) { await match.runSim(); }
+
+        // Round 3: W5 vs W6, L7 vs L8
+        matches[2] = [
+            new PlayoffMatch( 9, matches[1][0].winningSeed, matches[1][1].winningSeed ), // Match 9 (Lower)
+            new PlayoffMatch( 10, matches[1][2].losingSeed, matches[1][3].losingSeed ), // Match 10 (Lower)
+        ];
+        for (let match of matches[2]) { await match.runSim(); }
+
+        // Round 4: W7 vs W8, W9 vs W10
+        matches[3] = [
+            new PlayoffMatch( 11, matches[1][2].winningSeed, matches[1][3].winningSeed ), // Match 11
+            new PlayoffMatch( 12, matches[2][0].winningSeed, matches[2][1].winningSeed ), // Match 12 (Lower)
+        ];
+        for (let match of matches[3]) { await match.runSim(); }
+
+        // Round 5: L11 vs W12
+        matches[4] = [
+            new PlayoffMatch( 13, matches[3][0].losingSeed, matches[3][1].winningSeed ), // Match 13 (Lower)
+        ];
+        for (let match of matches[4]) { await match.runSim(); }
+
+        // Round 6 (Championship: W13 vs W11)
+        matches[5] = [
+            new PlayoffMatch( 14, matches[3][0].winningSeed, matches[4][0].winningSeed ), // Match 14 (Championship)
+        ];
+        for (let match of matches[5]) { await match.runSim(); }
+
+        return matches;
     }
 };
 

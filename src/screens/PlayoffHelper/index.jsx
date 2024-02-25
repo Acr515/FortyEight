@@ -4,11 +4,12 @@ import Button from "components/Button";
 import PageHeader from "components/PageHeader";
 import LoadingSpinner from "components/LoadingSpinner";
 import PlayoffHelperContext from "context/PlayoffHelperContext";
-import { PlayoffHelperState } from "data/PlayoffHelperData";
+import PlayoffHelperFunctions, { PlayoffHelperState } from "data/PlayoffHelperData";
 import FeedbackModalContext from "context/FeedbackModalContext";
 import DialogBoxContext from "context/DialogBoxContext";
 import PlayoffHelperTeam from "components/PlayoffHelperTeam";
 import sleep from "util/sleep";
+import CheckImage from "assets/images/check.png";
 import "./style.scss";
 
 const SUBPAGE = {
@@ -209,7 +210,7 @@ function SimulatingDraft({ setSubpageState }) {
     )
 }
 
-// A component of screens showing an alliance as a row
+// A component for screens that show an alliance as a row
 function AllianceRow({ teams, isOnTheClock = false, seed = 0 }) {
 
     const playoffHelper = useContext(PlayoffHelperContext);
@@ -318,11 +319,122 @@ function FinishedDraft({ subpageState, setSubpageState }) {
                     })) }
                 </div>
             }
-            { subpageState == SUBPAGE.SimulatedBracket && 
-                <div>
+            { subpageState == SUBPAGE.SimulatedBracket && <SimulatedPlayoffs /> }
+        </div>
+    )
+}
 
+// Screen that shows for the playoff bracket simulator
+function SimulatedPlayoffs() {
+
+    const [playoffResults, setPlayoffResults] = useState(null);
+    const [simulationInProgress, setSimulationInProgress] = useState(false);
+    const playoffHelper = useContext(PlayoffHelperContext);
+
+    const initiateSimulation = () => {
+        setSimulationInProgress(true);
+    };
+
+    const runSimulation = async () => {
+        let results = await PlayoffHelperFunctions.simulateBracket(playoffHelper.data);
+        setPlayoffResults(results);
+        setSimulationInProgress(false)
+    }
+
+    useEffect(() => {
+        if (simulationInProgress) runSimulation();
+    }, [simulationInProgress])
+
+    return (
+        <div className="_SimulatedPlayoffs">
+            { (playoffResults == null && !simulationInProgress) && 
+                <div>
+                    Click the button below to generate a playoff bracket.
+                    <Button
+                        text="Begin"
+                        action={initiateSimulation}
+                    />
                 </div>
             }
+            { simulationInProgress &&
+                <div><LoadingSpinner /></div>
+            }
+            { (playoffResults != null && !simulationInProgress) &&
+                <div className="match-container">
+                    <div className="round-column" style={{ paddingLeft: 0 }}>
+                        <h2>Round 1</h2>
+                        <SimulatedMatch match={playoffResults[0][0]} />
+                        <SimulatedMatch match={playoffResults[0][1]} />
+                        <SimulatedMatch match={playoffResults[0][2]} />
+                        <SimulatedMatch match={playoffResults[0][3]} />
+                    </div>
+                    <div className="round-column">
+                        <h2>Round 2</h2>
+                        <SimulatedMatch match={playoffResults[1][2]} marginTop={100} />
+                        <SimulatedMatch match={playoffResults[1][3]} marginTop={180} marginBottom={200} />
+                        <SimulatedMatch match={playoffResults[1][0]} />
+                        <SimulatedMatch match={playoffResults[1][1]} />
+                    </div>
+                    <div className="round-column">
+                        <h2>Round 3</h2>
+                        <SimulatedMatch match={playoffResults[2][1]} marginTop={700} />
+                        <SimulatedMatch match={playoffResults[2][0]} marginTop={50}/>
+                    </div>
+                    <div className="round-column">
+                        <h2>Round 4</h2>
+                        <SimulatedMatch match={playoffResults[3][0]} marginTop={300} />
+                        <SimulatedMatch match={playoffResults[3][1]} marginTop={300}/>
+                    </div>
+                    <div className="round-column">
+                        <h2>Round 5</h2>
+                        <SimulatedMatch match={playoffResults[4][0]} marginTop={540} />
+                    </div>
+                    <div className="round-column">
+                        <h2>Championship</h2>
+                        <SimulatedMatch match={playoffResults[5][0]} marginTop={300} />
+                    </div>
+                </div>
+            }
+        </div>
+    )
+}
+
+// Component that shows the result of a specific match
+function SimulatedMatch({ match, marginTop, marginBottom }) {
+    return (
+        <div className="_SimulatedMatch" style={{ marginTop, marginBottom }}>
+            <div className="match-info">
+                <div className="match-number">{match.matchNumber == 14 ? "Championship" : `Match ${match.matchNumber}`}</div>
+                <div className="breakdown">View breakdown</div>
+            </div>
+            <div className="alliance-row">
+                <div className="seed-region red">
+                    <div className="seed">{ match.redSeed + 1 }</div>
+                    { match.winningSeed == match.redSeed && <div className="win-indicator" style={{ backgroundImage: 'url(' + CheckImage + ')' }}></div> }
+                </div>
+                <div className="alliance-details red">
+                    <div className="alliance-numbers">
+                        { match.redTeams.map(n => (<div key={n}>{n}</div>)) }
+                    </div>
+                    <div className="win-rate">
+                        { match.redWinRate }% win probability
+                    </div>
+                </div>
+            </div>
+            <div className="alliance-row">
+                <div className="seed-region blue">
+                    <div className="seed">{ match.blueSeed + 1 }</div>
+                    { match.winningSeed == match.blueSeed && <div className="win-indicator" style={{ backgroundImage: 'url(' + CheckImage + ')' }}></div> }
+                </div>
+                <div className="alliance-details blue">
+                    <div className="alliance-numbers">
+                        { match.blueTeams.map(n => (<div key={n}>{n}</div>)) }
+                    </div>
+                    <div className="win-rate">
+                        { match.blueWinRate }% win probability
+                    </div>
+                </div>
+            </div>
         </div>
     )
 }

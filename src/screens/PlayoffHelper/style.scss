@@ -162,4 +162,123 @@
             color: #888;
         }
     }
+
+    ._SimulatedPlayoffs {
+        .match-container {
+            display: flex;
+            overflow-x: scroll;
+
+            .round-column {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                padding: 16px;
+
+                h2 {
+                    margin-top: 0;
+                    font-size: 24px;
+                }
+
+                &:nth-child(even) {
+                    background: rgba(0,0,0,0.05);
+                }
+            }
+        }
+    }
+
+    ._SimulatedMatch {
+        min-width: 300px;
+
+        .match-info {
+            display: flex;
+            background-color: white;
+            border: 2px solid #333;
+            border-bottom: 2px solid transparent;
+            margin-left: 50px;
+            padding: 4px 10px 2px;
+
+            .match-number {
+                font-family: 'transandina';
+                font-size: 16px;
+            }
+
+            .breakdown {
+                font-family: 'transandina';
+                color: #4941B1;
+                font-size: 16px;
+                font-weight: 700;
+                margin-left: auto;
+            }
+        }
+
+        .alliance-row {
+            display: flex;
+            width: 100%;
+
+            .seed-region {
+                display: flex;
+                gap: 6px;
+                flex-direction: column;
+                width: 50px;
+                padding: 12px;
+                box-sizing: border-box;
+                color: white;
+                text-align: center;
+                flex-shrink: 0;
+
+                .seed {
+                    font-family: 'industry';
+                    font-weight: 700;
+                    font-size: 20px;
+                }
+
+                .win-indicator {
+                    background-size: contain;
+                    width: 18px;
+                    height: 18px;
+                    background-position: right;
+                    background-repeat: no-repeat;
+                    margin: 0 auto;
+                    filter: invert(100%);
+                }
+
+                &.red {
+                    background-color: #C21E23;
+                }
+
+                &.blue {
+                    background-color: #1E37C2;
+                }
+            }
+
+            .alliance-details {
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+                padding: 12px;
+                width: 100%;
+                box-sizing: border-box;
+
+                .alliance-numbers {
+                    display: flex;
+                    gap: 10px;
+                    font-family: 'industry';
+                    font-weight: 600;
+                    font-size: 20px;
+                }
+
+                .win-rate {
+                    font-family: 'transandina';
+                }
+
+                &.red {
+                    background-color: #FFB5B5;
+                }
+
+                &.blue {
+                    background-color: #CFD6FF;
+                }
+            }
+        }
+    }
 }
