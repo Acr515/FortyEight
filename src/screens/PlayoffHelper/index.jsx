@@ -348,16 +348,19 @@ function SimulatedPlayoffs() {
     return (
         <div className="_SimulatedPlayoffs">
             { (playoffResults == null && !simulationInProgress) && 
-                <div>
-                    Click the button below to generate a playoff bracket.
+                <div className="button-screen">
+                    <p>Click the button below to generate an estimated playoff bracket and projected tournament winner.</p>
                     <Button
-                        text="Begin"
+                        text="Simulate playoffs"
                         action={initiateSimulation}
                     />
                 </div>
             }
             { simulationInProgress &&
-                <div><LoadingSpinner /></div>
+                <div className="loading-screen">
+                    <LoadingSpinner className="spinner" />
+                    <p className="caption">Simulating playoff bracket...</p>
+                </div>
             }
             { (playoffResults != null && !simulationInProgress) &&
                 <div className="match-container">
