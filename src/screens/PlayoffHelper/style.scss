@@ -149,6 +149,15 @@
         }
     }
 
+    ._DraftBoard {
+        .under-construction {
+            font-style: italic;
+            margin-top: 20vh;
+            text-align: center;
+            color: #555;
+        }   
+    }
+
     ._SimulatingDraft {
         display: flex;
         flex-direction: column;

@@ -289,11 +289,23 @@ function LiveDraft({ subpageState }) {
                     })) }
                 </div>
             }
-            { subpageState == SUBPAGE.DraftBoard &&
-                <div>
+            { subpageState == SUBPAGE.DraftBoard && <DraftBoard /> }
+        </div>
+    )
+}
 
-                </div>
-            }
+// Shows the draft board
+function DraftBoard() {
+    const playoffHelper = useContext(PlayoffHelperContext);
+    const [sortMethod, setSortMethod] = useState(0);
+
+    const updateSort = method => {
+
+    };
+
+    return (
+        <div className="_DraftBoard">
+            <div className="under-construction">This feature is under construction.</div>
         </div>
     )
 }
