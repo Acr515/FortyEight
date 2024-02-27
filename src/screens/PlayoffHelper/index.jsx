@@ -62,7 +62,7 @@ export default function PlayoffHelper() {
                 </div> }
             </PageHeader>
             <div className="content-area">
-                { ( state == PlayoffHelperState.INACTIVE || state == PlayoffHelperState.READY ) && <RankingInput /> }
+                { ( state == PlayoffHelperState.INACTIVE || state == PlayoffHelperState.READY ) && <RankingInput setSubpageState={setSubpageState} /> }
                 { ( state == PlayoffHelperState.LIVE_DRAFT ) && <LiveDraft subpageState={subpageState} setSubpageState={setSubpageState} /> }
                 { ( state == PlayoffHelperState.SIMULATED_DRAFT ) && <SimulatingDraft subpageState={subpageState} setSubpageState={setSubpageState} /> }
                 { ( state == PlayoffHelperState.LIVE_PLAYOFFS || state == PlayoffHelperState.SIMULATED_PLAYOFFS ) && <FinishedDraft subpageState={subpageState} setSubpageState={setSubpageState} /> }
@@ -72,7 +72,7 @@ export default function PlayoffHelper() {
 }
 
 // Screen that shows initial configuration inputs
-function RankingInput() {
+function RankingInput({ setSubpageState }) {
 
     const feedbackModal = useContext(FeedbackModalContext);
     const dialogFunctions = useContext(DialogBoxContext);
@@ -103,6 +103,8 @@ function RankingInput() {
 
     const startLiveDraft = () => {
         playoffHelper.setup(PlayoffHelperState.LIVE_DRAFT, backupSelections);
+        setSubpageState(SUBPAGE.LiveSelection);
+
     };
 
     const deleteData = () => {
@@ -148,7 +150,7 @@ function RankingInput() {
                     />
                 </div> : <div>
                     <h3>Manual Rankings</h3>
-                    <p>Manual input is not available at this time. Please use the TBA integration feature.</p>
+                    <p>Manual input is currently under construction. Please use the TBA integration feature.</p>
                 </div> }
             </div>
 

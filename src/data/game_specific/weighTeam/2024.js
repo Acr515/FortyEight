@@ -20,7 +20,7 @@ export const WeightSets = {
         Autonomous: 2,
         Speaker: 2.8,
         Amp: 2.2,
-        Endgame: 1.5,
+        Endgame: 1.8,
         Defense: 1,
         Flags: 1
     },

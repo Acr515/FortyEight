@@ -7,6 +7,7 @@ import { Weights } from "data/game_specific/weighTeam/GAME_YEAR";
 import { getOrdinalSuffix } from "util/getOrdinalSuffix";
 import "./style.scss";
 import DialogBoxContext from "context/DialogBoxContext";
+import { getTeamData } from "data/SearchData";
 
 /**
  * Creates a team card to be used on the playoff helper screen.
@@ -47,15 +48,26 @@ export default function PlayoffHelperTeam({ team, isOnTheClock = false, captain 
 
         let bestAttribute = { rank: 1000, weight: "---" };
         let estimatedWinRate = Math.round((team.simulatedWinRate - playoffHelper.data.config.weightOfSimulations) * 1000) / 10;
-        if (estimatedWinRate < 1) estimatedWinRate = ">1";
+        if (estimatedWinRate < 1) estimatedWinRate = "<1";
+        if (estimatedWinRate > 99) estimatedWinRate = ">99";
 
         Object.keys(Weights).forEach(weight => {
             if (team.powerScoreRankings[weight] < bestAttribute.rank) bestAttribute = { rank: team.powerScoreRankings[weight], weight };
+        });
+
+        // Get flag #s
+        let breakdowns = 0, fouls = 0;
+        getTeamData(team.teamNumber).data.forEach(match => {
+            breakdowns += match.performance.notes.broken;
+            fouls += match.performance.notes.fouls;
         });
         
         return <>
             <div className="row">Base score used to rank team: <span className="strong">{Math.round(team.bestCompositeScore * 10) / 10}</span></div>
             <div className="row">Best strength: <span className="strong">{bestAttribute.weight}</span> ({getOrdinalSuffix(bestAttribute.rank)} at event)</div>
+            { (breakdowns > 0 || fouls > 0) &&
+                <div className="row">Broke down in <span className="strong">{breakdowns}</span> matches, drew excessive fouls in <span className="strong">{fouls}</span> matches</div>
+            }
             { team.uniqueStrengthAdded != -1 &&
                 <div className="row">Ranks <span className="strong">{getOrdinalSuffix(team.uniqueStrengthAddedRank)}</span> against remaining teams in improving the alliance&apos;s weaknesses ({Math.round(team.uniqueStrengthAdded * playoffHelper.data.config.weightOfUniqueStrengths * 10) / 10} points added to base score above)</div>
             }
@@ -68,7 +80,6 @@ export default function PlayoffHelperTeam({ team, isOnTheClock = false, captain 
     const teamNumber = team.teamNumber;
     const place = getOrdinalSuffix(team.qualRanking);
     const record = `(${typeof team.getRecord !== 'undefined' ? team.getRecord() : ""})`;
-    const letterGrade = "A-";
     const partnerTeamNumbers = partners.map(p => p.teamNumber);
 
     return (
@@ -80,7 +91,7 @@ export default function PlayoffHelperTeam({ team, isOnTheClock = false, captain 
                         { partners.length == 0 && <div className="inline-entry record">{place} {record}</div> }
                     </div>
                     { (!isOnTheClock && !consolidated) && <div className="inline-entry grade-info">
-                        <div className="letter-grade">{letterGrade}</div>
+                        <div className="letter-grade">{team.pickGrade}</div>
                         <div className="info-button" onClick={() => setInfoBox(!infoBox)}>{infoBox ? "X" : "i"}</div>
                         <div className={`info-box${infoBox ? " visible" : ""}`}>
                             <InfoBoxInnerContent />

@@ -46,7 +46,7 @@ export const PlayoffHelperData = {
         numberOfSimulatedFillerOptions: 2,  // Number of different "fill-in" options used when the opponent alliance in the simulator hasn't filled their alliance yet
         simulatedMatches: 300,              // Number of matches to simulate with each available team
         weightOfSimulations: 0.5,           // The factor used to change team value based on simulated outcomes. Must be greater than 0
-        weightOfUniqueStrengths: 1,         // The factor used to change team value based on how much better it is than its partners in different scoring categories
+        weightOfUniqueStrengths: 0.8,       // The factor used to change team value based on how much better it is than its partners in different scoring categories
     }
 };
 
@@ -118,6 +118,7 @@ const PlayoffHelperFunctions = {
         // Rank every attribute of every team
         let sortedTeams = [...playoffHelper.teams];
         Object.keys(Weights).forEach(weight => {
+            if (weight == Weights.Flags) return;
             sortedTeams.sort((a, b) => b.powerScores.WellRounded[weight] - a.powerScores.WellRounded[weight]);  // sort by well-rounded scores (WellRounded should always exist)
             sortedTeams.forEach((team, ranking) => { team.powerScoreRankings[weight] = ranking + 1 });
         });
@@ -335,14 +336,16 @@ const PlayoffHelperFunctions = {
      * @returns A string letter grade
      */
     convertNumberToLetter(number) {
-        if (number > 3.7) return "A";
-        if (number > 3.3) return "A-";
-        if (number > 3.0) return "B+";
-        if (number > 2.7) return "B";
-        if (number > 2.4) return "C+";
-        if (number > 2) return "C";
-        if (number > 1.7) return "C-";
-        if (number > 1.3) return "D";
+        if (number > 3.7) return "A+";
+        if (number > 3.3) return "A";
+        if (number > 3.0) return "A-";
+        if (number > 2.7) return "B+";
+        if (number > 2.4) return "B";
+        if (number > 2) return "B-";
+        if (number > 1.7) return "C+";
+        if (number > 1.3) return "C";
+        if (number > 1) return "C-";
+        if (number > 0.7) return "D";
         return "F";
     },
 
@@ -402,7 +405,7 @@ const PlayoffHelperFunctions = {
             picklist.forEach((team, ranking) => { team.uniqueStrengthAddedRank = ranking + 1 });
         }
 
-        // Then, sort by best composite scores
+        // Sort by best composite scores (this will happen again later)
         picklist.sort((a, b) => (b.bestCompositeScore + b.uniqueStrengthAdded) - (a.bestCompositeScore + a.uniqueStrengthAdded));
 
         // Then, add flags for which teams have the best score in each weight group; must remove them first though
@@ -488,7 +491,14 @@ const PlayoffHelperFunctions = {
 
             // Finally, re-score the old set of rankings using simulated win rates
             picklist.sort((a, b) => (b.bestCompositeScore * b.simulatedWinRate) - (a.bestCompositeScore * a.simulatedWinRate));
-        }
+        } else picklist.forEach(team => { team.simulatedWinRate = -1; team.simulatedWinRateRank = 0; });
+
+        // Sort picks and grade them
+        const getAdjCompScore = team => (team.bestCompositeScore + team.uniqueStrengthAdded) * (team.simulatedWinRate == -1 ? 1 : team.simulatedWinRate);
+        picklist.sort((a, b) => getAdjCompScore(b) - getAdjCompScore(a));
+        let max = getAdjCompScore(picklist[0]), min = getAdjCompScore(picklist[picklist.length - 1]);
+        let conv = (max - min) / 4;
+        picklist.forEach(team => team.pickGrade = PlayoffHelperFunctions.convertNumberToLetter((getAdjCompScore(team) - min) / conv));
 
         // Return the picklist
         return picklist;
