@@ -8,6 +8,7 @@ import { getOrdinalSuffix } from "util/getOrdinalSuffix";
 import "./style.scss";
 import DialogBoxContext from "context/DialogBoxContext";
 import { getTeamData } from "data/SearchData";
+import TeamLink from "components/TeamLink";
 
 /**
  * Creates a team card to be used on the playoff helper screen.
@@ -87,7 +88,7 @@ export default function PlayoffHelperTeam({ team, isOnTheClock = false, captain 
             <div className={`team-card${ isOnTheClock ? " on-the-clock" : "" }${ consolidated ? " consolidated" : "" }${ consolidated && captain ? " captain" : "" }`}>
                 <div className="headline-row">
                     <div className="number-record">
-                        <div className={`inline-entry team-number${partners.length > 0 && isOnTheClock ? " small" : ""}`}>{(partners.length == 0 || !isOnTheClock) ? teamNumber : `${teamNumber}, ${partnerTeamNumbers.join(", ")}`}</div>
+                        <div className={`inline-entry team-number${partners.length > 0 && isOnTheClock ? " small" : ""}`}>{(partners.length == 0 || !isOnTheClock) ? <TeamLink number={teamNumber} returnName="Playoff Helper">{teamNumber}</TeamLink> : `${teamNumber}, ${partnerTeamNumbers.join(", ")}`}</div>
                         { partners.length == 0 && <div className="inline-entry record">{place} {record}</div> }
                     </div>
                     { (!isOnTheClock && !consolidated) && <div className="inline-entry grade-info">

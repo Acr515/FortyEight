@@ -11,8 +11,8 @@ import getTeamName from "data/getTeamName";
 import { getTeamNumberArray } from "data/SearchData";
 import TeamData from "data/TeamData";
 import sleep from "util/sleep";
-import './style.scss';
 import { PlayoffHelperState } from "data/PlayoffHelperData";
+import './style.scss';
 
 export default function SimulatorConfig() {
     const modalFunctions = useContext(FeedbackModalContext);
@@ -90,7 +90,7 @@ export default function SimulatorConfig() {
                 console.log(results);
                 dialogFunctions.hideDialog();
                 modalFunctions.setModal("Simulation complete!", false)
-                navigate("/analysis/viewer", {state: {results}});
+                navigate("/analysis/viewer", {state: { results }});
             });
         }
     };

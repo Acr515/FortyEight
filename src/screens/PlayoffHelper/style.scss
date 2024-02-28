@@ -243,6 +243,12 @@
                 font-size: 16px;
                 font-weight: 700;
                 margin-left: auto;
+                cursor: pointer;
+                transition: opacity .2s;
+
+                &:hover {
+                    opacity: .75;
+                }
             }
         }
 

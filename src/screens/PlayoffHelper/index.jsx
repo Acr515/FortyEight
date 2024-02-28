@@ -10,6 +10,9 @@ import DialogBoxContext from "context/DialogBoxContext";
 import PlayoffHelperTeam from "components/PlayoffHelperTeam";
 import sleep from "util/sleep";
 import CheckImage from "assets/images/check.png";
+import { DEVELOP_MODE } from "/src/config";
+import { useLocation, useNavigate } from "react-router-dom";
+import Simulator from "data/game_specific/Simulator/_Universal";
 import "./style.scss";
 
 const SUBPAGE = {
@@ -24,13 +27,16 @@ const SUBPAGE = {
  */
 export default function PlayoffHelper() {
     
+    const location = useLocation();
     const playoffHelper = useContext(PlayoffHelperContext);
     const dialogFunctions = useContext(DialogBoxContext);
     const feedbackModal = useContext(FeedbackModalContext);
     const [subpageState, setSubpageState] = useState(SUBPAGE.LiveSelection);
+    const [cachedBracket, setCachedBracket] = useState(null);
 
     const state = playoffHelper.data.state;
 
+    // Resets all playoff helper data
     const resetData = () => {
         dialogFunctions.setDialog({
             body: "All playoff-related data will be deleted from the system. This will not affect any of your scouting data. Would you like to proceed?",
@@ -39,7 +45,18 @@ export default function PlayoffHelper() {
             confirmLabel: "Yes",
             cancelLabel: "No"
         });
-    }
+    };
+
+    // Check to see if there was any state in the location object
+    useEffect(() => {
+        if (location.state !== null) {
+            // Check for a cached playoff bracket
+            if (typeof location.state.cachedBracket !== 'undefined') {
+                setCachedBracket(location.state.cachedBracket);
+                setSubpageState(SUBPAGE.SimulatedBracket);
+            }
+        }
+    }, []);
 
     return (
         <div className="SCREEN _PlayoffHelper">
@@ -65,7 +82,7 @@ export default function PlayoffHelper() {
                 { ( state == PlayoffHelperState.INACTIVE || state == PlayoffHelperState.READY ) && <RankingInput setSubpageState={setSubpageState} /> }
                 { ( state == PlayoffHelperState.LIVE_DRAFT ) && <LiveDraft subpageState={subpageState} setSubpageState={setSubpageState} /> }
                 { ( state == PlayoffHelperState.SIMULATED_DRAFT ) && <SimulatingDraft subpageState={subpageState} setSubpageState={setSubpageState} /> }
-                { ( state == PlayoffHelperState.LIVE_PLAYOFFS || state == PlayoffHelperState.SIMULATED_PLAYOFFS ) && <FinishedDraft subpageState={subpageState} setSubpageState={setSubpageState} /> }
+                { ( state == PlayoffHelperState.LIVE_PLAYOFFS || state == PlayoffHelperState.SIMULATED_PLAYOFFS ) && <FinishedDraft subpageState={subpageState} setSubpageState={setSubpageState} cachedBracket={cachedBracket} setCachedBracket={setCachedBracket}/> }
             </div>
         </div>
     )
@@ -104,7 +121,9 @@ function RankingInput({ setSubpageState }) {
     const startLiveDraft = () => {
         playoffHelper.setup(PlayoffHelperState.LIVE_DRAFT, backupSelections);
         setSubpageState(SUBPAGE.LiveSelection);
-
+        if (!DEVELOP_MODE) dialogFunctions.setDialog({
+            body: "Disclaimer: This tool is imperfect and should NOT be a substitution for human judgement. It is intended to only supplement the decision-making of your team and your alliance."
+        });
     };
 
     const deleteData = () => {
@@ -313,7 +332,7 @@ function DraftBoard() {
 }
 
 // Screen that shows after alliance selection is done
-function FinishedDraft({ subpageState, setSubpageState }) {
+function FinishedDraft({ subpageState, setSubpageState, cachedBracket, setCachedBracket }) {
 
     const playoffHelper = useContext(PlayoffHelperContext);
     useEffect(() => {
@@ -333,31 +352,57 @@ function FinishedDraft({ subpageState, setSubpageState }) {
                     })) }
                 </div>
             }
-            { subpageState == SUBPAGE.SimulatedBracket && <SimulatedPlayoffs /> }
+            { subpageState == SUBPAGE.SimulatedBracket && <SimulatedPlayoffs subpageState={subpageState} cachedBracket={cachedBracket} setCachedBracket={setCachedBracket} /> }
         </div>
     )
 }
 
 // Screen that shows for the playoff bracket simulator
-function SimulatedPlayoffs() {
+function SimulatedPlayoffs({ subpageState, cachedBracket, setCachedBracket }) {
 
-    const [playoffResults, setPlayoffResults] = useState(null);
+    const [playoffResults, setPlayoffResults] = useState(cachedBracket);
     const [simulationInProgress, setSimulationInProgress] = useState(false);
     const playoffHelper = useContext(PlayoffHelperContext);
 
+    const navigate = useNavigate();
+
+    // Sent to every playoff match to give each the ability to view the breakdown for each match
+    const viewMatch = async (match) => {
+        var simulator = new Simulator(
+            match.redTeams.slice(0, 3),
+            match.blueTeams.slice(0, 3), 
+            {
+                simulations: 1000, 
+                applyDefense: false,    // TODO set to true
+            }
+        );
+        await simulator.run(results => {
+            // Simulator is done- go to viewer but cache the bracket results so that they reappear when we return
+            navigate("/analysis/viewer", { state: { 
+                results, 
+                overrideLocation: "/analysis/playoffs", 
+                returnState: { subpage: subpageState, cachedBracket: playoffResults } 
+            } });
+        });
+    }
+
+    // Sets the state variable indicating that simulation should start
     const initiateSimulation = () => {
         setSimulationInProgress(true);
     };
 
+    // Runs the simulateBracket function, triggered by useEffect
     const runSimulation = async () => {
         let results = await PlayoffHelperFunctions.simulateBracket(playoffHelper.data);
         setPlayoffResults(results);
-        setSimulationInProgress(false)
-    }
+        setCachedBracket(results);
+        setSimulationInProgress(false);
+    };
 
+    // Waits for simulationInProgress to change before beginning the simulation
     useEffect(() => {
         if (simulationInProgress) runSimulation();
-    }, [simulationInProgress])
+    }, [simulationInProgress]);
 
     return (
         <div className="_SimulatedPlayoffs">
@@ -380,35 +425,35 @@ function SimulatedPlayoffs() {
                 <div className="match-container">
                     <div className="round-column" style={{ paddingLeft: 0 }}>
                         <h2>Round 1</h2>
-                        <SimulatedMatch match={playoffResults[0][0]} />
-                        <SimulatedMatch match={playoffResults[0][1]} />
-                        <SimulatedMatch match={playoffResults[0][2]} />
-                        <SimulatedMatch match={playoffResults[0][3]} />
+                        <SimulatedMatch viewMatch={viewMatch} match={playoffResults[0][0]} />
+                        <SimulatedMatch viewMatch={viewMatch} match={playoffResults[0][1]} />
+                        <SimulatedMatch viewMatch={viewMatch} match={playoffResults[0][2]} />
+                        <SimulatedMatch viewMatch={viewMatch} match={playoffResults[0][3]} />
                     </div>
                     <div className="round-column">
                         <h2>Round 2</h2>
-                        <SimulatedMatch match={playoffResults[1][2]} marginTop={100} />
-                        <SimulatedMatch match={playoffResults[1][3]} marginTop={180} marginBottom={200} />
-                        <SimulatedMatch match={playoffResults[1][0]} />
-                        <SimulatedMatch match={playoffResults[1][1]} />
+                        <SimulatedMatch viewMatch={viewMatch} match={playoffResults[1][2]} marginTop={100} />
+                        <SimulatedMatch viewMatch={viewMatch} match={playoffResults[1][3]} marginTop={180} marginBottom={200} />
+                        <SimulatedMatch viewMatch={viewMatch} match={playoffResults[1][0]} />
+                        <SimulatedMatch viewMatch={viewMatch} match={playoffResults[1][1]} />
                     </div>
                     <div className="round-column">
                         <h2>Round 3</h2>
-                        <SimulatedMatch match={playoffResults[2][1]} marginTop={700} />
-                        <SimulatedMatch match={playoffResults[2][0]} marginTop={50}/>
+                        <SimulatedMatch viewMatch={viewMatch} match={playoffResults[2][1]} marginTop={700} />
+                        <SimulatedMatch viewMatch={viewMatch} match={playoffResults[2][0]} marginTop={50}/>
                     </div>
                     <div className="round-column">
                         <h2>Round 4</h2>
-                        <SimulatedMatch match={playoffResults[3][0]} marginTop={300} />
-                        <SimulatedMatch match={playoffResults[3][1]} marginTop={300}/>
+                        <SimulatedMatch viewMatch={viewMatch} match={playoffResults[3][0]} marginTop={300} />
+                        <SimulatedMatch viewMatch={viewMatch} match={playoffResults[3][1]} marginTop={300}/>
                     </div>
                     <div className="round-column">
                         <h2>Round 5</h2>
-                        <SimulatedMatch match={playoffResults[4][0]} marginTop={540} />
+                        <SimulatedMatch viewMatch={viewMatch} match={playoffResults[4][0]} marginTop={540} />
                     </div>
                     <div className="round-column">
                         <h2>Championship</h2>
-                        <SimulatedMatch match={playoffResults[5][0]} marginTop={300} />
+                        <SimulatedMatch viewMatch={viewMatch} match={playoffResults[5][0]} marginTop={300} />
                     </div>
                 </div>
             }
@@ -417,12 +462,13 @@ function SimulatedPlayoffs() {
 }
 
 // Component that shows the result of a specific match
-function SimulatedMatch({ match, marginTop, marginBottom }) {
+function SimulatedMatch({ match, marginTop, marginBottom, viewMatch }) {
+
     return (
         <div className="_SimulatedMatch" style={{ marginTop, marginBottom }}>
             <div className="match-info">
                 <div className="match-number">{match.matchNumber == 14 ? "Championship" : `Match ${match.matchNumber}`}</div>
-                <div className="breakdown">View breakdown</div>
+                <div className="breakdown" onClick={() => viewMatch(match)}>View breakdown</div>
             </div>
             <div className="alliance-row">
                 <div className="seed-region red">

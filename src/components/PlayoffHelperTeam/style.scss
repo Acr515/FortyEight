@@ -13,6 +13,15 @@
         border-radius: 16px;
         box-sizing: border-box;
 
+        ._TeamLink {
+            text-decoration: none;
+            color: black;
+        }
+
+        ._TeamLink:hover {
+            opacity: 0.6;
+        }
+
         .headline-row {
             display: flex;
             flex-direction: row;
@@ -164,6 +173,10 @@
         background-color: #4941B1;
         border: none;
         color: white;
+
+        ._TeamLink {
+            color: white;
+        }
     }
     .team-card.consolidated {
         background-color: transparent;
