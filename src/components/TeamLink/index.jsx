@@ -6,9 +6,9 @@ import './style.scss';
  * Links any element to its team number. Primarily used in simulator viewer; its functionality cannot be guaranteed outside of that screen.
  * @param {number} number The team # 
  */
-export default function TeamLink({children, number, style, className}) {
+export default function TeamLink({children, number, style, className, returnName = "Results"}) {
     return <Link
-        to={`/teams/${number}/-1/Results`}
+        to={`/teams/${number}/-1/${returnName}`}
         style={style}
         className={`${className} _TeamLink`}
     >

@@ -21,16 +21,20 @@ ChartJS.register(BarElement);
 export default function SimulatorViewer() {
 
     const location = useLocation();
-
+    
     // Make sure there is data to use
-    if (location.state == null/*localStorage.getItem("simulation") == null || localStorage.getItem("simulation") == ""*/) return (
+    if (location.state == null) return (
         <div className="SCREEN _SimulatorViewer">
             There is no simulation data in memory. Run a simulation in the Simulator menu.
         </div>
     )
+    
+    // Determine where to go back to
+    const backLocation = location.state.overrideLocation ?? "/analysis/simulator?pf=y&t=[" + sim.red.teamNumbers + "," + sim.blue.teamNumbers + "]&sims=" + sim.simulations + "&def=" + (sim.applyDefense ? "true" : "false");
+    const returnState = location.state.returnState ?? {};   // the state to send through the back button
 
     // Parse simulation data
-    var sim = location.state.results//JSON.parse(localStorage.getItem("simulation"));
+    var sim = location.state.results
     const teamSimInfo = (colorString) => { return {
         colorName: colorString.toLowerCase(),
         colorString,
@@ -65,7 +69,7 @@ export default function SimulatorViewer() {
         responsive: true,
         maintainAspectRatio: false,
         cutout: "70%"
-    }
+    };
 
     // Bar chart
     var rpData = {
@@ -87,7 +91,7 @@ export default function SimulatorViewer() {
         responsive: true,
         maintainAspectRatio: false,
         indexAxis: 'y'
-    }
+    };
     
     // Find most statistically relevant insights to show
     const getInsights = alliance => {
@@ -98,7 +102,7 @@ export default function SimulatorViewer() {
                     <span className={alliance.colorName + "-text alliance-name"}>{alliance.colorString} Alliance</span> {isLosingRate ? "lost" : "won"} <span className={alliance.colorName + "-text percentage"}>{Math.round(rate * 1000) / 10}%</span> of matches when {string}
                 </div>
             }
-        }
+        };
 
         Object.keys(sim[alliance.colorName].insights).forEach(insightKey => {
             let insight = sim[alliance.colorName].insights[insightKey];
@@ -131,7 +135,8 @@ export default function SimulatorViewer() {
                 text="Results"
                 showBack={true}
                 backText="Config"
-                location={"/analysis/simulator?pf=y&t=[" + sim.red.teamNumbers + "," + sim.blue.teamNumbers + "]&sims=" + sim.simulations + "&def=" + (sim.applyDefense ? "true" : "false")}
+                location={backLocation}
+                backState={returnState}
             />
             <div className="simulator-section">
                 <h2>Summary</h2>

@@ -13,6 +13,7 @@ import { loadData } from './data/saveLoadData';
 import SimulatorViewer from './screens/SimulatorViewer';
 import SimulatorAccuracy from './screens/SimulatorAccuracy';
 import ImportConflicts from 'screens/ImportConflicts';
+import PlayoffHelper from 'screens/PlayoffHelper';
 
 
 export default function App() {
@@ -36,6 +37,7 @@ export default function App() {
                     <Route path="simulator" element={<SimulatorConfig />}/>
                     <Route path="sim-accuracy" element={<SimulatorAccuracy />}/>
                     <Route path="viewer" element={ <SimulatorViewer />}/>
+                    <Route path="playoffs" element={ <PlayoffHelper />}/>
                 </Route>
             </Route>
         </Routes>

@@ -5,16 +5,19 @@ import Input from "components/Input";
 import PageHeader from "components/PageHeader";
 import DialogBoxContext from "context/DialogBoxContext";
 import FeedbackModalContext from "context/FeedbackModalContext";
+import PlayoffHelperContext from "context/PlayoffHelperContext";
 import Simulator from "data/game_specific/Simulator/_Universal";
 import getTeamName from "data/getTeamName";
 import { getTeamNumberArray } from "data/SearchData";
 import TeamData from "data/TeamData";
 import sleep from "util/sleep";
+import { PlayoffHelperState } from "data/PlayoffHelperData";
 import './style.scss';
 
 export default function SimulatorConfig() {
     const modalFunctions = useContext(FeedbackModalContext);
     const dialogFunctions = useContext(DialogBoxContext);
+    const playoffHelper = useContext(PlayoffHelperContext);
     const navigate = useNavigate();
 
 
@@ -29,9 +32,12 @@ export default function SimulatorConfig() {
         prefill.def = prefill.def == "true";
     }
 
+    // Get playoff helper information if it exists
+
 
     const [useTextboxes, setUseTextboxes] = useState(false);
     const [useMatchImport, setUseMatchImport] = useState(false);
+    const [usePlayoffTeams, setUsePlayoffTeams] = useState(false);
     const [simulations, setSimulations] = useState(configPrefill ? prefill.sims : 1000);
     const [importEventCode, setImportEventCode] = useState(localStorage.getItem("EventCodePrefill") || "");
     const [importMatch, setImportMatch] = useState("");
@@ -39,16 +45,27 @@ export default function SimulatorConfig() {
     const teamNumbers = getTeamNumberArray(TeamData);
     const [redTeams, setRedTeams] = useState(configPrefill ? [prefill.t[0], prefill.t[1], prefill.t[2]] : ["", "", ""]);
     const [blueTeams, setBlueTeams] = useState(configPrefill ? [prefill.t[3], prefill.t[4], prefill.t[5]] : ["", "", ""]);
+    const [redAllianceSeed, setRedAllianceSeed] = useState(0);
+    const [blueAllianceSeed, setBlueAllianceSeed] = useState(1);
+    const [benchedRedTeam, setBenchedRedTeam] = useState(-1);
+    const [benchedBlueTeam, setBenchedBlueTeam] = useState(-1);
 
+    // Runs before the simulation starts
     const verifySettings = async () => {
         let incomplete = false, invalid = false;
+        let inputRedTeams = [...redTeams], inputBlueTeams = [...blueTeams];
+
+        if (usePlayoffTeams) {
+            if (inputRedTeams.length > 3) inputRedTeams.splice(benchedRedTeam, 1);
+            if (inputBlueTeams.length > 3) inputBlueTeams.splice(benchedBlueTeam, 1);
+        }
 
         const validateNum = num => {
             if (teamNumbers.indexOf(num) == -1) invalid = true;
             if (num == "" || Number(num) == 0) incomplete = true;
         }
-        redTeams.forEach(num => validateNum(num));
-        blueTeams.forEach(num => validateNum(num));
+        inputRedTeams.forEach(num => validateNum(num));
+        inputBlueTeams.forEach(num => validateNum(num));
 
         if (incomplete) {
             modalFunctions.setModal("You did not provide enough teams.", true);
@@ -59,8 +76,8 @@ export default function SimulatorConfig() {
             await sleep(250);
 
             var simulator = new Simulator(
-                redTeams,
-                blueTeams, 
+                inputRedTeams,
+                inputBlueTeams, 
                 {
                     simulations, 
                     applyDefense: false, 
@@ -73,10 +90,10 @@ export default function SimulatorConfig() {
                 console.log(results);
                 dialogFunctions.hideDialog();
                 modalFunctions.setModal("Simulation complete!", false)
-                navigate("/analysis/viewer", {state: {results}});
+                navigate("/analysis/viewer", {state: { results }});
             });
         }
-    }
+    };
 
     // Prefills based on schedule input
     const getFromSchedule = (num = null) => {
@@ -102,6 +119,44 @@ export default function SimulatorConfig() {
             setRedTeams(["", "", ""]);
             setBlueTeams(["", "", ""]);
         }
+    };
+
+    // Runs whenever the playoff prefill box is ticked, OR the seeds of either alliance change
+    const setPlayoffPrefill = (value = null, color = null) => {
+        if (value === null) {
+            setRedTeams(playoffHelper.data.alliances[redAllianceSeed]);
+            setBlueTeams(playoffHelper.data.alliances[blueAllianceSeed]);
+            
+            if (playoffHelper.data.alliances[redAllianceSeed].length > 3 && benchedRedTeam == -1) setBenchedRedTeam(3);
+            if (playoffHelper.data.alliances[redAllianceSeed].length < 4) setBenchedRedTeam(-1);
+            if (playoffHelper.data.alliances[blueAllianceSeed].length > 3 && benchedBlueTeam == -1) setBenchedBlueTeam(3);
+            if (playoffHelper.data.alliances[blueAllianceSeed].length < 4) setBenchedBlueTeam(-1);
+        } else {
+            // Validate new seed input
+            let seed = Number(value);
+            if (seed <= 8 && seed >= 1) {
+                seed -= 1;
+                if (color === "red") {
+                    setRedAllianceSeed(seed);
+                    setRedTeams(playoffHelper.data.alliances[seed]);
+                    if (playoffHelper.data.alliances[seed].length > 3 && benchedRedTeam == -1) setBenchedRedTeam(3);
+                    if (playoffHelper.data.alliances[seed].length < 4) setBenchedRedTeam(-1);
+                } else {
+                    setBlueAllianceSeed(seed);
+                    setBlueTeams(playoffHelper.data.alliances[seed]);
+                    if (playoffHelper.data.alliances[seed].length > 3 && benchedBlueTeam == -1) setBenchedBlueTeam(3);
+                    if (playoffHelper.data.alliances[seed].length < 4) setBenchedBlueTeam(-1);
+                }
+            }
+        }
+    };
+
+    // Resets the teams when disabling the playoff prefill feature
+    const disablePlayoffPrefill = () => {
+        setRedTeams(["", "", ""]);
+        setBlueTeams(["", "", ""]);
+        setBenchedRedTeam(-1);
+        setBenchedBlueTeam(-1);
     }
 
     return (
@@ -111,71 +166,122 @@ export default function SimulatorConfig() {
                 <div className="alliance-column">
                     <div className="alliance-cell red">
                         <h3>Red Alliance</h3>
-                        <TeamNumberInput
-                            index={0}
-                            stateVar={redTeams}
-                            stateFunc={setRedTeams}
-                            teamNumbers={teamNumbers}
-                            useTextbox={useTextboxes}
-                            prefill={configPrefill ? prefill.t[0] : -1}
-                        />
-                        <TeamNumberInput
-                            index={1}
-                            stateVar={redTeams}
-                            stateFunc={setRedTeams}
-                            teamNumbers={teamNumbers}
-                            useTextbox={useTextboxes}
-                            prefill={configPrefill ? prefill.t[1] : -1}
-                        />
-                        <TeamNumberInput
-                            index={2}
-                            stateVar={redTeams}
-                            stateFunc={setRedTeams}
-                            teamNumbers={teamNumbers}
-                            useTextbox={useTextboxes}
-                            prefill={configPrefill ? prefill.t[2] : -1}
-                        />
+                        { !usePlayoffTeams ? <>
+                            <TeamNumberInput
+                                index={0}
+                                stateVar={redTeams}
+                                stateFunc={setRedTeams}
+                                teamNumbers={teamNumbers}
+                                useTextbox={useTextboxes}
+                                prefill={configPrefill ? prefill.t[0] : -1}
+                            />
+                            <TeamNumberInput
+                                index={1}
+                                stateVar={redTeams}
+                                stateFunc={setRedTeams}
+                                teamNumbers={teamNumbers}
+                                useTextbox={useTextboxes}
+                                prefill={configPrefill ? prefill.t[1] : -1}
+                            />
+                            <TeamNumberInput
+                                index={2}
+                                stateVar={redTeams}
+                                stateFunc={setRedTeams}
+                                teamNumbers={teamNumbers}
+                                useTextbox={useTextboxes}
+                                prefill={configPrefill ? prefill.t[2] : -1}
+                            />
+                        </> : <>
+                            <Input
+                                label="Red Alliance Seed"
+                                labelStyle={{ fontWeight: 600 }}
+                                onInput={e => setPlayoffPrefill(e.target.value, "red")}
+                                prefill={redAllianceSeed + 1}
+                            />
+                            { redTeams.map((team, ind) => <PlayoffTeamNumber
+                                key={ind}
+                                number={team}
+                                isBenched={ind == benchedRedTeam}
+                                benchedSetter={() => setBenchedRedTeam(ind)}
+                                showBenchSetting={redTeams.length > 3}
+                            /> )}
+                        </> }
                     </div>
                     <div className="alliance-cell blue">
                         <h3>Blue Alliance</h3>
-                        <TeamNumberInput
-                            index={0}
-                            stateVar={blueTeams}
-                            stateFunc={setBlueTeams}
-                            teamNumbers={teamNumbers}
-                            useTextbox={useTextboxes}
-                            prefill={configPrefill ? prefill.t[3] : -1}
-                        />
-                        <TeamNumberInput
-                            index={1}
-                            stateVar={blueTeams}
-                            stateFunc={setBlueTeams}
-                            teamNumbers={teamNumbers}
-                            useTextbox={useTextboxes}
-                            prefill={configPrefill ? prefill.t[4] : -1}
-                        />
-                        <TeamNumberInput
-                            index={2}
-                            stateVar={blueTeams}
-                            stateFunc={setBlueTeams}
-                            teamNumbers={teamNumbers}
-                            useTextbox={useTextboxes}
-                            prefill={configPrefill ? prefill.t[5] : -1}
-                        />
+                        { ! usePlayoffTeams ? <>
+                            <TeamNumberInput
+                                index={0}
+                                stateVar={blueTeams}
+                                stateFunc={setBlueTeams}
+                                teamNumbers={teamNumbers}
+                                useTextbox={useTextboxes}
+                                prefill={configPrefill ? prefill.t[3] : -1}
+                            />
+                            <TeamNumberInput
+                                index={1}
+                                stateVar={blueTeams}
+                                stateFunc={setBlueTeams}
+                                teamNumbers={teamNumbers}
+                                useTextbox={useTextboxes}
+                                prefill={configPrefill ? prefill.t[4] : -1}
+                            />
+                            <TeamNumberInput
+                                index={2}
+                                stateVar={blueTeams}
+                                stateFunc={setBlueTeams}
+                                teamNumbers={teamNumbers}
+                                useTextbox={useTextboxes}
+                                prefill={configPrefill ? prefill.t[5] : -1}
+                            />
+                        </> : <>
+                            <Input
+                                label="Blue Alliance Seed"
+                                labelStyle={{ fontWeight: 600 }}
+                                onInput={e => setPlayoffPrefill(e.target.value, "blue")}
+                                prefill={blueAllianceSeed + 1}
+                            />
+                            { blueTeams.map((team, ind) => <PlayoffTeamNumber
+                                key={ind}
+                                number={team}
+                                isBenched={ind == benchedBlueTeam}
+                                benchedSetter={() => setBenchedBlueTeam(ind)}
+                                showBenchSetting={blueTeams.length > 3}
+                            /> )}
+                        </> }
                     </div>
                 </div>
                 <div className="settings-column">
                     <h2>Settings</h2>
-                    <Input
-                        label="Use text boxes for team inputs"
-                        isCheckbox={true}
-                        onInput={ e => setUseTextboxes(e.target.checked) }
-                    />
-                    <Input
+                    { !usePlayoffTeams &&
+                        <Input
+                            label="Use text boxes for team inputs"
+                            isCheckbox
+                            onInput={ e => setUseTextboxes(e.target.checked) }
+                        />
+                    }
+                    { localStorage.getItem("schedules") !== null && <Input
                         label="Import match from schedule"
-                        isCheckbox={true}
-                        onInput={ e => setUseMatchImport(e.target.checked) }
-                    />
+                        isCheckbox
+                        onInput={ e => {
+                            if (e.target.checked) {
+                                setUsePlayoffTeams(false);
+                                disablePlayoffPrefill();
+                            }
+                            setUseMatchImport(e.target.checked);
+                        }}
+                    /> }
+                    { (playoffHelper.data.state == PlayoffHelperState.LIVE_PLAYOFFS || playoffHelper.data.state == PlayoffHelperState.SIMULATED_PLAYOFFS) && <Input
+                        label="Use playoff teams"
+                        isCheckbox
+                        onInput={ e => {
+                            if (e.target.checked) {
+                                setUseMatchImport(false);
+                                setPlayoffPrefill();
+                            }
+                            setUsePlayoffTeams(e.target.checked);
+                        }}
+                    /> }
                     { useMatchImport && <>
                         <Input
                             label="Event code"
@@ -186,7 +292,7 @@ export default function SimulatorConfig() {
                             label="Match #"
                             onInput={ e => { setImportMatch(e.target.value); getFromSchedule(e.target.value) } }
                         />
-                    </>}
+                    </> }
                     <div className="divider-line"></div>
                     <Input
                         label="# of simulations"
@@ -280,6 +386,15 @@ function TeamNumberInput({ index, stateVar, stateFunc, teamNumbers, useTextbox, 
             <div className="team-name-label">
                 {teamName}
             </div>
+        </div>
+    )
+}
+
+function PlayoffTeamNumber({ number, isBenched = false, benchedSetter, showBenchSetting = false }) {
+    return (
+        <div className="_PlayoffTeamNumber">
+            <div className={`number ${isBenched ? "benched" : ""}`}>{number}<span className="team-name"> - { getTeamName(number) }</span></div>
+            { (showBenchSetting && !isBenched) && <div className="bench-button" onClick={benchedSetter}>Sit out</div> }
         </div>
     )
 }
