@@ -89,7 +89,7 @@ export default function ViewTeam() {
         labels: graphInfo.graphLabels,
         datasets: [
             {
-                label: 'RPI',   // TODO research how this is used
+                label: graphInfo.scaleY.title.text,   // TODO research how this is used
                 data: graphInfo.graphData,
                 borderColor: graphInfo.borderColor,
                 backgroundColor: graphInfo.backgroundColor,
