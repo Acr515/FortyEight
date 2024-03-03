@@ -83,7 +83,7 @@ export default class Simulator {
 
         /**
          * Finds the minimum, maximum, average, and median for a scoring category of a team. Also finds the number of
-         * occurrances of the lowest value. The full implementation can be found inside the year's `SimulationInformation` object.
+         * occurrences of the lowest value. The full implementation can be found inside the year's `SimulationInformation` object.
          * @param {Team} team The team object
          * @param {string} key The part of the game (i.e. auto, teleop)
          * @param {string} subkey The scoring category (i.e. cargoLow)

@@ -45,8 +45,6 @@ export default function PlayoffHelperTeam({ team, isOnTheClock = false, captain 
 
     // Gets the text content to write in the info box
     const InfoBoxInnerContent = () => {
-        // TODO ADD FLAGS HERE TOO (number of breakdowns, number of high penalty games)
-
         let bestAttribute = { rank: 1000, weight: "---" };
         let estimatedWinRate = Math.round((team.simulatedWinRate - playoffHelper.data.config.weightOfSimulations) * 1000) / 10;
         if (estimatedWinRate < 1) estimatedWinRate = "<1";

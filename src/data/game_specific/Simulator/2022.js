@@ -70,7 +70,7 @@ const SimulationInformation = {
     
     /**
      * Finds the minimum, maximum, average, and median for a scoring category of a team. Also finds the number of
-     * occurrances of the lowest value.
+     * occurrences of the lowest value.
      * @param {Team} team The team object
      * @param {string} key The part of the game (i.e. auto, teleop)
      * @param {string} subkey The scoring category (i.e. cargoLow)
@@ -163,11 +163,11 @@ const SimulationInformation = {
             result.endgame.state = ScoreCalculator.Endgame.getLevelFromNumber(Math.round(biasedRandom(endgameRange.min, endgameRange.max, endgameRange["median"], 0)));
         } else {
             let mostCommonEndgame = EndgameResult.NONE;
-            let occurrances = 0;
+            let occurrences = 0;
             Object.keys(ef).forEach(endgame => {
-                if (ef[endgame] >= occurrances) {
+                if (ef[endgame] >= occurrences) {
                     mostCommonEndgame = endgame;
-                    occurrances = ef[endgame];
+                    occurrences = ef[endgame];
                 }
             });
             result.endgame.state = mostCommonEndgame;

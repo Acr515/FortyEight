@@ -61,7 +61,7 @@ const SimulationInformation = {
     
     /**
      * Finds the minimum, maximum, average, and median for a scoring category of a team. Also finds the number of
-     * occurrances of the lowest value.
+     * occurrences of the lowest value.
      * @param {Team} team The team object
      * @param {string} key The part of the game (i.e. auto, teleop)
      * @param {string} subkey The scoring category (i.e. cargoLow)

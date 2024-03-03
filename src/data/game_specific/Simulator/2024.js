@@ -10,6 +10,8 @@ const SimulationInformation = {
         ensembleRPRate: 0,
         averageNotes: 0,
         speakerNoteRate: 0,
+        defenseNotesPrevented: 0,
+        defenseOccurrences: 0,
     },
 
     /**
@@ -78,7 +80,7 @@ const SimulationInformation = {
     
     /**
      * Finds the minimum, maximum, average, and median for a scoring category of a team. Also finds the number of
-     * occurrances of the lowest value.
+     * occurrences of the lowest value.
      * @param {Team} team The team object
      * @param {string} key The part of the game (i.e. auto, teleop)
      * @param {string} subkey The scoring category (i.e. cargoLow)
@@ -203,11 +205,11 @@ const SimulationInformation = {
             result.endgame.state = ScoreCalculator.Endgame.getLevelFromNumber(Math.round(biasedRandom(endgameRange.min, endgameRange.max, endgameRange["median"], 0)));
         } else {
             let mostCommonEndgame = EndgameResult.NONE;
-            let occurrances = 0;
+            let occurrences = 0;
             Object.keys(ef).forEach(endgame => {
-                if (ef[endgame] >= occurrances) {
+                if (ef[endgame] >= occurrences) {
                     mostCommonEndgame = endgame;
-                    occurrances = ef[endgame];
+                    occurrences = ef[endgame];
                 }
             });
             result.endgame.state = mostCommonEndgame;
@@ -338,8 +340,7 @@ const SimulationInformation = {
         if (performanceDefender.defense.rating == "Strong") reductionRate = 0.65;
         reductionRate = Math.max(0, reductionRate + (rng() * 0.4 - 0.2));  // +/- 20% from base rate
         pieces = Math.round(pieces * reductionRate);
-
-        //console.log(`${performanceDefender.defense.rating} defense blocked ${pieces} notes out of ${basePieces} with a rate of ${reductionRate}`);
+        performanceDefender.defense.prevented = pieces;
 
         // Reduce points
         while (pieces > 0) {
@@ -384,6 +385,11 @@ const SimulationInformation = {
         
         matchDetails[color].teamPerformances.forEach( p => results[color].averageNotes += ScoreCalculator.Auto.getPieces({ performance: p }) + ScoreCalculator.Teleop.getPieces({ performance: p }) );
         matchDetails[color].teamPerformances.forEach( p => results[color].speakerNoteRate += p.auto.speaker + p.teleop.speaker );
+        
+        let defensePieces = 0;
+        matchDetails[color].teamPerformances.forEach( p => defensePieces += (p.defense.prevented ?? 0) );
+        results[color].defenseOccurrences += defensePieces > 0;
+        results[color].defenseNotesPrevented += defensePieces;
 
         // Insights that are independent of what the opposing alliance did
         if (matchDetails[color].autoScore > results[color].insights.autoAboveThreshold.threshold) {
@@ -419,11 +425,13 @@ const SimulationInformation = {
         results.red.ensembleRPRate /= config.simulations;
         results.red.speakerNoteRate /= results.red.averageNotes;
         results.red.averageNotes /= config.simulations;
+        results.red.defenseNotesPrevented /= results.red.defenseOccurrences;
         
         results.blue.melodyRPRate /= config.simulations;
         results.blue.ensembleRPRate /= config.simulations;
         results.blue.speakerNoteRate /= results.blue.averageNotes;
         results.blue.averageNotes /= config.simulations;
+        results.blue.defenseNotesPrevented /= results.blue.defenseOccurrences;
     }
 }
 
