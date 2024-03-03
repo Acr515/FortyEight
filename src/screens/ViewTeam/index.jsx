@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { useParams } from "react-router";
 import { Line } from 'react-chartjs-2';
 import {
@@ -62,6 +62,14 @@ export default function ViewTeam() {
     const [graphIndex, setGraphIndex] = useState(0);                            // numerical index for whichever graph is showing
     const [graphInfo, setGraphInfo] = useState(createDefaultData(teamNumber));  // graph display settings & data
     const [rerender, rerenderPage] = useState(false);
+    const [defenseRate, setDefenseRate] = useState(0);
+
+    // Get team defense rate
+    useEffect(() => {
+        let data = getTeamData(teamNumber).data, defensePlayed = 0;
+        data.forEach(match => defensePlayed += match.performance.defense.played);
+        setDefenseRate(Math.round(defensePlayed / data.length * 1000) / 10);
+    }, []);
 
     // Configure RPI chart
     const chartOptions = {
@@ -107,7 +115,7 @@ export default function ViewTeam() {
                             <div className="info-label">Forms</div>
                         </div>
                         <div className="info-cell">
-                            <div className="info-value">--%</div>
+                            <div className="info-value">{defenseRate}%</div>
                             <div className="info-label">Defense Rate</div>
                         </div>
                         <ViewTeamCells team={team}/>

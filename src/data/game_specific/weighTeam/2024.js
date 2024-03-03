@@ -72,6 +72,7 @@ export default function weighTeam(team, weights) {
         if (match.performance.defense.played) {
             score.Defense.instances ++;
             if (match.performance.defense.rating == "Strong") score.Defense.compositeStrength ++;
+            if (match.performance.defense.rating == "OK") score.Defense.compositeStrength += 0.5;
         }
 
         // Compile a team's negative flags (penalties, break-downs)

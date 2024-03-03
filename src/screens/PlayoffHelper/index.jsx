@@ -373,7 +373,7 @@ function SimulatedPlayoffs({ subpageState, cachedBracket, setCachedBracket }) {
             match.blueTeams.slice(0, 3), 
             {
                 simulations: 1000, 
-                applyDefense: false,    // TODO set to true
+                applyDefense: true,
             }
         );
         await simulator.run(results => {

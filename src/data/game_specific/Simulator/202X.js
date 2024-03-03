@@ -166,6 +166,22 @@ const SimulationInformation = {
     preCompilationCalculations: (color, performances, gameStats) => {},
 
     /**
+     * Given the performance object of a defender, removes game pieces from their score, assuming that their defense
+     * during the match reduces their capacity to score points.
+     * @param {performanceObject} performance The `performanceObject` of the defender
+     */
+    deductDefenderScore: (performance) => {},
+
+    /**
+     * Reduces the scoring output of a team being targeted by a defender.
+     * @param {performanceObject} performanceDefender The `performanceObject` of the defender
+     * @param {performanceObject} performanceTarget The `performanceObject` of the 
+     */
+    applyDefense: (performanceDefender, performanceTarget) => {
+
+    },
+
+    /**
      * Runs during every match of the simulator to tabulate certain running averages and insights.
      * @param {string} color The alliance color
      * @param {object} results The results object in the simulator

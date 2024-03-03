@@ -29,12 +29,13 @@ export default function SimulatorViewer() {
         </div>
     )
     
+    var sim = location.state.results;
+    
     // Determine where to go back to
     const backLocation = location.state.overrideLocation ?? "/analysis/simulator?pf=y&t=[" + sim.red.teamNumbers + "," + sim.blue.teamNumbers + "]&sims=" + sim.simulations + "&def=" + (sim.applyDefense ? "true" : "false");
     const returnState = location.state.returnState ?? {};   // the state to send through the back button
 
     // Parse simulation data
-    var sim = location.state.results
     const teamSimInfo = (colorString) => { return {
         colorName: colorString.toLowerCase(),
         colorString,

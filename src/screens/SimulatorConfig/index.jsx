@@ -38,6 +38,7 @@ export default function SimulatorConfig() {
     const [useTextboxes, setUseTextboxes] = useState(false);
     const [useMatchImport, setUseMatchImport] = useState(false);
     const [usePlayoffTeams, setUsePlayoffTeams] = useState(false);
+    const [useDefense, setUseDefense] = useState(prefill.def ?? false);
     const [simulations, setSimulations] = useState(configPrefill ? prefill.sims : 1000);
     const [importEventCode, setImportEventCode] = useState(localStorage.getItem("EventCodePrefill") || "");
     const [importMatch, setImportMatch] = useState("");
@@ -80,7 +81,7 @@ export default function SimulatorConfig() {
                 inputBlueTeams, 
                 {
                     simulations, 
-                    applyDefense: false, 
+                    applyDefense: useDefense, 
                 }
             );
 
@@ -303,6 +304,7 @@ export default function SimulatorConfig() {
                         label="Simulate defense"
                         isCheckbox={true}
                         prefill={configPrefill ? prefill.def : false}
+                        onInput={ e => setUseDefense(e.target.checked) }
                     />
                     <Button
                         text="Run simulation"

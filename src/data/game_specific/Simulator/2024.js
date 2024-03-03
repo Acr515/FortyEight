@@ -227,17 +227,21 @@ const SimulationInformation = {
 
         // Get defense tendencies
         if (config.applyDefense) {
-            let defensivePlays = 0;
-            let strongDefensePlays = 0;
+            let defensivePlays = 0, okDefensePlays = 0, strongDefensePlays = 0;
             team.data.forEach(match => {
                 if (match.performance.defense.played) {
                     defensivePlays ++;
                     if (match.performance.defense.rating == "Strong") strongDefensePlays ++;
+                    if (match.performance.defense.rating == "OK") okDefensePlays ++;
                 }
             });
             result.defense.tendency = defensivePlays / team.data.length;    // new property- only invoked in cases where more than 1 team says yes to play defense
             result.defense.played = rng() < result.defense.tendency;        // TODO add option for this to not be random
-            result.defense.rating = rng() < (strongDefensePlays / defensivePlays) ? "Strong" : "Weak";
+
+            let rngValue = rng();
+            result.defense.rating = "Weak";
+            if (rngValue < (strongDefensePlays + okDefensePlays) / defensivePlays) result.defense.rating = "OK";
+            if (rngValue < strongDefensePlays / defensivePlays) result.defense.rating = "Strong";
         }
         
         return result;
@@ -295,6 +299,60 @@ const SimulationInformation = {
      */
     adjustScoring: (allianceDetails) => {
         allianceDetails.teleopScore += allianceDetails.gameStats.amplifiedNotes * 3;    // bonus for amplified notes is +3 on top of the 2 points received already
+    },
+
+    /**
+     * Given the performance object of a defender, removes game pieces from their score, assuming that their defense
+     * during the match reduces their capacity to score points.
+     * @param {performanceObject} performance The `performanceObject` of the defender
+     */
+    deductDefenderScore: (performance) => {
+        let pieces = ScoreCalculator.Teleop.getPieces({ performance });
+        pieces = Math.ceil(pieces / 3);
+
+        while (pieces > 0) {
+            if (performance.teleop.amp > 0) {
+                performance.teleop.amp --;
+                pieces --;
+            }
+            if (pieces > 0 && performance.teleop.speaker > 0) {
+                performance.teleop.speaker --;
+                pieces --;
+            }
+            if (performance.teleop.amp + performance.teleop.speaker <= 0) pieces = 0;
+        }
+    },
+
+    /**
+     * Reduces the scoring output of a team being targeted by a defender.
+     * @param {performanceObject} performanceDefender The `performanceObject` of the defender
+     * @param {performanceObject} performanceTarget The `performanceObject` of the offensive robot
+     * @param {function} rng The random number generator
+     */
+    applyDefense: (performanceDefender, performanceTarget, rng) => {
+        // Determine the quality of defense
+        let basePieces = ScoreCalculator.Teleop.getPieces({ performance: performanceTarget });
+        let pieces = basePieces;
+        let reductionRate = 0.05;
+        if (performanceDefender.defense.rating == "OK") reductionRate = 0.35;
+        if (performanceDefender.defense.rating == "Strong") reductionRate = 0.65;
+        reductionRate = Math.max(0, reductionRate + (rng() * 0.4 - 0.2));  // +/- 20% from base rate
+        pieces = Math.round(pieces * reductionRate);
+
+        //console.log(`${performanceDefender.defense.rating} defense blocked ${pieces} notes out of ${basePieces} with a rate of ${reductionRate}`);
+
+        // Reduce points
+        while (pieces > 0) {
+            if (performanceTarget.teleop.amp > 0) {
+                performanceTarget.teleop.amp --;
+                pieces --;
+            }
+            if (pieces > 0 && performanceTarget.teleop.speaker > 0) {
+                performanceTarget.teleop.speaker --;
+                pieces --;
+            }
+            if (performanceTarget.teleop.amp + performanceTarget.teleop.speaker <= 0) pieces = 0;
+        }
     },
 
     /**

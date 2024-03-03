@@ -462,7 +462,7 @@ const PlayoffHelperFunctions = {
                         [...pickingAllianceNumbers, candidate.teamNumber],                                                                         // red alliance, always the picking team
                         (filler === null ? simulatedPh.alliances[opponentSeed] : [...simulatedPh.alliances[opponentSeed], filler.teamNumber]), {   // blue alliance, always 1st round opponent
                             simulations: (ph.config.simulatedMatches / ph.config.numberOfSimulatedFillerOptions),
-                            applyDefense: false,    // TODO SET THIS TO TRUE
+                            applyDefense: true,
                         }
                     );
                     let simResults = null;
@@ -553,7 +553,7 @@ const PlayoffHelperFunctions = {
                 let sim = new Simulator(
                     this.redTeams.length > 3 ? this.redTeams.slice(0, 3) : this.redTeams,
                     this.blueTeams.length > 3 ? this.blueTeams.slice(0, 3) : this.blueTeams, {
-                        applyDefense: false // TODO SET TO TRUE
+                        applyDefense: true,
                     }
                 );
                 await sim.run((outcome) => {
