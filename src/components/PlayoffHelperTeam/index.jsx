@@ -61,15 +61,13 @@ export default function PlayoffHelperTeam({ team, isOnTheClock = false, captain 
             }
         }
 
-        if (backup != null) {
+        if (backup != null && alliance != -1) {
             dialogFunctions.setDialog({
                 body: `The designated back-up robot is the robot with the highest qualifying ranking that didn't get selected. According to available data, that team is ${backup.teamNumber}. Are you sure you would like to assign this back-up robot to this alliance?`,
                 useConfirmation: true,
                 confirmFunction: () => { 
                     // Add backup and save the data
-                    team.selected = true;
-                    playoffHelper.data.alliances[alliance].push(backup.teamNumber);
-                    playoffHelper.finishDraft();
+                    playoffHelper.addBackupTeam(backup.teamNumber, alliance);
                 },
                 confirmLabel: "Yes",
                 cancelLabel: "No"

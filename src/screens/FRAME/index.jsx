@@ -64,6 +64,7 @@ export default function FRAME() {
         simulateDraft: async () => PlayoffHelperFunctions.simulateDraft(playoffHelper, setPlayoffHelper),
         loadDraftResults: () => PlayoffHelperFunctions.loadDraftResults(playoffHelper, setPlayoffHelper),
         finishDraft: () => PlayoffHelperFunctions.finishDraft(playoffHelper, setPlayoffHelper),
+        addBackupTeam: (teamNumber, allianceSeed) => PlayoffHelperFunctions.addBackupTeam(playoffHelper, setPlayoffHelper, teamNumber, allianceSeed),
     };
     
 

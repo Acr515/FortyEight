@@ -155,7 +155,6 @@ const PlayoffHelperFunctions = {
         if (playoffHelper.state == PlayoffHelperState.SIMULATED_DRAFT) playoffHelper.state = PlayoffHelperState.SIMULATED_PLAYOFFS;
 
         // Save to localStorage
-        //let savedTeams = playoffHelper.alliances.map(alliance => alliance.map(team => PlayoffHelperFunctions.getTeam(playoffHelper, team)));
         localStorage.setItem("playoffHelper", JSON.stringify({ state: playoffHelper.state, teams: playoffHelper.teams, alliances: playoffHelper.alliances }));
         
         phSetter(playoffHelper);
@@ -326,6 +325,24 @@ const PlayoffHelperFunctions = {
         // Set team to unavailable
         let teamObj = PlayoffHelperFunctions.getTeam(playoffHelper, teamNumber);
         teamObj.declined = true;
+
+        phSetter(playoffHelper);
+    },
+
+    /**
+     * Assigns a robot to an alliance as a back-up.
+     * @param {PlayoffHelperData} ph The state object containing the playoff helper data
+     * @param {function} phSetter The state setter from the FRAME screen
+     * @param {number} teamNumber The team number to pick
+     * @param {number} allianceSeed The seed to assign to
+     */
+    addBackupTeam(ph, phSetter, teamNumber, allianceSeed) {
+        let playoffHelper = clonePlayoffHelper(ph);
+
+        let team = PlayoffHelperFunctions.getTeam(playoffHelper, teamNumber);
+        team.selected = true;
+        playoffHelper.alliances[allianceSeed].push(teamNumber);
+        localStorage.setItem("playoffHelper", JSON.stringify({ state: playoffHelper.state, teams: playoffHelper.teams, alliances: playoffHelper.alliances }));
 
         phSetter(playoffHelper);
     },
