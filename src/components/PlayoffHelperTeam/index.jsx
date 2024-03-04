@@ -5,10 +5,12 @@ import PlayoffHelperContext from "context/PlayoffHelperContext";
 import getTeamName from "data/getTeamName";
 import { Weights } from "data/game_specific/weighTeam/GAME_YEAR";
 import { getOrdinalSuffix } from "util/getOrdinalSuffix";
-import "./style.scss";
 import DialogBoxContext from "context/DialogBoxContext";
 import { getTeamData } from "data/SearchData";
 import TeamLink from "components/TeamLink";
+import BreakdownImage from "assets/images/flag-breakdown.png";
+import "./style.scss";
+import { PlayoffHelperState } from "data/PlayoffHelperData";
 
 /**
  * Creates a team card to be used on the playoff helper screen.
@@ -41,6 +43,42 @@ export default function PlayoffHelperTeam({ team, isOnTheClock = false, captain 
             confirmLabel: "Yes",
             cancelLabel: "No"
         });
+    };
+
+    // Gets a back-up robot
+    const getBackupRobot = () => {
+        let backup = null, alliance = -1;
+        for (let team of playoffHelper.data.teams) {
+            if (!team.selected && !team.captain && !team.declined) {
+                backup = team;
+                break;
+            }
+        }
+        for (let i = 0; i < playoffHelper.data.alliances.length; i ++) {
+            if (playoffHelper.data.alliances[i][0] == team.teamNumber) {
+                alliance = i;
+                break;
+            }
+        }
+
+        if (backup != null) {
+            dialogFunctions.setDialog({
+                body: `The designated back-up robot is the robot with the highest qualifying ranking that didn't get selected. According to available data, that team is ${backup.teamNumber}. Are you sure you would like to assign this back-up robot to this alliance?`,
+                useConfirmation: true,
+                confirmFunction: () => { 
+                    // Add backup and save the data
+                    team.selected = true;
+                    playoffHelper.data.alliances[alliance].push(backup.teamNumber);
+                    playoffHelper.finishDraft();
+                },
+                confirmLabel: "Yes",
+                cancelLabel: "No"
+            }); 
+        } else {
+            dialogFunctions.setDialog({
+                body: "There are no eligible backups available for the alliance."
+            }); 
+        }
     };
 
     // Gets the text content to write in the info box
@@ -114,7 +152,13 @@ export default function PlayoffHelperTeam({ team, isOnTheClock = false, captain 
                         ) }
                     </div>
                 }
-                { consolidated ? <div className="rpi-row">{team.rpi.RPI} RPI ({getOrdinalSuffix(team.rpi.ranking)})</div>
+                { consolidated ? 
+                    <div className="rpi-row">
+                        <span>{team.rpi.RPI} RPI ({getOrdinalSuffix(team.rpi.ranking)})</span>
+                        { (captain && partners.length < 3 && (playoffHelper.data.state == PlayoffHelperState.LIVE_PLAYOFFS || playoffHelper.data.state == PlayoffHelperState.SIMULATED_PLAYOFFS)) && 
+                            <div className="backup-button" onClick={getBackupRobot} style={{ backgroundImage: 'url(' + BreakdownImage + ')' }}></div>
+                        }
+                    </div>
                 : 
                     <div className="cell-row">
                         <PlayoffHelperTeamCellSet team={activeTeam} />

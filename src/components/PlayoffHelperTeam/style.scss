@@ -141,10 +141,27 @@
         }
 
         .rpi-row {
+            display: flex;
             margin-top: auto;
             font-family: 'transandina';
             font-size: 16px;
             font-weight: 500;
+
+            .backup-button {
+                margin-left: auto;
+                background-size: contain;
+                background-position: center;
+                background-repeat: no-repeat;
+                width: 20px;
+                height: 20px;
+                opacity: .5;
+                transition: opacity .2s;
+                cursor: pointer;
+
+                &:hover {
+                    opacity: .2;
+                }
+            }
         }
 
         .number-buttons {

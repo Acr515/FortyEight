@@ -63,6 +63,7 @@ export default function FRAME() {
         getAllianceRPI: (seed) => PlayoffHelperFunctions.getAllianceRPI(playoffHelper, seed),
         simulateDraft: async () => PlayoffHelperFunctions.simulateDraft(playoffHelper, setPlayoffHelper),
         loadDraftResults: () => PlayoffHelperFunctions.loadDraftResults(playoffHelper, setPlayoffHelper),
+        finishDraft: () => PlayoffHelperFunctions.finishDraft(playoffHelper, setPlayoffHelper),
     };
     
 

@@ -43,10 +43,10 @@ export const PlayoffHelperData = {
         fullTBAData: false,                 // Whether or not ranking data was supplied by TBA
         backupSelections: false,            // Whether or not to add a third round of selections to the draft (i.e. world championship style selection)
         useSimulation: true,                // Whether to use simulation to inform the picklist generator
-        numberOfSimulatedFillerOptions: 2,  // Number of different "fill-in" options used when the opponent alliance in the simulator hasn't filled their alliance yet
-        simulatedMatches: 300,              // Number of matches to simulate with each available team
-        weightOfSimulations: 0.5,           // The factor used to change team value based on simulated outcomes. Must be greater than 0
-        weightOfUniqueStrengths: 0.8,       // The factor used to change team value based on how much better it is than its partners in different scoring categories
+        numberOfSimulatedFillerOptions: 3,  // Number of different "fill-in" options used when the opponent alliance in the simulator hasn't filled their alliance yet
+        simulatedMatches: 400,              // Number of matches to simulate with each available team
+        weightOfSimulations: 0.65,          // The factor used to change team value based on simulated outcomes. Must be greater than 0
+        weightOfUniqueStrengths: 0.75,      // The factor used to change team value based on how much better it is than its partners in different scoring categories
     }
 };
 
