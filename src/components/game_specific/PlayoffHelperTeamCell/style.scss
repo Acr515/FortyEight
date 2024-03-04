@@ -1,0 +1,31 @@
+
+._PlayoffHelperTeamCell {
+    display: flex;
+    flex-direction: column;
+
+    .value-holder {
+        display: flex;
+        flex-direction: row;
+        gap: 4px;
+
+        .inline-entry {
+            margin-top: auto;
+        }
+        .value {
+            font-family: 'industry';
+            font-weight: 500;
+            font-size: 27px;
+        }
+        .place {
+            font-family: 'industry';
+            font-weight: 500;
+            font-size: 16px;
+        }
+    }
+    .label {
+        font-family: 'transandina';
+        font-size: 16px;
+        font-weight: 300;
+        white-space: nowrap;
+    }
+}

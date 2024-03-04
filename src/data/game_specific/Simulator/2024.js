@@ -9,7 +9,10 @@ const SimulationInformation = {
         melodyRPRate: 0,
         ensembleRPRate: 0,
         averageNotes: 0,
+        averageEndgame: 0,
         speakerNoteRate: 0,
+        defenseNotesPrevented: 0,
+        defenseOccurrences: 0,
     },
 
     /**
@@ -78,7 +81,7 @@ const SimulationInformation = {
     
     /**
      * Finds the minimum, maximum, average, and median for a scoring category of a team. Also finds the number of
-     * occurrances of the lowest value.
+     * occurrences of the lowest value.
      * @param {Team} team The team object
      * @param {string} key The part of the game (i.e. auto, teleop)
      * @param {string} subkey The scoring category (i.e. cargoLow)
@@ -203,11 +206,11 @@ const SimulationInformation = {
             result.endgame.state = ScoreCalculator.Endgame.getLevelFromNumber(Math.round(biasedRandom(endgameRange.min, endgameRange.max, endgameRange["median"], 0)));
         } else {
             let mostCommonEndgame = EndgameResult.NONE;
-            let occurrances = 0;
+            let occurrences = 0;
             Object.keys(ef).forEach(endgame => {
-                if (ef[endgame] >= occurrances) {
+                if (ef[endgame] >= occurrences) {
                     mostCommonEndgame = endgame;
-                    occurrances = ef[endgame];
+                    occurrences = ef[endgame];
                 }
             });
             result.endgame.state = mostCommonEndgame;
@@ -227,17 +230,21 @@ const SimulationInformation = {
 
         // Get defense tendencies
         if (config.applyDefense) {
-            let defensivePlays = 0;
-            let strongDefensePlays = 0;
+            let defensivePlays = 0, okDefensePlays = 0, strongDefensePlays = 0;
             team.data.forEach(match => {
                 if (match.performance.defense.played) {
                     defensivePlays ++;
                     if (match.performance.defense.rating == "Strong") strongDefensePlays ++;
+                    if (match.performance.defense.rating == "OK") okDefensePlays ++;
                 }
             });
             result.defense.tendency = defensivePlays / team.data.length;    // new property- only invoked in cases where more than 1 team says yes to play defense
             result.defense.played = rng() < result.defense.tendency;        // TODO add option for this to not be random
-            result.defense.rating = rng() < (strongDefensePlays / defensivePlays) ? "Strong" : "Weak";
+
+            let rngValue = rng();
+            result.defense.rating = "Weak";
+            if (rngValue < (strongDefensePlays + okDefensePlays) / defensivePlays) result.defense.rating = "OK";
+            if (rngValue < strongDefensePlays / defensivePlays) result.defense.rating = "Strong";
         }
         
         return result;
@@ -298,6 +305,59 @@ const SimulationInformation = {
     },
 
     /**
+     * Given the performance object of a defender, removes game pieces from their score, assuming that their defense
+     * during the match reduces their capacity to score points.
+     * @param {performanceObject} performance The `performanceObject` of the defender
+     */
+    deductDefenderScore: (performance) => {
+        let pieces = ScoreCalculator.Teleop.getPieces({ performance });
+        pieces = Math.ceil(pieces / 3);
+
+        while (pieces > 0) {
+            if (performance.teleop.amp > 0) {
+                performance.teleop.amp --;
+                pieces --;
+            }
+            if (pieces > 0 && performance.teleop.speaker > 0) {
+                performance.teleop.speaker --;
+                pieces --;
+            }
+            if (performance.teleop.amp + performance.teleop.speaker <= 0) pieces = 0;
+        }
+    },
+
+    /**
+     * Reduces the scoring output of a team being targeted by a defender.
+     * @param {performanceObject} performanceDefender The `performanceObject` of the defender
+     * @param {performanceObject} performanceTarget The `performanceObject` of the offensive robot
+     * @param {function} rng The random number generator
+     */
+    applyDefense: (performanceDefender, performanceTarget, rng) => {
+        // Determine the quality of defense
+        let basePieces = ScoreCalculator.Teleop.getPieces({ performance: performanceTarget });
+        let pieces = basePieces;
+        let reductionRate = 0.05;
+        if (performanceDefender.defense.rating == "OK") reductionRate = 0.35;
+        if (performanceDefender.defense.rating == "Strong") reductionRate = 0.65;
+        reductionRate = Math.max(0, reductionRate + (rng() * 0.4 - 0.2));  // +/- 20% from base rate
+        pieces = Math.round(pieces * reductionRate);
+        performanceDefender.defense.prevented = pieces;
+
+        // Reduce points
+        while (pieces > 0) {
+            if (performanceTarget.teleop.amp > 0) {
+                performanceTarget.teleop.amp --;
+                pieces --;
+            }
+            if (pieces > 0 && performanceTarget.teleop.speaker > 0) {
+                performanceTarget.teleop.speaker --;
+                pieces --;
+            }
+            if (performanceTarget.teleop.amp + performanceTarget.teleop.speaker <= 0) pieces = 0;
+        }
+    },
+
+    /**
      * An optional function that runs IMMEDIATELY before the winner of a match is determined in `MatchDetails`.
      * It should be used to adjust RPs or apply any game-specific mechanics.
      * @param {AllianceDetails} red The red alliance object
@@ -325,7 +385,13 @@ const SimulationInformation = {
         results[color].ensembleRPRate += matchDetails[color].gameStats.ensembleRP ? 1 : 0;
         
         matchDetails[color].teamPerformances.forEach( p => results[color].averageNotes += ScoreCalculator.Auto.getPieces({ performance: p }) + ScoreCalculator.Teleop.getPieces({ performance: p }) );
+        matchDetails[color].teamPerformances.forEach( p => results[color].averageEndgame += ScoreCalculator.Endgame.getScore({ performance: p }) );
         matchDetails[color].teamPerformances.forEach( p => results[color].speakerNoteRate += p.auto.speaker + p.teleop.speaker );
+        
+        let defensePieces = 0;
+        matchDetails[color].teamPerformances.forEach( p => defensePieces += (p.defense.prevented ?? 0) );
+        results[color].defenseOccurrences += defensePieces > 0;
+        results[color].defenseNotesPrevented += defensePieces;
 
         // Insights that are independent of what the opposing alliance did
         if (matchDetails[color].autoScore > results[color].insights.autoAboveThreshold.threshold) {
@@ -361,11 +427,15 @@ const SimulationInformation = {
         results.red.ensembleRPRate /= config.simulations;
         results.red.speakerNoteRate /= results.red.averageNotes;
         results.red.averageNotes /= config.simulations;
+        results.red.averageEndgame /= config.simulations;
+        results.red.defenseNotesPrevented /= results.red.defenseOccurrences;
         
         results.blue.melodyRPRate /= config.simulations;
         results.blue.ensembleRPRate /= config.simulations;
         results.blue.speakerNoteRate /= results.blue.averageNotes;
         results.blue.averageNotes /= config.simulations;
+        results.blue.averageEndgame /= config.simulations;
+        results.blue.defenseNotesPrevented /= results.blue.defenseOccurrences;
     }
 }
 

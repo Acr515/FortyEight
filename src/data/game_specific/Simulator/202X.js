@@ -61,7 +61,7 @@ const SimulationInformation = {
     
     /**
      * Finds the minimum, maximum, average, and median for a scoring category of a team. Also finds the number of
-     * occurrances of the lowest value.
+     * occurrences of the lowest value.
      * @param {Team} team The team object
      * @param {string} key The part of the game (i.e. auto, teleop)
      * @param {string} subkey The scoring category (i.e. cargoLow)
@@ -164,6 +164,22 @@ const SimulationInformation = {
      * @param {*} gameStats The `gameStats` property of the `AllianceDetails` class
      */
     preCompilationCalculations: (color, performances, gameStats) => {},
+
+    /**
+     * Given the performance object of a defender, removes game pieces from their score, assuming that their defense
+     * during the match reduces their capacity to score points.
+     * @param {performanceObject} performance The `performanceObject` of the defender
+     */
+    deductDefenderScore: (performance) => {},
+
+    /**
+     * Reduces the scoring output of a team being targeted by a defender.
+     * @param {performanceObject} performanceDefender The `performanceObject` of the defender
+     * @param {performanceObject} performanceTarget The `performanceObject` of the 
+     */
+    applyDefense: (performanceDefender, performanceTarget) => {
+
+    },
 
     /**
      * Runs during every match of the simulator to tabulate certain running averages and insights.

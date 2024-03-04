@@ -24,7 +24,7 @@ export default class Simulator {
         // Define config defaults
         this.config = config;
         this.config.simulations ??= 1000;       // The number of matches to play
-        this.config.applyDefense ??= false;     // Whether or not the simulator should take defensive tendencies into account
+        this.config.applyDefense ??= true;      // Whether or not the simulator should take defensive tendencies into account
         this.config.dataset ??= TeamData;       // The dataset to isolate simulation reference data from
         this.config.defaultInfluence ??= 1.5;   // The default influence value to give to biasedRandom
         this.config.biasMethod ??= "median";    // The bias method to use on the random number generator
@@ -83,7 +83,7 @@ export default class Simulator {
 
         /**
          * Finds the minimum, maximum, average, and median for a scoring category of a team. Also finds the number of
-         * occurrances of the lowest value. The full implementation can be found inside the year's `SimulationInformation` object.
+         * occurrences of the lowest value. The full implementation can be found inside the year's `SimulationInformation` object.
          * @param {Team} team The team object
          * @param {string} key The part of the game (i.e. auto, teleop)
          * @param {string} subkey The scoring category (i.e. cargoLow)
@@ -204,15 +204,50 @@ class MatchDetails {
     winner;
 
     constructor(redPerformances, bluePerformances, useDefense, rng) {
-        this.red = new AllianceDetails(redPerformances, "Red", useDefense, rng);
-        this.blue = new AllianceDetails(bluePerformances, "Blue", useDefense, rng);
+        this.red = new AllianceDetails(redPerformances, "Red", useDefense);
+        this.blue = new AllianceDetails(bluePerformances, "Blue", useDefense);
 
         // Apply defense
         if (useDefense) {
-            // TODO implement
+            // Pick out the defender from each alliance
+            let redDefender = null, blueDefender = null;
+            redPerformances.forEach(team => {  
+                if (team.defense.played) redDefender = team;
+            });
+            bluePerformances.forEach(team => {  
+                if (team.defense.played) blueDefender = team;
+            });
+
+            if (redDefender != null) {
+                // Pick out a blue scorer to defend against
+                let blueScorer = null, blueScore = -10;
+                bluePerformances.forEach(team => {
+                    let score = ScoreCalculator.Teleop.getScore({ performance: team });
+                    if (score > blueScore) {
+                        blueScore = score;
+                        blueScorer = team;
+                    }
+                });
+                SimulationInformation.applyDefense(redDefender, blueScorer, rng);
+            }
+
+            if (blueDefender != null) {
+                // Pick out a blue scorer to defend against
+                let redScorer = null, redScore = -10;
+                bluePerformances.forEach(team => {
+                    let score = ScoreCalculator.Teleop.getScore({ performance: team });
+                    if (score > redScore) {
+                        redScore = score;
+                        redScorer = team;
+                    }
+                });
+                SimulationInformation.applyDefense(blueDefender, redScorer, rng);
+            }
         }
 
         // Calculate final scores and RP totals
+        SimulationInformation.preCompilationCalculations("Red", this.red.teamPerformances, this.red.gameStats, rng);
+        SimulationInformation.preCompilationCalculations("Blue", this.blue.teamPerformances, this.blue.gameStats, rng);
         this.red.getScores();
         this.blue.getScores();
         this.red.getRPs();
@@ -253,11 +288,9 @@ class AllianceDetails {
     matchRP = 0;
     gameStats = structuredClone(SimulationInformation.singleMatchAllianceDetails);
 
-    constructor(performances, color, useDefense, rng) {
+    constructor(performances, color, useDefense) {
         this.teamPerformances = performances;
         this.color = color;
-
-        SimulationInformation.preCompilationCalculations(this.color, this.teamPerformances, this.gameStats, rng);
 
         // Check if two or more robots are trying to play defense
         if (useDefense) {
@@ -285,8 +318,7 @@ class AllianceDetails {
             // Deduct score of a defending team
             this.teamPerformances.forEach((team) => {
                 if (team.defense.played) {
-                    //team.teleop.cargoLow = Math.floor(team.teleop.cargoLow / 2);
-                    //team.teleop.cargoHigh = Math.floor(team.teleop.cargoHigh / 2);
+                    SimulationInformation.deductDefenderScore(team);
                 }
             });
         }

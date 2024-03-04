@@ -12,6 +12,7 @@
 #content-container {
     width: 100%;
     flex-grow: 1;
+    min-width: 0;
 }
 #navigation-bar {
     display: flex;

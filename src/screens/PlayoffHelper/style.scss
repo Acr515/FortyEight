@@ -1,0 +1,325 @@
+._PlayoffHelper {
+    overflow-y: auto;
+    box-sizing: border-box;
+    
+    .sub-headline {
+        margin-left: 32px;
+        margin-top: 8px;
+        font-size: 20px;
+    }
+
+    .content-area {
+        padding: 0 0 0 32px;
+        box-sizing: border-box;
+        width: 100%;
+    }
+
+    .header-buttons {
+        display: flex;
+        gap: 20px;
+
+        .button {
+            font-family: 'transandina';
+            font-weight: 400;
+            font-size: 22px;
+            color: #4941B1;
+
+            &:hover:not(.active) {
+                opacity: .75;
+                cursor: pointer;
+            }
+
+            &.active {
+                font-weight: 700;
+                color: #000;
+            }
+        }
+    }
+
+    .pick-status {
+        background-color: #4941B1;
+        border-radius: 16px;
+        display: flex;
+        gap: 8px;
+        padding: 12px;
+        color: white;
+        margin-right: 20px;
+        
+        .alliance-seed {
+            font-family: 'industry';
+            font-weight: 600;
+            font-size: 24px;
+        }
+
+        .on-the-clock {
+            font-family: 'transandina';
+            font-weight: 500;
+            font-size: 18px;
+            margin-top: auto;
+        }
+    }
+
+    ._RankingInput {
+        padding-right: 32px;
+        h2 {
+            margin-top: 0;
+        }
+
+        .submission-buttons {
+            text-align: center;
+            ._Button {
+                display: inline-block;
+                margin: 12px 8px;
+            }
+        }
+        .horizontal-line {
+            width: 100%;
+            height: 1px;
+            margin: 32px 0;
+            background-color: rgba(0,0,0,0.3);
+        }
+
+        .input-area.inactive {
+            opacity: 0.5;
+        }
+    }
+
+    ._AllianceRow {
+        display: flex;
+        width: 100%;
+        gap: 10px;
+
+        .alliance-labels {
+            display: flex;
+            flex-direction: column;
+            width: 80px;
+            padding-top: 25px;
+            margin-right: 8px;
+
+            .ranking {
+                font-family: 'industry';
+                font-weight: 700;
+                font-size: 28px;
+                margin-bottom: 6px;
+            }
+            .rpi {
+                font-family: 'industry';
+                font-weight: 600;
+                font-size: 20px;
+            }
+            .rpi-label {
+                font-family: 'transandina';
+                font-weight: 400;
+                font-size: 15px;
+                white-space: nowrap;
+            }
+            .rpi-rating {
+                font-family: 'transandina';
+                font-weight: 400;
+                font-size: 12px;
+            }
+        }
+        .alliance-container {
+            display: flex;
+            width: 100%;
+            min-width: 0;
+        }
+        .alliance-teams {
+            width: 100%;
+            min-width: 0;
+            overflow-x: auto;
+            display: flex;
+            flex-direction: row;
+            gap: 10px;
+            overflow-y: hidden;
+        }
+        .alliance-teams.on-clock {
+            padding: 0 16px;
+        }
+    }    
+
+    ._LiveDraft {
+        width: 100%;
+        
+        .alliance-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            padding-bottom: 48px;
+        }
+    }
+
+    ._DraftBoard {
+        .under-construction {
+            font-style: italic;
+            margin-top: 20vh;
+            text-align: center;
+            color: #555;
+        }   
+    }
+
+    ._SimulatingDraft {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        .spinner {
+            margin-top: 20vh;
+        }
+        .caption {
+            margin-top: 32px;
+            color: #888;
+        }
+    }
+
+    ._SimulatedPlayoffs {
+        .button-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20vh;
+
+            p {
+                max-width: 400px;
+                text-align: center;
+            }
+        }
+
+        .loading-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+    
+            .spinner {
+                margin-top: 20vh;
+            }
+            .caption {
+                margin-top: 32px;
+                color: #888;
+            }
+        }
+
+        .match-container {
+            display: flex;
+            overflow-x: scroll;
+
+            .round-column {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                padding: 16px;
+
+                h2 {
+                    margin-top: 0;
+                    font-size: 24px;
+                }
+
+                &:nth-child(even) {
+                    background: rgba(0,0,0,0.05);
+                }
+            }
+        }
+    }
+
+    ._SimulatedMatch {
+        min-width: 300px;
+
+        .match-info {
+            display: flex;
+            background-color: white;
+            border: 2px solid #333;
+            border-bottom: 2px solid transparent;
+            margin-left: 50px;
+            padding: 4px 10px 2px;
+
+            .match-number {
+                font-family: 'transandina';
+                font-size: 16px;
+            }
+
+            .breakdown {
+                font-family: 'transandina';
+                color: #4941B1;
+                font-size: 16px;
+                font-weight: 700;
+                margin-left: auto;
+                cursor: pointer;
+                transition: opacity .2s;
+
+                &:hover {
+                    opacity: .75;
+                }
+            }
+        }
+
+        .alliance-row {
+            display: flex;
+            width: 100%;
+
+            .seed-region {
+                display: flex;
+                gap: 6px;
+                flex-direction: column;
+                width: 50px;
+                padding: 12px;
+                box-sizing: border-box;
+                color: white;
+                text-align: center;
+                flex-shrink: 0;
+
+                .seed {
+                    font-family: 'industry';
+                    font-weight: 700;
+                    font-size: 20px;
+                }
+
+                .win-indicator {
+                    background-size: contain;
+                    width: 18px;
+                    height: 18px;
+                    background-position: right;
+                    background-repeat: no-repeat;
+                    margin: 0 auto;
+                    filter: invert(100%);
+                }
+
+                &.red {
+                    background-color: #C21E23;
+                }
+
+                &.blue {
+                    background-color: #1E37C2;
+                }
+            }
+
+            .alliance-details {
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+                padding: 12px;
+                width: 100%;
+                box-sizing: border-box;
+
+                .alliance-numbers {
+                    display: flex;
+                    gap: 10px;
+                    font-family: 'industry';
+                    font-weight: 600;
+                    font-size: 20px;
+                }
+
+                .win-rate {
+                    font-family: 'transandina';
+                }
+
+                &.red {
+                    background-color: #FFB5B5;
+                }
+
+                &.blue {
+                    background-color: #CFD6FF;
+                }
+            }
+        }
+    }
+}
