@@ -292,3 +292,27 @@
         }
     }
 }
+
+@media screen and (max-width: 850px) {
+    ._SimulatorViewer {
+        .simulator-section {
+            .column-section {
+                flex-direction: column;
+                gap: 32px;
+                
+                .column {
+                    width: 100%;
+
+                    &:last-child, &:first-child {
+                        margin-left: 0;
+                        margin-right: 0;
+                    }
+                }
+            }
+
+            .large-doughnut-container {
+                max-width: unset;
+            }
+        }
+    }
+}

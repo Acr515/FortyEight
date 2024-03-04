@@ -141,10 +141,46 @@
     #drawer-opener {
         display: block;
         z-index: 99;
-        box-shadow: 2px;
+
+        .icon {
+            box-sizing: border-box;
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: absolute;
+            top: 50%;
+            left: 45%;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            transition: opacity .3s;
+            filter: invert(100%);
+
+            &.visible {
+                opacity: 1;
+            }
+
+            // Burger icon
+            width: 32px;
+            height: 32px;
+
+            // X icon
+            &.small {
+                width: 22px;
+                height: 22px;
+            }
+        }
     }
 
     #drawer-opener.opened {
         left: 220px;
+    }
+
+    #content-container {
+        transition: filter .25s;
+    }
+
+    #content-container.hide {
+        filter: blur(4px) grayscale(20%);
+        pointer-events: none;
     }
 }

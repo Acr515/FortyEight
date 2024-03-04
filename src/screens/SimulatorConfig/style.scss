@@ -108,3 +108,25 @@
         }
     }
 }
+
+@media screen and (max-width: 850px) {
+    ._SimulatorConfig {
+        overflow-y: auto;
+        padding-bottom: 64px;
+
+        .content-area {
+            flex-direction: column;
+            gap: 32px;
+
+            .alliance-column {
+                width: 100%;
+                margin-right: 0;
+                max-width: unset;
+            }
+
+            .settings-column {
+                width: 100%;
+            }
+        }
+    }
+}

@@ -8,6 +8,8 @@ import DialogBoxContext from 'context/DialogBoxContext';
 import gameData from 'util/gameData';
 import PlayoffHelperContext from 'context/PlayoffHelperContext';
 import PlayoffHelperFunctions, { clonePlayoffHelper, PlayoffHelperData } from 'data/PlayoffHelperData';
+import XImage from 'assets/images/x.png';
+import LinesImage from 'assets/images/three-lines.png';
 import './style.scss';
 
 var modalHideTimer = null;
@@ -133,8 +135,13 @@ export default function FRAME() {
                                 <p>v{VERSION_NAME}</p>
                             </div>
                         </div>
-                        <div id="drawer-opener" onClick={() => setDrawerOpen(!drawerOpen)} className={drawerOpen ? "opened" : ""}></div>
-                        <div id="content-container">
+                        <div id="drawer-opener" 
+                            onClick={() => setDrawerOpen(!drawerOpen)} className={drawerOpen ? "opened" : ""}
+                        >
+                            <div className={`icon small ${ drawerOpen ? "visible" : "" }`} style={{ backgroundImage: `url(${ XImage })` }}></div>
+                            <div className={`icon ${ !drawerOpen ? "visible" : "" }`} style={{ backgroundImage: `url(${ LinesImage })` }}></div>
+                        </div>
+                        <div id="content-container" className={drawerOpen ? "hide" : ""}>
                             <FeedbackModal 
                                 text={modalText}
                                 revealed={modalRevealed}
