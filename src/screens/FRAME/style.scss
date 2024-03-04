@@ -109,3 +109,42 @@
         }
     }
 }
+
+#drawer-opener {
+    position: absolute;
+    display: none;
+    top: 32px;
+    left: 0;
+    width: 48px;
+    height: 48px;
+    background-color: #4941B1;
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+    transition: left .2s;
+    box-shadow: 0px 2px 14px rgba(255,255,255,0.65);
+}
+
+@media screen and (max-width: 850px) {
+    #navigation-bar {
+        position: absolute;
+        z-index: 100;
+        top: 0;
+        bottom: 0;
+        left: -220px;
+        transition: left .2s;
+    }
+
+    #navigation-bar.opened {
+        left: 0;
+    }
+    
+    #drawer-opener {
+        display: block;
+        z-index: 99;
+        box-shadow: 2px;
+    }
+
+    #drawer-opener.opened {
+        left: 220px;
+    }
+}

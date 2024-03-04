@@ -15,6 +15,8 @@ var modalHideTimer = null;
 export default function FRAME() {
     const location = useLocation();
 
+    const [drawerOpen, setDrawerOpen] = useState(false);
+
     // Controls the FeedbackModal
     const [modalText, setModalText] = useState("");
     const [modalRevealed, setModalRevealed] = useState(false);
@@ -78,7 +80,7 @@ export default function FRAME() {
                         revealFunction={hideDialog}
                     />
                     <DialogBoxContext.Provider value={dialogContextObject}>
-                        <div id="navigation-bar">
+                        <div id="navigation-bar" className={drawerOpen ? "opened" : ""}>
                             <Link to={"/"} className="title-section">
                                 <span className="number">48</span>
                                 <span className="title">FortyEight</span>
@@ -131,6 +133,7 @@ export default function FRAME() {
                                 <p>v{VERSION_NAME}</p>
                             </div>
                         </div>
+                        <div id="drawer-opener" onClick={() => setDrawerOpen(!drawerOpen)} className={drawerOpen ? "opened" : ""}></div>
                         <div id="content-container">
                             <FeedbackModal 
                                 text={modalText}
