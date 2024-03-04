@@ -61,6 +61,13 @@ export default function SimulatorInsightRowSet({sim, winner, loser}) {
             loserColor={loser.color}
         />
         <SimulatorInsightRow
+            label="Average Endgame / Game"
+            winnerValue={Math.round(sim[winner.colorName].averageEndgame * 100) / 100}
+            winnerColor={winner.color}
+            loserValue={Math.round(sim[loser.colorName].averageEndgame * 100) / 100}
+            loserColor={loser.color}
+        />
+        <SimulatorInsightRow
             label="Avg. Notes Stopped by Defense"
             winnerValue={sim[winner.colorName].defenseOccurrences > 0 ? Math.round(sim[winner.colorName].defenseNotesPrevented * 100 / 100) : "---"}
             winnerColor={winner.color}

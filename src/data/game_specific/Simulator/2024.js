@@ -9,6 +9,7 @@ const SimulationInformation = {
         melodyRPRate: 0,
         ensembleRPRate: 0,
         averageNotes: 0,
+        averageEndgame: 0,
         speakerNoteRate: 0,
         defenseNotesPrevented: 0,
         defenseOccurrences: 0,
@@ -384,6 +385,7 @@ const SimulationInformation = {
         results[color].ensembleRPRate += matchDetails[color].gameStats.ensembleRP ? 1 : 0;
         
         matchDetails[color].teamPerformances.forEach( p => results[color].averageNotes += ScoreCalculator.Auto.getPieces({ performance: p }) + ScoreCalculator.Teleop.getPieces({ performance: p }) );
+        matchDetails[color].teamPerformances.forEach( p => results[color].averageEndgame += ScoreCalculator.Endgame.getScore({ performance: p }) );
         matchDetails[color].teamPerformances.forEach( p => results[color].speakerNoteRate += p.auto.speaker + p.teleop.speaker );
         
         let defensePieces = 0;
@@ -425,12 +427,14 @@ const SimulationInformation = {
         results.red.ensembleRPRate /= config.simulations;
         results.red.speakerNoteRate /= results.red.averageNotes;
         results.red.averageNotes /= config.simulations;
+        results.red.averageEndgame /= config.simulations;
         results.red.defenseNotesPrevented /= results.red.defenseOccurrences;
         
         results.blue.melodyRPRate /= config.simulations;
         results.blue.ensembleRPRate /= config.simulations;
         results.blue.speakerNoteRate /= results.blue.averageNotes;
         results.blue.averageNotes /= config.simulations;
+        results.blue.averageEndgame /= config.simulations;
         results.blue.defenseNotesPrevented /= results.blue.defenseOccurrences;
     }
 }
