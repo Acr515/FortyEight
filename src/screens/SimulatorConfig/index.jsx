@@ -258,12 +258,14 @@ export default function SimulatorConfig() {
                         <Input
                             label="Use text boxes for team inputs"
                             isCheckbox
+                            floodLabel
                             onInput={ e => setUseTextboxes(e.target.checked) }
                         />
                     }
                     { localStorage.getItem("schedules") !== null && <Input
                         label="Import match from schedule"
                         isCheckbox
+                        floodLabel
                         onInput={ e => {
                             if (e.target.checked) {
                                 setUsePlayoffTeams(false);
@@ -275,6 +277,7 @@ export default function SimulatorConfig() {
                     { (playoffHelper.data.state == PlayoffHelperState.LIVE_PLAYOFFS || playoffHelper.data.state == PlayoffHelperState.SIMULATED_PLAYOFFS) && <Input
                         label="Use playoff teams"
                         isCheckbox
+                        floodLabel
                         onInput={ e => {
                             if (e.target.checked) {
                                 setUseMatchImport(false);
@@ -299,12 +302,14 @@ export default function SimulatorConfig() {
                         label="# of simulations"
                         onInput={e => setSimulations(Number(e.target.value))}
                         prefill={configPrefill ? prefill.sims : simulations}
+                        floodLabel
                     />
                     <Input
                         label="Simulate defense"
                         isCheckbox={true}
                         prefill={configPrefill ? prefill.def : useDefense}
                         onInput={ e => setUseDefense(e.target.checked) }
+                        floodLabel
                     />
                     <Button
                         text="Run simulation"

@@ -82,4 +82,15 @@
             }
         }
     }
+
+    &.flood-label {
+        label {
+            flex-grow: 1;
+        }
+        .input-area {
+            flex-grow: 0;
+            width: unset;
+            margin-left: auto;
+        }
+    }
 }

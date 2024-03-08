@@ -30,6 +30,10 @@
         margin-bottom: 18px;
         font-weight: 500;
     }
+
+    .mobile-submit-button {
+        display: none;
+    }
 }
 
 @media screen and (max-width: 850px) {
@@ -55,6 +59,14 @@
             ._GameDataSection {
                 padding: 0;
             }
+        }
+
+        .desktop-submit-button {
+            display: none;
+        }
+
+        .mobile-submit-button {
+            display: block;
         }
     }
 }

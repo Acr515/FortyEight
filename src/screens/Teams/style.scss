@@ -98,12 +98,14 @@
             display: flex;
             width: 100%;
             flex-grow: 1;
+            overflow: hidden;
         }
 
         .item-module {
             display: flex;
             flex-grow: 1;
             width: 100%;
+            min-width: 0;
             flex-direction: column;
             color: black;
             text-decoration: none;
@@ -122,6 +124,9 @@
                 font-family: 'transandina';
                 font-size: 16px;
                 font-weight: 400;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                overflow: hidden;
             }
         }
         .item-module.short {
@@ -130,6 +135,14 @@
         }
         .item-module.link:hover {
             color: #4941B1;
+        }
+    }
+}
+
+@media screen and (max-width: 850px) {
+    ._Teams {
+        .item-module.short.forms {
+            max-width: 80px;
         }
     }
 }

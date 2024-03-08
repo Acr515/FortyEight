@@ -21,8 +21,9 @@ import Chevron from '../../assets/images/chevron.png';
  * @param labelStyle Any custom CSS styles to apply to the label
  * @param externalUpdate If you wish to have control over this input's values using state from its parent, its state should be set using this property. A `useEffect()` hook will run when it changes
  * @param getExternalUpdate This function should return a value that will be used to set the value state of this input component
+ * @param floodLabel Optional. When true, floods the available space with the label instead of the normal 50/50 width split
  */
-export default function Input({label, prefill, id, onInput, isCheckbox, isNumerical, optionList, marginBottom, alignLabel = "middle", textArea = false, required = false, disabled = false, warning = false, style = {}, labelStyle = {}, externalUpdate = null, getExternalUpdate = null}) {
+export default function Input({ label, prefill, id, onInput, isCheckbox, isNumerical, optionList, marginBottom, alignLabel = "middle", textArea = false, required = false, disabled = false, warning = false, style = {}, labelStyle = {}, externalUpdate = null, getExternalUpdate = null, floodLabel = false }) {
     
     optionList = typeof optionList !== "undefined" ? optionList : false;
 
@@ -54,7 +55,7 @@ export default function Input({label, prefill, id, onInput, isCheckbox, isNumeri
     }, [externalUpdate])
     
     return (
-        <div className="_Input" style={{ ...style, marginBottom: marginBottom || 18 }}>
+        <div className={`_Input ${floodLabel ? "flood-label" : ""}`} style={{ ...style, marginBottom: marginBottom || 18 }}>
             { typeof label !== 'undefined' && (
                 <label 
                     htmlFor={id}
