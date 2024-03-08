@@ -133,7 +133,7 @@ function Team({team, updateHook}) {
                     <span className="number">{addLeadingZero(calculateRPI(team).RPI)}</span>
                     <span className="label">RPI ({calculateRPI(team).rating})</span>
                 </div>
-                <div className="item-module short">
+                <div className="item-module short forms">
                     <span className="number">{team.data.length}</span>
                     <span className="label">Forms</span>
                 </div>

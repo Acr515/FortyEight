@@ -10,12 +10,12 @@
 
         .control-area {
             display: flex;
+            gap: 32px;
             margin-bottom: 50px;
             .cell {
                 width: 100%;
             }
             .cell.explanation {
-                margin-right: 32px;
                 max-width: 550px;
                 p {
                     margin: 0;
@@ -26,6 +26,14 @@
                 font-size: 15px;
                 font-weight: 500;
             }
+        }
+    }
+}
+
+@media screen and (max-width: 850px) {
+    ._ManageData {
+        .control-area {
+            flex-direction: column;
         }
     }
 }

@@ -144,11 +144,17 @@ export default function Form() {
                     <Button
                         text="Submit"
                         action={submitForm}
+                        className="desktop-submit-button"
                     />
                 </div>
             </div>
             <div className="form-area">
                 <GameDataSection inputs={GameDataInputs} edit={edit}/>
+                <Button
+                    text="Submit"
+                    action={submitForm}
+                    className="mobile-submit-button"
+                />
             </div>
         </form>
     );

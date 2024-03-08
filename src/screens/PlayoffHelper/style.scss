@@ -36,6 +36,10 @@
         }
     }
 
+    .header-tab-expander {
+        display: none;
+    }
+
     .pick-status {
         background-color: #4941B1;
         border-radius: 16px;
@@ -318,6 +322,93 @@
 
                 &.blue {
                     background-color: #CFD6FF;
+                }
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 900px) and (min-width: 851px) {
+    ._PlayoffHelper {
+        .header-tab-container .header-buttons {
+            gap: 10px;
+            .button {
+                font-size: 18px;
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 850px) {
+    ._PlayoffHelper {
+        ._AllianceRow {
+            .alliance-container {
+                overflow-x: auto;
+            }
+            .alliance-teams.on-clock {
+                overflow-x: unset;
+                overflow-y: unset;
+            }
+        }
+
+        .header-tab-container {
+            display: none;
+            position: absolute;
+            right: 0;
+            text-align: right;
+            padding: 16px 32px 24px;
+            top: 68px;
+            background-color: white;
+            z-index: 80;
+            padding-right: 32px;
+            border-bottom-left-radius: 16px;
+
+            &.open {
+                display: block;
+                
+                .header-buttons {
+                    flex-direction: column;
+                }
+            }
+
+            .pick-status {
+                margin-right: 0;
+                margin-left: auto;
+                margin-bottom: 20px;
+            }
+        }
+
+        .header-tab-expander {
+            display: block;
+            position: relative;
+            width: 40px;
+            height: 40px;
+
+            .icon {
+                box-sizing: border-box;
+                background-size: contain;
+                background-position: center;
+                background-repeat: no-repeat;
+                position: absolute;
+                top: 50%;
+                right: 0;
+                transform: translate(0, -50%);
+                opacity: 0;
+                transition: opacity .15s;
+                //filter: invert(100%);
+    
+                &.visible {
+                    opacity: 1;
+                }
+    
+                // Dots icon
+                width: 40px;
+                height: 40px;
+    
+                // X icon
+                &.small {
+                    width: 22px;
+                    height: 22px;
                 }
             }
         }

@@ -48,4 +48,10 @@
     ._BackButton .back-button-image {
         transform: translateY(-6px) rotate(-90deg);
     }
- }
+}
+
+@media screen and (max-width: 850px) {
+    ._PageHeader {
+        padding-left: 58px;
+    }
+}

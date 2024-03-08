@@ -43,7 +43,7 @@ export default function DialogBox({options, revealed, revealFunction}) {
                             action={() => { options.confirmFunction(); revealFunction(); }}
                             marginTop={1}
                             marginBottom={1}
-                            style={{ minWidth: 150, display: "inline-block", marginRight: 16 }}
+                            style={{ minWidth: 120 }}
                         />
                     )}
                     <Button
@@ -51,7 +51,7 @@ export default function DialogBox({options, revealed, revealFunction}) {
                         action={options.cancelFunction}
                         marginTop={1}
                         marginBottom={1}
-                        style={{ minWidth: 150, display: "inline-block"  }}
+                        style={{ minWidth: 120 }}
                     />
                 </div>
             </div>

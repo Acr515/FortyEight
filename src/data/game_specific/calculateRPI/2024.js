@@ -20,6 +20,7 @@ export default function calculateRPI(team) {
 export function calculateSingleRPI(data, round) {
     let RPI = 0;
     RPI += ScoreCalculator.Auto.getScore(data) + ScoreCalculator.Teleop.getScore(data) + ScoreCalculator.Endgame.getScore(data);
+    RPI += data.performance.teleop.amp * .5 + data.performance.auto.amp;
 
     if (data.performance.notes.fouls) RPI -= 3;
 
@@ -33,10 +34,10 @@ export function calculateSingleRPI(data, round) {
  */
 export function getRPIRating(rpi) {
     if (rpi <= 5) return "Very Poor";
-    else if (rpi <= 11) return "Poor";
-    else if (rpi <= 17) return "Average";
-    else if (rpi <= 25) return "Good";
-    else if (rpi <= 32) return "Very Good";
-    else if (rpi <= 41) return "Excellent";
+    else if (rpi <= 10) return "Poor";
+    else if (rpi <= 16) return "Average";
+    else if (rpi <= 23) return "Good";
+    else if (rpi <= 30) return "Very Good";
+    else if (rpi <= 39) return "Excellent";
     else return "Godly";
 }

@@ -13,6 +13,8 @@ import CheckImage from "assets/images/check.png";
 import { DEVELOP_MODE } from "/src/config";
 import { useLocation, useNavigate } from "react-router-dom";
 import Simulator from "data/game_specific/Simulator/_Universal";
+import XImage from 'assets/images/x.png';
+import DotsImage from 'assets/images/three-dots.png';
 import "./style.scss";
 
 const SUBPAGE = {
@@ -33,6 +35,7 @@ export default function PlayoffHelper() {
     const feedbackModal = useContext(FeedbackModalContext);
     const [subpageState, setSubpageState] = useState(SUBPAGE.LiveSelection);
     const [cachedBracket, setCachedBracket] = useState(null);
+    const [headerTabsOpen, setHeaderTabsOpen] = useState(false);
 
     const state = playoffHelper.data.state;
 
@@ -41,7 +44,12 @@ export default function PlayoffHelper() {
         dialogFunctions.setDialog({
             body: "All playoff-related data will be deleted from the system. This will not affect any of your scouting data. Would you like to proceed?",
             useConfirmation: true,
-            confirmFunction: () => { playoffHelper.reset(true); feedbackModal.setModal("Successfully reset the playoff helper.", false) },
+            confirmFunction: () => { 
+                playoffHelper.reset(true);
+                feedbackModal.setModal("Successfully reset the playoff helper.", false);
+                setHeaderTabsOpen(false);
+                setCachedBracket(null);
+            },
             confirmLabel: "Yes",
             cancelLabel: "No"
         });
@@ -61,22 +69,32 @@ export default function PlayoffHelper() {
     return (
         <div className="SCREEN _PlayoffHelper">
             <PageHeader text="Playoff Helper">
-                { (state == PlayoffHelperState.LIVE_DRAFT && subpageState == SUBPAGE.DraftBoard) && 
-                    <div className="pick-status">
-                        <div className="alliance-seed">#{playoffHelper.data.draftState.alliance + 1}</div>
-                        <div className="on-the-clock">is on the clock...</div>
-                    </div>
-                }
-                { (state == PlayoffHelperState.LIVE_PLAYOFFS || state == PlayoffHelperState.SIMULATED_PLAYOFFS) && <div className="header-buttons"> 
-                    <div className={`button ${ subpageState == SUBPAGE.Alliances ? "active" : "" }`} onClick={ () => setSubpageState(SUBPAGE.Alliances) }>Alliances</div>
-                    <div className={`button ${ subpageState == SUBPAGE.SimulatedBracket ? "active" : "" }`} onClick={ () => setSubpageState(SUBPAGE.SimulatedBracket) }>Simulated Bracket</div>
-                    <div className="button" onClick={resetData}>Reset</div>
-                </div> }
-                { (state == PlayoffHelperState.LIVE_DRAFT) && <div className="header-buttons"> 
-                    <div className={`button ${ subpageState == SUBPAGE.LiveSelection ? "active" : "" }`} onClick={ () => setSubpageState(SUBPAGE.LiveSelection) }>Live Selection</div>
-                    <div className={`button ${ subpageState == SUBPAGE.DraftBoard ? "active" : "" }`} onClick={ () => setSubpageState(SUBPAGE.DraftBoard) }>Draft Board</div>
-                    <div className="button" onClick={resetData}>Reset</div>
-                </div> }
+                <div className={`header-tab-container ${headerTabsOpen ? "open" : ""}`}>
+                    { (state == PlayoffHelperState.LIVE_DRAFT && subpageState == SUBPAGE.DraftBoard) && 
+                        <div className="pick-status">
+                            <div className="alliance-seed">#{playoffHelper.data.draftState.alliance + 1}</div>
+                            <div className="on-the-clock">is on the clock...</div>
+                        </div>
+                    }
+                    { (state == PlayoffHelperState.LIVE_PLAYOFFS || state == PlayoffHelperState.SIMULATED_PLAYOFFS) && <div className="header-buttons"> 
+                        <div className={`button ${ subpageState == SUBPAGE.Alliances ? "active" : "" }`} onClick={ () => setSubpageState(SUBPAGE.Alliances) }>Alliances</div>
+                        <div className={`button ${ subpageState == SUBPAGE.SimulatedBracket ? "active" : "" }`} onClick={ () => setSubpageState(SUBPAGE.SimulatedBracket) }>Simulated Bracket</div>
+                        <div className="button" onClick={resetData}>Reset</div>
+                    </div> }
+                    { (state == PlayoffHelperState.LIVE_DRAFT) && <div className="header-buttons"> 
+                        <div className={`button ${ subpageState == SUBPAGE.LiveSelection ? "active" : "" }`} onClick={ () => setSubpageState(SUBPAGE.LiveSelection) }>Live Selection</div>
+                        <div className={`button ${ subpageState == SUBPAGE.DraftBoard ? "active" : "" }`} onClick={ () => setSubpageState(SUBPAGE.DraftBoard) }>Draft Board</div>
+                        <div className="button" onClick={resetData}>Reset</div>
+                    </div> }
+                </div>
+                <div 
+                    className={`header-tab-expander ${headerTabsOpen ? "open" : ""}`} 
+                    onClick={() => setHeaderTabsOpen(!headerTabsOpen)}
+                    style={{ display: state == PlayoffHelperState.LIVE_PLAYOFFS || state == PlayoffHelperState.SIMULATED_PLAYOFFS || state == PlayoffHelperState.LIVE_DRAFT ? "block" : "none" }}
+                >
+                    <div className={`icon small ${ headerTabsOpen ? "visible" : "" }`} style={{ backgroundImage: `url(${ XImage })` }}></div>
+                    <div className={`icon ${ !headerTabsOpen ? "visible" : "" }`} style={{ backgroundImage: `url(${ DotsImage })` }}></div>
+                </div>
             </PageHeader>
             <div className="content-area">
                 { ( state == PlayoffHelperState.INACTIVE || state == PlayoffHelperState.READY ) && <RankingInput setSubpageState={setSubpageState} /> }
@@ -115,15 +133,20 @@ function RankingInput({ setSubpageState }) {
     };
 
     const setupSimulatedDraft = () => {
-        playoffHelper.setup(PlayoffHelperState.SIMULATED_DRAFT, backupSelections);
+        if (!playoffHelper.setup(PlayoffHelperState.SIMULATED_DRAFT, backupSelections)) {
+            feedbackModal.setModal("Your dataset does not include all of the teams at the event you requested. Please check the console for more details and try again.", true);
+        }
     };
 
     const startLiveDraft = () => {
-        playoffHelper.setup(PlayoffHelperState.LIVE_DRAFT, backupSelections);
-        setSubpageState(SUBPAGE.LiveSelection);
-        if (!DEVELOP_MODE) dialogFunctions.setDialog({
-            body: "Disclaimer: This tool is imperfect and should NOT be a substitution for human judgement. It is intended to only supplement the decision-making of your team and your alliance."
-        });
+        if (!playoffHelper.setup(PlayoffHelperState.LIVE_DRAFT, backupSelections)) {
+            feedbackModal.setModal("Your dataset does not include all of the teams at the event you requested. Please check the console for more details and try again.", true);
+        } else {
+            setSubpageState(SUBPAGE.LiveSelection);
+            if (!DEVELOP_MODE) dialogFunctions.setDialog({
+                body: "Disclaimer: This tool is imperfect and should NOT be a substitution for human judgement. It is intended to only supplement the decision-making of your team and your alliance."
+            });
+        }
     };
 
     const deleteData = () => {

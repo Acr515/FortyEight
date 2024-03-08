@@ -15,12 +15,21 @@ export const Weights = {
  * for a team to be ranked "the best" in
  */
 export const WeightSets = {
+    // Composite score focuses on amp scoring ability
+    AmpScorer: {
+        Autonomous: 1.35,
+        Speaker: 0.25,
+        Amp: 2.5,
+        Endgame: 0.75,
+        Defense: 0.25,
+        Flags: 1.75
+    },
     // Every year should have a `WellRounded` set, which uses a wholistic approach to analyze a team
     WellRounded: {
         Autonomous: 2,
-        Speaker: 2.8,
+        Speaker: 2.4,
         Amp: 2.2,
-        Endgame: 1.8,
+        Endgame: 1.6,
         Defense: 1,
         Flags: 1
     },
@@ -32,15 +41,16 @@ export const WeightSets = {
         Endgame: 1.5,
         Defense: 2.75,
         Flags: 2
-    }
+    },
 };
 
 /**
  * Converts the above weight sets into readable names.
  */
 export const WeightSetNames = {
-    WellRounded: "well-rounded",
     Defensive: "defensive",
+    AmpScorer: "amp-focused",
+    WellRounded: "well-rounded",
 }
 
 /**
@@ -78,7 +88,7 @@ export default function weighTeam(team, weights) {
         // Compile a team's negative flags (penalties, break-downs)
         if (match.performance.notes.misses) score.Flags -= 1;
         if (match.performance.notes.fouls) score.Flags -= 2;
-        if (match.performance.notes.broken) score.Flags -= 3.5;
+        if (match.performance.notes.broken) score.Flags -= 3;
     });
 
     let composite = 0;

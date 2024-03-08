@@ -61,7 +61,7 @@ export default function ManageData() {
                 <h2>Import Data</h2>
                 <div className="control-area">
                     <div className="cell explanation">
-                        <p>Use the input to the right to attach any number of .json files that contain match data created in FortyEight. The data will automatically populate under the Teams tab. Any duplicate matches will be automatically removed.</p>
+                        <p>Use this tool to attach any number of .json files that contain match data created in FortyEight. The data will automatically populate under the Teams tab. Any duplicate matches will be automatically removed.</p>
                     </div>
                     <form className="cell" action="" id="import-form">
                         <input 
@@ -82,7 +82,7 @@ export default function ManageData() {
                 <h2>Export Data</h2>
                 <div className="control-area">
                     <div className="cell explanation">
-                        <p>Click the button to the right to generate a .json file that will be downloaded to your hard drive and can be imported by other users.</p>
+                        <p>Click the button to generate a .json file that will be downloaded to your hard drive and can be imported by other users.</p>
                     </div>
                     <div className="cell">
                         <Button
@@ -98,7 +98,7 @@ export default function ManageData() {
                 <h2>Delete Data</h2>
                 <div className="control-area">
                     <div className="cell explanation">
-                        <p>Click the button to the right to delete all teams currently stored in memory. Be sure to export the data of any team information you wish to save, as this cannot be undone!</p>
+                        <p>Click the button to delete all teams currently stored in memory. Be sure to export the data of any team information you wish to save, as this cannot be undone!</p>
                     </div>
                     <div className="cell">
                         <Button
@@ -114,7 +114,7 @@ export default function ManageData() {
                 <h2>Download Schedule from TBA</h2>
                 <div className="control-area">
                     <div className="cell explanation">
-                        <p>Using the controls on the right, you can download a qualification match schedule for a full event that will allow you to simulate any of its matches simply by typing in its match number.</p>
+                        <p>Using this tool, you can download a qualification match schedule for a full event that will allow you to simulate any of its matches simply by typing in its match number.</p>
                     </div>
                     <div className="cell">
                         <Input
