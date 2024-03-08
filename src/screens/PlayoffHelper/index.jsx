@@ -48,6 +48,7 @@ export default function PlayoffHelper() {
                 playoffHelper.reset(true);
                 feedbackModal.setModal("Successfully reset the playoff helper.", false);
                 setHeaderTabsOpen(false);
+                setCachedBracket(null);
             },
             confirmLabel: "Yes",
             cancelLabel: "No"

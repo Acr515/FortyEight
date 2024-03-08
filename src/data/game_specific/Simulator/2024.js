@@ -282,14 +282,14 @@ const SimulationInformation = {
         // For every TWO notes scored in the AMP, provide amplification of 1-4 SPEAKER notes, dependent on the rate of speaker scoring
         // Count # of possible amplifications during the course of the game and the number of possible amplified speaker scores
         let teleopAmpNotes = 0, speakerNotes = 0, maxAmplifications = 0;
-        const AMPLIFY_PERIOD = 120, AMPLIFY_COOLDOWN = 15; // assuming that amplification would only possibly happen during teleop and not during last 15 seconds, also assuming 15 seconds between amplifications
+        const AMPLIFY_PERIOD = 120, AMPLIFY_COOLDOWN = 12; // assuming that amplification would only possibly happen during teleop and not during last 15 seconds, also assuming 12 seconds between amplifications
         performances.forEach(p => {
             teleopAmpNotes += p.teleop.amp;
             speakerNotes += p.teleop.speaker;
         });
 
-        maxAmplifications = Math.min(teleopAmpNotes / 2, AMPLIFY_PERIOD / AMPLIFY_COOLDOWN);  // there is a ceiling to the # of amplifications in a match
-        if (maxAmplifications > 1) maxAmplifications = Math.max(2, maxAmplifications - Math.round(rng()));          // randomly remove an amplification
+        maxAmplifications = Math.min(teleopAmpNotes / 2, AMPLIFY_PERIOD / AMPLIFY_COOLDOWN);                        // there is a ceiling to the # of amplifications in a match
+        //if (maxAmplifications > 1) maxAmplifications = Math.max(2, maxAmplifications - Math.round(rng()));        // randomly remove an amplification
         let speakerRate = speakerNotes / AMPLIFY_PERIOD;                                                            // # of notes in speaker per second
         gameStats.amplifiedNotes = Math.min(maxAmplifications * 4, Math.ceil(10 * maxAmplifications * speakerRate));// 10 seconds of amplification * # of amplifications * speaker notes per second = # of amplified notes
     },

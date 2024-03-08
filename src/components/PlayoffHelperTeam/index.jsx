@@ -103,11 +103,17 @@ export default function PlayoffHelperTeam({ team, isOnTheClock = false, captain 
             { (breakdowns > 0 || fouls > 0) &&
                 <div className="row">Broke down in <span className="strong">{breakdowns}</span> matches, drew excessive fouls in <span className="strong">{fouls}</span> matches</div>
             }
-            { team.uniqueStrengthAdded != -1 &&
+            { (team.uniqueStrengthAdded != -1 && team.uniqueStrengthAdded > 0) &&
                 <div className="row">Ranks <span className="strong">{getOrdinalSuffix(team.uniqueStrengthAddedRank)}</span> against remaining teams in improving the alliance&apos;s weaknesses ({Math.round(team.uniqueStrengthAdded * playoffHelper.data.config.weightOfUniqueStrengths * 10) / 10} points added to base score above)</div>
             }
+            { (team.uniqueStrengthAdded != -1 && team.uniqueStrengthAdded == 0) &&
+                <div className="row">No measurable addition to alliance&apos;s skillset</div>
+            }
             { team.simulatedWinRate != -1 &&
-                <div className="row">Simulator estimates a <span className="strong">{estimatedWinRate}%</span> win rate against alliance&apos;s first round opponent ({getOrdinalSuffix(team.simulatedWinRateRank)} among remaining teams)</div>
+                <div className="row">
+                    Simulator estimates a <span className="strong">{estimatedWinRate}%</span> win rate against alliance&apos;s first round opponent 
+                    { estimatedWinRate > 0 ? `(${getOrdinalSuffix(team.simulatedWinRateRank)} among remaining teams)` : "" }
+                </div>
             }
         </>
     };
