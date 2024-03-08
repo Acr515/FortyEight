@@ -24,7 +24,7 @@ export default function SimulatorMatchViewer_Universal({sim}) {
     };
 
     const getMatchRedWinner = (sim) => {
-        let startIndex = (matchIndex == -1 ? 0 : matchIndex), currentIndex = matchIndex + 1;
+        let startIndex = (matchIndex == -1 ? 0 : matchIndex), currentIndex = (matchIndex == -1 ? 0 : matchIndex) + 1;
         while (startIndex != currentIndex) {
             if (sim.data[currentIndex].red.score > sim.data[currentIndex].blue.score) {
                 displayMatch(currentIndex, sim);
@@ -36,7 +36,7 @@ export default function SimulatorMatchViewer_Universal({sim}) {
     };
 
     const getMatchBlueWinner = (sim) => {
-        let startIndex = (matchIndex == -1 ? 0 : matchIndex), currentIndex = matchIndex + 1;
+        let startIndex = (matchIndex == -1 ? 0 : matchIndex), currentIndex = (matchIndex == -1 ? 0 : matchIndex) + 1;
         while (startIndex != currentIndex) {
             if (sim.data[currentIndex].blue.score > sim.data[currentIndex].red.score) {
                 displayMatch(currentIndex, sim);
@@ -48,7 +48,7 @@ export default function SimulatorMatchViewer_Universal({sim}) {
     };
 
     const getMatchTie = (sim) => {
-        let startIndex = (matchIndex == -1 ? 0 : matchIndex), currentIndex = matchIndex + 1;
+        let startIndex = (matchIndex == -1 ? 0 : matchIndex), currentIndex = (matchIndex == -1 ? 0 : matchIndex) + 1;
         while (startIndex != currentIndex) {
             if (sim.data[currentIndex].red.score == sim.data[currentIndex].blue.score) {
                 displayMatch(currentIndex, sim);
