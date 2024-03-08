@@ -8,7 +8,7 @@
     "start": "webpack serve --mode development --env game_year=2024",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack --env game_year=2024",
-    "deploy": "gh-pages -d dist"
+    "deploy": "gh-pages -d build"
   },
   "keywords": [],
   "author": "",
