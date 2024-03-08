@@ -97,6 +97,7 @@ const PlayoffHelperFunctions = {
      * @param {function} phSetter The state setter from the FRAME screen
      * @param {PlayoffHelperState} mode Either `SIMULATED_DRAFT` or `LIVE_DRAFT` based on user input
      * @param {boolean} backupSelections If true, alliances will have four teams
+     * @returns 1 if successful, 0 otherwise
      */
     setup: (ph, phSetter, mode, backupSelections) => {
         let playoffHelper = clonePlayoffHelper(ph);
@@ -108,11 +109,12 @@ const PlayoffHelperFunctions = {
             let returnValue = team.calculatePowerScores();
             if (returnValue !== null) emptyTeams.push(returnValue);
         });
+        console.log(emptyTeams)
         if (emptyTeams.length > 0) {
             // Throw error
             phSetter(playoffHelper);
             console.error("Analysis was halted- the following teams don't have data in memory: " + emptyTeams.toString());
-            return;
+            return 0;
         }
 
         // Rank every attribute of every team
@@ -138,6 +140,7 @@ const PlayoffHelperFunctions = {
         playoffHelper.config.backupSelections = backupSelections;
 
         phSetter(playoffHelper);
+        return 1;
     },
 
     /**

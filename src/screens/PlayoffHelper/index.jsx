@@ -132,15 +132,20 @@ function RankingInput({ setSubpageState }) {
     };
 
     const setupSimulatedDraft = () => {
-        playoffHelper.setup(PlayoffHelperState.SIMULATED_DRAFT, backupSelections);
+        if (!playoffHelper.setup(PlayoffHelperState.SIMULATED_DRAFT, backupSelections)) {
+            feedbackModal.setModal("Your dataset does not include all of the teams at the event you requested. Please check the console for more details and try again.", true);
+        }
     };
 
     const startLiveDraft = () => {
-        playoffHelper.setup(PlayoffHelperState.LIVE_DRAFT, backupSelections);
-        setSubpageState(SUBPAGE.LiveSelection);
-        if (!DEVELOP_MODE) dialogFunctions.setDialog({
-            body: "Disclaimer: This tool is imperfect and should NOT be a substitution for human judgement. It is intended to only supplement the decision-making of your team and your alliance."
-        });
+        if (!playoffHelper.setup(PlayoffHelperState.LIVE_DRAFT, backupSelections)) {
+            feedbackModal.setModal("Your dataset does not include all of the teams at the event you requested. Please check the console for more details and try again.", true);
+        } else {
+            setSubpageState(SUBPAGE.LiveSelection);
+            if (!DEVELOP_MODE) dialogFunctions.setDialog({
+                body: "Disclaimer: This tool is imperfect and should NOT be a substitution for human judgement. It is intended to only supplement the decision-making of your team and your alliance."
+            });
+        }
     };
 
     const deleteData = () => {

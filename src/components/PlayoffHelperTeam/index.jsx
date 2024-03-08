@@ -92,7 +92,7 @@ export default function PlayoffHelperTeam({ team, isOnTheClock = false, captain 
 
         // Get flag #s
         let breakdowns = 0, fouls = 0;
-        getTeamData(team.teamNumber).data.forEach(match => {
+        if (getTeamData(team.teamNumber) !== null) getTeamData(team.teamNumber).data.forEach(match => {
             breakdowns += match.performance.notes.broken;
             fouls += match.performance.notes.fouls;
         });
