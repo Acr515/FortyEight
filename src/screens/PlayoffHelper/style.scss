@@ -328,6 +328,17 @@
     }
 }
 
+@media screen and (max-width: 900px) and (min-width: 851px) {
+    ._PlayoffHelper {
+        .header-tab-container .header-buttons {
+            gap: 10px;
+            .button {
+                font-size: 18px;
+            }
+        }
+    }
+}
+
 @media screen and (max-width: 850px) {
     ._PlayoffHelper {
         ._AllianceRow {
@@ -358,6 +369,12 @@
                 .header-buttons {
                     flex-direction: column;
                 }
+            }
+
+            .pick-status {
+                margin-right: 0;
+                margin-left: auto;
+                margin-bottom: 20px;
             }
         }
 
