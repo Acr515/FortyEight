@@ -1,0 +1,30 @@
+{
+    "short_name": "FortyEight",
+    "name": "FortyEight: FRC Scouting",
+    "icons": [
+        {
+            "src": "../pwa-icons/icon_1024.png",
+            "sizes": "1024x1024",
+            "type": "image/png"
+        },
+        {
+            "src": "../pwa-icons/icon_512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "../pwa-icons/icon_196.png",
+            "sizes": "196x196",
+            "type": "image/png"
+        },
+        {
+            "src": "../pwa-icons/icon_144.png",
+            "sizes": "144x144",
+            "type": "image/png"
+        }
+    ],
+    "start_url": "../",
+    "display": "standalone",
+    "theme_color": "#4941B1",
+    "background_color": "#fff"
+}
