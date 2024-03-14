@@ -6,6 +6,12 @@ const CopyPlugin = require("copy-webpack-plugin");
 
 
 module.exports = (env, argv) => {
+    // Receives env.ghp, which tells webpack whether or not the build is intended for GitHub Pages
+    env.ghp = env.ghp ?? false;
+
+    /*const filesToPrecache = [];
+    const fontContext = ('src/assets/fonts/transandina/', true, /\.WOFF$/);
+    fontContext.keys().forEach(key => filesToPrecache.push(key));*/
 
     const plugins = [
         new HtmlWebpackPlugin({
@@ -22,7 +28,8 @@ module.exports = (env, argv) => {
         ),
         new CopyPlugin({
             patterns: [
-                { from: "public/manifest.json", to: "manifest.json" },
+                { from: env.ghp ? "public/manifest-ghp.json" : "public/manifest-local.json", to: "manifest.json" },
+                { from: "public/favicon.ico", to: "favicon.ico" },
                 { from: "src/assets/images/pwa-icons", to: "pwa-icons" },
             ],
         })
@@ -32,8 +39,25 @@ module.exports = (env, argv) => {
             clientsClaim: true,
             skipWaiting: true,
             maximumFileSizeToCacheInBytes: 8000000,
+            swDest: env.ghp ? "FortyEight/service-worker.js" : "service-worker.js",
+            runtimeCaching: [
+                {
+                    urlPattern: env.ghp ? new RegExp('^/FortyEight/assets/') : new RegExp('^/assets/'),
+                    handler: 'CacheFirst',
+                    options: {
+                        cacheName: 'custom-images-fonts-cache',
+                        expiration: {
+                            maxEntries: 100,
+                            maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
+                        },
+                    },
+                },
+            ],
+            //include: (env.ghp ? ['/FortyEight/assets/*.WOFF', '/FortyEight/assets/*.png'] : ['/assets/*.WOFF', '/assets/*.png'])
+            include: ['src/assets/images/*.png', /^src\/assets\/fonts\/(?:[^/]+\/)*[^/]+\.WOFF$/, 'src/assets/fonts/**/*.css']
+            //include: filesToPrecache
         })
-    )
+    );
 
     return {
         entry: path.resolve(__dirname, './src/index.js'),
