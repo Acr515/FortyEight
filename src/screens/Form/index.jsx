@@ -29,6 +29,7 @@ export default function Form() {
     }
     // Gets an event's name
     const getEventName = (code) => {
+        if (code == "") return "Event name will show here";
         for (let ev of Events) {
             if (ev.code == code) return ev.name;
         }
@@ -40,7 +41,7 @@ export default function Form() {
     const navigate = useNavigate();
     const teamNumberPrefill = location.state == null ? null : location.state.teamNumberPrefill == null ? null : location.state.teamNumberPrefill;
     const [fullTeamName, setFullTeamName] = useState(teamNumberPrefill != null ? getTeamName(teamNumberPrefill) : "Team name will show here");
-    const [eventName, setEventName] = useState(edit.isEdit ? getEventName(edit.data.eventCode) : "Event name will show here");
+    const [eventName, setEventName] = useState(edit.isEdit ? getEventName(edit.data.eventCode) : getEventName(localStorage.getItem("EventCodePrefill")));
     const modalFunctions = useContext(FeedbackModalContext);
 
 

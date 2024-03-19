@@ -15,7 +15,11 @@ import { useLocation, useNavigate } from "react-router-dom";
 import Simulator from "data/game_specific/Simulator/_Universal";
 import XImage from 'assets/images/x.png';
 import DotsImage from 'assets/images/three-dots.png';
+import { TeamNumberInput } from "screens/SimulatorConfig";
+import TeamData from "data/TeamData";
+import { getTeamData, getTeamNumberArray } from "data/SearchData";
 import "./style.scss";
+import { getOrdinalSuffix } from "util/getOrdinalSuffix";
 
 const SUBPAGE = {
     LiveSelection: "Live Selection",
@@ -116,7 +120,9 @@ function RankingInput({ setSubpageState }) {
     const [useTBA, setUseTBA] = useState(true);
     const [eventKey, setEventKey] = useState("");
     const [backupSelections, setBackupSelections] = useState(false);
+    const [manualRankings, setManualRankings] = useState([{ number: "" }, { number: "" }, { number: "" }, { number: "" }, { number: "" }, { number: "" }, { number: "" }, { number: "" }]);
 
+    const teamNumbers = getTeamNumberArray(TeamData);
     const phRef = useRef();
     phRef.current = playoffHelper;
 
@@ -128,7 +134,22 @@ function RankingInput({ setSubpageState }) {
                 feedbackModal.setModal("Something went wrong while polling The Blue Alliance API.", true);
             });
         } else {
-            // Log rankings from user input
+            if (manualRankings.length < 24 && !backupSelections) {
+                feedbackModal.setModal("You must supply at least 24 teams to proceed.", true);
+                return;
+            }
+            if (manualRankings.length < 32 && backupSelections) {
+                feedbackModal.setModal("You must supply at least 32 teams to proceed.", true);
+                return;
+            }
+            let teamsValid = true;
+            manualRankings.forEach(team => {
+                if (getTeamData(Number(team.number)) == null) teamsValid = false;
+            });
+            if (!teamsValid) {
+                feedbackModal.setModal("A field was left blank or a team couldn't be found in your dataset. Please review your selections and try again.", true);
+                return;
+            }
         }
     };
 
@@ -157,6 +178,12 @@ function RankingInput({ setSubpageState }) {
             confirmLabel: "Yes",
             cancelLabel: "No"
         });
+    };
+
+    const updateManualTeamNumber = (number, index) => {
+        let rankingsCopy = manualRankings.map(t => ({ number: t.number }));
+        rankingsCopy[index].number = number;
+        setManualRankings(rankingsCopy);
     };
 
     return (
@@ -192,7 +219,18 @@ function RankingInput({ setSubpageState }) {
                     />
                 </div> : <div>
                     <h3>Manual Rankings</h3>
-                    <p>Manual input is currently under construction. Please use the TBA integration feature.</p>
+                    {
+                        manualRankings.map((team, ind) => <div className="manual-team-input">
+                            <div className={`x-icon`} style={{ backgroundImage: `url(${ XImage })` }}></div>
+                            <div className="ranking">{getOrdinalSuffix(ind + 1)}</div>
+                            <TeamNumberInput
+                                useAllianceBasedState={false}
+                                teamNumbers={teamNumbers}
+                                stateVar={team.number}
+                                stateFunc={(num) => updateManualTeamNumber(num, Number(ind))}
+                            />
+                        </div>)
+                    }
                 </div> }
             </div>
 

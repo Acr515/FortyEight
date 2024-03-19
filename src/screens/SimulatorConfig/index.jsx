@@ -321,7 +321,7 @@ export default function SimulatorConfig() {
     )
 }
 
-function TeamNumberInput({ index, stateVar, stateFunc, teamNumbers, useTextbox, prefill = -1 }) {
+export function TeamNumberInput({ index, stateVar, stateFunc, teamNumbers, useTextbox, prefill = -1, useAllianceBasedState = true }) {
 
     // const [teamNumber, setTeamNumber] = useState(prefill == -1 ? "" : prefill);
     const [teamName, setTeamName] = useState(prefill == -1 ? "" : getTeamName(Number(prefill)));
@@ -332,10 +332,12 @@ function TeamNumberInput({ index, stateVar, stateFunc, teamNumbers, useTextbox, 
     teamNumbers.forEach(num => { optionValues.push({ label: num.toString(), value: num }); });
 
     const updateTeamNumber = num => {
-        let newStateVar = [];
-        stateVar.forEach(num => newStateVar.push(num));
-        newStateVar[index] = num;
-        stateFunc(newStateVar);
+        if (useAllianceBasedState) {
+            let newStateVar = [];
+            stateVar.forEach(num => newStateVar.push(num));
+            newStateVar[index] = num;
+            stateFunc(newStateVar);
+        } else stateFunc(num);
     }
 
     // Execute every time the number is changed
@@ -343,7 +345,6 @@ function TeamNumberInput({ index, stateVar, stateFunc, teamNumbers, useTextbox, 
         if (teamNumbers.indexOf(Number(num)) == -1) {
             setValidNumber(false);
             setTeamName("???");
-            //if (updateState) updateTeamNumber("");
         } else {
             setValidNumber(true);
             setTeamName(getTeamName(Number(num)));
@@ -356,7 +357,7 @@ function TeamNumberInput({ index, stateVar, stateFunc, teamNumbers, useTextbox, 
     }
 
     useEffect(() => {
-        checkTeamNumber(stateVar[index], false);
+        if (useAllianceBasedState) checkTeamNumber(stateVar[index], false); else checkTeamNumber(stateVar, false);
     }, [teamNumbers])
 
     return (
@@ -371,9 +372,9 @@ function TeamNumberInput({ index, stateVar, stateFunc, teamNumbers, useTextbox, 
                     marginBottom={0}
                     warning={!validNumber}
                     onInput={numberInput}
-                    prefill={stateVar[index]}
+                    prefill={useAllianceBasedState ? stateVar[index] : stateVar}
                     externalUpdate={stateVar}
-                    getExternalUpdate={() => stateVar[index]}
+                    getExternalUpdate={() => (useAllianceBasedState ? stateVar[index] : stateVar)}
                 />
             :
                 <Input
@@ -385,9 +386,9 @@ function TeamNumberInput({ index, stateVar, stateFunc, teamNumbers, useTextbox, 
                     }}
                     marginBottom={0}
                     onInput={numberInput}
-                    prefill={stateVar[index]}
+                    prefill={useAllianceBasedState ? stateVar[index] : stateVar}
                     externalUpdate={stateVar}
-                    getExternalUpdate={() => stateVar[index]}
+                    getExternalUpdate={() => (useAllianceBasedState ? stateVar[index] : stateVar)}
                 />
             }
             <div className="team-name-label">

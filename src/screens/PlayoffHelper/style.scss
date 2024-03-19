@@ -86,6 +86,38 @@
         .input-area.inactive {
             opacity: 0.5;
         }
+
+        .manual-team-input {
+            display: flex;
+            flex-direction: row;
+            gap: 16px;
+            
+            ._TeamNumberInput {
+                display: flex;
+
+                .team-name-label {
+                    margin-top: 5px;
+                }
+            }
+
+            .x-icon {
+                background-size: contain;
+                background-position: center;
+                background-repeat: no-repeat;
+                margin-top: 5px;
+                filter: invert(70%);
+                width: 17px;
+                height: 17px;
+            }
+
+            .ranking {
+                font-family: 'industry';
+                font-weight: 600;
+                font-size: 18px;
+                width: 30px;
+                margin-top: 2px;
+            }
+        }
     }
 
     ._AllianceRow {
