@@ -62,6 +62,7 @@ export default function FRAME() {
         declineTeam: (teamNumber) => PlayoffHelperFunctions.declineTeam(playoffHelper, setPlayoffHelper, teamNumber),
         setup: (mode, backupSelections) => PlayoffHelperFunctions.setup(playoffHelper, setPlayoffHelper, mode, backupSelections),
         getTBARankings: (eventKey, failureCallback) => PlayoffHelperFunctions.getTBARankings(playoffHelper, setPlayoffHelper, eventKey, failureCallback),
+        setManualRankings: (teams) => PlayoffHelperFunctions.setManualRankings(playoffHelper, setPlayoffHelper, teams),
         convertNumberToLetter: (number) => PlayoffHelperFunctions.convertNumberToLetter(number),
         generatePicklist: () => PlayoffHelperFunctions.generatePicklist(playoffHelper),
         getAllianceRPI: (seed) => PlayoffHelperFunctions.getAllianceRPI(playoffHelper, seed),

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import './style.scss';
 import Chevron from '../../assets/images/chevron.png';
+import './style.scss';
+import Spinner from 'components/Spinner';
 
 /**
  * Creates an input box.
@@ -98,24 +99,11 @@ export default function Input({ label, prefill, id, onInput, isCheckbox, isNumer
                         }
                     </select>
                 )}
-                {isNumerical && (
-                    <div className="control-area">
-                        <button 
-                            type="button" 
-                            className="arrow"
-                            style={{ backgroundImage: 'url(' + Chevron + ')' }}
-                            onClick={increment}
-                            disabled={disabled}
-                        />
-                        <button 
-                            type="button" 
-                            className="arrow down" 
-                            style={{ backgroundImage: 'url(' + Chevron + ')' }}
-                            onClick={decrement}
-                            disabled={disabled}
-                        />
-                    </div>
-                )}
+                { isNumerical && <Spinner
+                    increment={increment}
+                    decrement={decrement}
+                    disabled={disabled}
+                />} 
             </div>
         </div>
     )

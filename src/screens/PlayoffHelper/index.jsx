@@ -1,25 +1,27 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import PlayoffHelperTeam from "components/PlayoffHelperTeam";
+import { DEVELOP_MODE } from "/src/config";
 import Input from "components/Input";
 import Button from "components/Button";
 import PageHeader from "components/PageHeader";
 import LoadingSpinner from "components/LoadingSpinner";
+import Spinner from "components/Spinner";
+import { TeamNumberInput } from "screens/SimulatorConfig";
 import PlayoffHelperContext from "context/PlayoffHelperContext";
-import PlayoffHelperFunctions, { PlayoffHelperState } from "data/PlayoffHelperData";
 import FeedbackModalContext from "context/FeedbackModalContext";
 import DialogBoxContext from "context/DialogBoxContext";
-import PlayoffHelperTeam from "components/PlayoffHelperTeam";
-import sleep from "util/sleep";
-import CheckImage from "assets/images/check.png";
-import { DEVELOP_MODE } from "/src/config";
-import { useLocation, useNavigate } from "react-router-dom";
 import Simulator from "data/game_specific/Simulator/_Universal";
+import TeamData from "data/TeamData";
+import PlayoffHelperFunctions, { PlayoffHelperState } from "data/PlayoffHelperData";
+import { getTeamData, getTeamNumberArray } from "data/SearchData";
+import sleep from "util/sleep";
+import { getOrdinalSuffix } from "util/getOrdinalSuffix";
+import { Method, sortTeams } from "util/sortData";
+import CheckImage from "assets/images/check.png";
 import XImage from 'assets/images/x.png';
 import DotsImage from 'assets/images/three-dots.png';
-import { TeamNumberInput } from "screens/SimulatorConfig";
-import TeamData from "data/TeamData";
-import { getTeamData, getTeamNumberArray } from "data/SearchData";
 import "./style.scss";
-import { getOrdinalSuffix } from "util/getOrdinalSuffix";
 
 const SUBPAGE = {
     LiveSelection: "Live Selection",
@@ -129,19 +131,27 @@ function RankingInput({ setSubpageState }) {
     const preparePlayoffHelper = () => {
         if (useTBA) {
             // Get rankings from TBA
+            if (eventKey == "") {
+                feedbackModal.setModal("Please supply an event key to continue.", true);
+                return;
+            }
+
             playoffHelper.getTBARankings(eventKey, () => {
                 // Error with API
-                feedbackModal.setModal("Something went wrong while polling The Blue Alliance API.", true);
+                feedbackModal.setModal("Something went wrong while polling The Blue Alliance API. Please make sure you have a stable internet connection and that the event key is valid and try again.", true);
             });
         } else {
+            // Feed rankings in manually
             if (manualRankings.length < 24 && !backupSelections) {
                 feedbackModal.setModal("You must supply at least 24 teams to proceed.", true);
                 return;
             }
             if (manualRankings.length < 32 && backupSelections) {
-                feedbackModal.setModal("You must supply at least 32 teams to proceed.", true);
+                feedbackModal.setModal("You must supply at least 32 teams to create a 4-team alliance draft.", true);
                 return;
             }
+
+            // Make sure teams all have existing data
             let teamsValid = true;
             manualRankings.forEach(team => {
                 if (getTeamData(Number(team.number)) == null) teamsValid = false;
@@ -150,6 +160,20 @@ function RankingInput({ setSubpageState }) {
                 feedbackModal.setModal("A field was left blank or a team couldn't be found in your dataset. Please review your selections and try again.", true);
                 return;
             }
+
+            // Make sure there are no duplicate teams
+            let duplicates = manualRankings
+                .map(e => e.number)
+                .map((e, i, final) => final.indexOf(e) !== i && i)
+                .filter(obj=> manualRankings[obj])
+                .map(e => manualRankings[e].number)
+            if (duplicates.length > 0) {
+                feedbackModal.setModal(`Team${ duplicates.length > 1 ? "s" : "" } ${ duplicates.join(", ") } exist${ duplicates.length > 1 ? "" : "s" } multiple times in the ranking list. Please remove any repeated team entries and try again.`, true);
+                return;
+            }
+
+            // Parse out the data and start prepping the playoff helper for use
+            playoffHelper.setManualRankings(manualRankings.map(t => t.number));
         }
     };
 
@@ -174,15 +198,46 @@ function RankingInput({ setSubpageState }) {
         dialogFunctions.setDialog({
             body: "Team ranking data will be deleted from the system. This will not affect any of your scouting data. Would you like to proceed?",
             useConfirmation: true,
-            confirmFunction: () => { playoffHelper.reset(true); feedbackModal.setModal("Successfully reset the playoff helper.", false) },
+            confirmFunction: () => {
+                setManualRankings([ { number: "" }, { number: "" }, { number: "" }, { number: "" }, { number: "" }, { number: "" }, { number: "" }, { number: "" } ]);
+                playoffHelper.reset(true); 
+                feedbackModal.setModal("Successfully reset the playoff helper.", false) 
+            },
             confirmLabel: "Yes",
             cancelLabel: "No"
         });
     };
 
+    const autoPopulateManualTeams = () => {
+        let teams = sortTeams(TeamData, Method.StrengthDescending).map(team => ({ number: team.number }));
+        setManualRankings(teams);
+    }
+
     const updateManualTeamNumber = (number, index) => {
         let rankingsCopy = manualRankings.map(t => ({ number: t.number }));
         rankingsCopy[index].number = number;
+        setManualRankings(rankingsCopy);
+    };
+
+    const deleteManualTeamNumber = (index) => {
+        let rankingsCopy = manualRankings.map(t => ({ number: t.number }));
+        rankingsCopy.splice(index, 1);
+        setManualRankings(rankingsCopy);
+    };
+
+    const addManualTeamNumber = () => {
+        let rankingsCopy = manualRankings.map(t => ({ number: t.number }));
+        rankingsCopy.push({ number: "" });
+        setManualRankings(rankingsCopy);
+    };
+
+    const shiftTeam = (ind, dir) => {
+        let rankingsCopy = manualRankings.map(t => ({ number: t.number }));
+        if (ind == 0 && dir == -1) return;
+        if (ind == rankingsCopy.length - 1 && dir == 1) return;
+        
+        let team = rankingsCopy.splice(ind, 1)[0];
+        rankingsCopy.splice(ind + dir, 0, team);
         setManualRankings(rankingsCopy);
     };
 
@@ -218,19 +273,40 @@ function RankingInput({ setSubpageState }) {
                         disabled={ playoffHelper.data.state == PlayoffHelperState.READY }
                     />
                 </div> : <div>
-                    <h3>Manual Rankings</h3>
-                    {
-                        manualRankings.map((team, ind) => <div className="manual-team-input">
-                            <div className={`x-icon`} style={{ backgroundImage: `url(${ XImage })` }}></div>
-                            <div className="ranking">{getOrdinalSuffix(ind + 1)}</div>
-                            <TeamNumberInput
-                                useAllianceBasedState={false}
-                                teamNumbers={teamNumbers}
-                                stateVar={team.number}
-                                stateFunc={(num) => updateManualTeamNumber(num, Number(ind))}
-                            />
-                        </div>)
-                    }
+                    <div className="rankings-header">
+                        <h3>Manual Rankings</h3>
+                        <button className="populate-button" onClick={autoPopulateManualTeams}>Auto-populate teams from my dataset</button>
+                    </div>
+                    <div className="ranking-list">
+                        {
+                            manualRankings.map((team, ind) => 
+                                <div className="manual-team-input" key={ind}>
+                                    <div 
+                                        className={`x-icon`} 
+                                        style={{ backgroundImage: `url(${ XImage })` }}
+                                        onClick={() => deleteManualTeamNumber(ind)}
+                                    ></div>
+                                    <Spinner
+                                        increment={() => shiftTeam(ind, -1)}
+                                        decrement={() => shiftTeam(ind, 1)}
+                                    />
+                                    <div className="ranking">{getOrdinalSuffix(ind + 1)}</div>
+                                    <TeamNumberInput
+                                        useAllianceBasedState={false}
+                                        teamNumbers={teamNumbers}
+                                        stateVar={team.number}
+                                        stateFunc={(num) => updateManualTeamNumber(num, Number(ind))}
+                                    />
+                                </div>
+                            )
+                        }
+                        <div 
+                            className="add-team-button"
+                            onClick={addManualTeamNumber}
+                        >
+                            Add new team...
+                        </div>
+                    </div>
                 </div> }
             </div>
 
