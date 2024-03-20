@@ -294,6 +294,7 @@ function RankingInput({ setSubpageState }) {
                                     <TeamNumberInput
                                         useAllianceBasedState={false}
                                         teamNumbers={teamNumbers}
+                                        useTextbox
                                         stateVar={team.number}
                                         stateFunc={(num) => updateManualTeamNumber(num, Number(ind))}
                                     />

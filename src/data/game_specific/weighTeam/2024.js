@@ -12,18 +12,9 @@ export const Weights = {
 
 /**
  * Sets of tuned weights to use. Adding another weight set here will add another category
- * for a team to be ranked "the best" in
+ * for a team to be ranked "the best" in. Order by priority or importance
  */
 export const WeightSets = {
-    // Composite score focuses on amp scoring ability
-    AmpScorer: {
-        Autonomous: 1.35,
-        Speaker: 0.25,
-        Amp: 2.5,
-        Endgame: 0.75,
-        Defense: 0.25,
-        Flags: 1.75
-    },
     // Every year should have a `WellRounded` set, which uses a wholistic approach to analyze a team
     WellRounded: {
         Autonomous: 2,
@@ -33,13 +24,22 @@ export const WeightSets = {
         Defense: 1,
         Flags: 1
     },
+    // Composite score focuses on amp scoring ability
+    AmpScorer: {
+        Autonomous: 1.25,
+        Speaker: 0,
+        Amp: 3,
+        Endgame: 0.25,
+        Defense: 0.25,
+        Flags: 1.75
+    },
     // Composite score focuses on reliable defenders with good supporting traits
     Defensive: {
         Autonomous: 1,
-        Speaker: 0.5,
+        Speaker: 0.25,
         Amp: 1.25,
         Endgame: 1.5,
-        Defense: 2.75,
+        Defense: 3,
         Flags: 2
     },
 };
@@ -96,7 +96,7 @@ export default function weighTeam(team, weights) {
         if (key == Weights.Defense && score.Defense.instances > 0) {
             // For defense, divide by instances instead of by total matches, while also rewarding several 
             score.Defense.compositeStrength /= score.Defense.instances;
-            score.Defense.compositeStrength *= (score.Defense.instances * .25) * 8;
+            score.Defense.compositeStrength *= (score.Defense.instances * .35) * 8;
             
             score[key].compositeStrength *= weights[key];
             score[key] = score[key].compositeStrength;  // remove object structure & replace with single number
