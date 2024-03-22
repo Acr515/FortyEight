@@ -67,6 +67,7 @@ export default function FRAME() {
         generatePicklist: () => PlayoffHelperFunctions.generatePicklist(playoffHelper),
         getAllianceRPI: (seed) => PlayoffHelperFunctions.getAllianceRPI(playoffHelper, seed),
         simulateDraft: async () => PlayoffHelperFunctions.simulateDraft(playoffHelper, setPlayoffHelper),
+        saveDraftResults: () => PlayoffHelperFunctions.saveDraftResults(playoffHelper),
         loadDraftResults: () => PlayoffHelperFunctions.loadDraftResults(playoffHelper, setPlayoffHelper),
         finishDraft: () => PlayoffHelperFunctions.finishDraft(playoffHelper, setPlayoffHelper),
         addBackupTeam: (teamNumber, allianceSeed) => PlayoffHelperFunctions.addBackupTeam(playoffHelper, setPlayoffHelper, teamNumber, allianceSeed),

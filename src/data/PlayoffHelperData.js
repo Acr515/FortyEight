@@ -69,7 +69,7 @@ const PlayoffHelperFunctions = {
             round: 1,
             alliance: 0
         };
-        playoffHelper.teams.forEach(team => team.flush());
+        playoffHelper.teams.forEach(team => PlayoffTeam.flush(team));
 
         phSetter(playoffHelper);
     },
@@ -107,7 +107,7 @@ const PlayoffHelperFunctions = {
         // Run calculations on playoff teams
         let emptyTeams = [];
         playoffHelper.teams.forEach(team => {
-            team.flush();
+            PlayoffTeam.flush(team);
             let returnValue = team.calculatePowerScores();
             if (returnValue !== null) emptyTeams.push(returnValue);
         });
@@ -159,9 +159,18 @@ const PlayoffHelperFunctions = {
         if (playoffHelper.state == PlayoffHelperState.SIMULATED_DRAFT) playoffHelper.state = PlayoffHelperState.SIMULATED_PLAYOFFS;
 
         // Save to localStorage
-        localStorage.setItem("playoffHelper", JSON.stringify({ state: playoffHelper.state, teams: playoffHelper.teams, alliances: playoffHelper.alliances }));
+        PlayoffHelperFunctions.saveDraftResults(playoffHelper);
         
         phSetter(playoffHelper);
+    },
+
+    /**
+     * Saves playoff helper data to localStorage.
+     * @param {PlayoffHelperData} ph The state object containing the playoff helper data
+     */
+    saveDraftResults: (ph) => {
+        let playoffHelper = clonePlayoffHelper(ph);
+        localStorage.setItem("playoffHelper", JSON.stringify({ state: playoffHelper.state, teams: playoffHelper.teams, alliances: playoffHelper.alliances }));
     },
 
     /**
@@ -175,9 +184,15 @@ const PlayoffHelperFunctions = {
         let savedData = localStorage.getItem("playoffHelper");
         if (savedData != null) {
             savedData = JSON.parse(savedData);
-            playoffHelper.teams = savedData.teams;
             playoffHelper.alliances = savedData.alliances;
             playoffHelper.state = savedData.state;
+            let baseTeams = savedData.teams;
+
+            // Duplicate all teams, adding class methods back to their definitions
+            playoffHelper.teams = baseTeams.map(team => {
+                let baseTeam = new PlayoffTeam(-1, -1);
+                return Object.assign(Object.create(Object.getPrototypeOf(baseTeam)), team);
+            });
         }
 
         phSetter(playoffHelper);
@@ -207,6 +222,7 @@ const PlayoffHelperFunctions = {
             playoffHelper.config.fullTBAData = true;
             playoffHelper.state = PlayoffHelperState.READY;
 
+            PlayoffHelperFunctions.saveDraftResults(playoffHelper);
             phSetter(playoffHelper);
         }, failureCallback);
     },
@@ -228,6 +244,7 @@ const PlayoffHelperFunctions = {
         });
         playoffHelper.state = PlayoffHelperState.READY;
 
+        PlayoffHelperFunctions.saveDraftResults(playoffHelper);
         phSetter(playoffHelper);
     },
 
@@ -702,9 +719,9 @@ export class PlayoffTeam {
     }
 
     /**
-     * Sets all playoff selection related variables to their default values.
+     * Sets all playoff selection related variables to their default values when instances still have this function
      */
-    flush() {
+    flushSelf() {
         this.captain = false;
         this.selected = false;
         this.declined = false;
@@ -713,6 +730,20 @@ export class PlayoffTeam {
         this.simulatedWinRateRank = 0;
         this.uniqueStrengthAdded = -1;
         this.uniqueStrengthAddedRank = 0; 
+    }
+
+    /**
+     * Sets all playoff selection related variables to their default values.
+     */
+    static flush(team) {
+        team.captain = false;
+        team.selected = false;
+        team.declined = false;
+        team.pickGrade = null;
+        team.simulatedWinRate = -1;
+        team.simulatedWinRateRank = 0;
+        team.uniqueStrengthAdded = -1;
+        team.uniqueStrengthAddedRank = 0; 
     }
 
     /**
@@ -747,7 +778,6 @@ export class PlayoffTeam {
 
         this.calculateRPI();
         Object.keys(WeightSets).forEach(setName => {
-            // TODO check if it would be unreasonable to publish an inappropriate score (like Defensive) and nullify it if so
             let scores = weighTeam(getTeamData(this.teamNumber), WeightSets[setName]);
             if (WeightSetNames[setName] == WeightSetNames.Defensive && scores.Defense == 0) scores.Composite = -100;
 

@@ -61,6 +61,22 @@ export default function PlayoffHelper() {
         });
     };
 
+    // Flushes out draft-related data so that the user can start the draft over with the same rankings
+    const flushDraft = () => {
+        dialogFunctions.setDialog({
+            body: "Teams and their rankings will be preserved, but all selections will be reset, allowing you to restart the draft. Would you like to proceed?",
+            useConfirmation: true,
+            confirmFunction: () => { 
+                playoffHelper.flush();
+                feedbackModal.setModal("Successfully flushed the playoff helper.", false);
+                setHeaderTabsOpen(false);
+                setCachedBracket(null);
+            },
+            confirmLabel: "Yes",
+            cancelLabel: "No"
+        });
+    };
+
     // Check to see if there was any state in the location object
     useEffect(() => {
         if (location.state !== null) {
@@ -85,12 +101,14 @@ export default function PlayoffHelper() {
                     { (state == PlayoffHelperState.LIVE_PLAYOFFS || state == PlayoffHelperState.SIMULATED_PLAYOFFS) && <div className="header-buttons"> 
                         <div className={`button ${ subpageState == SUBPAGE.Alliances ? "active" : "" }`} onClick={ () => setSubpageState(SUBPAGE.Alliances) }>Alliances</div>
                         <div className={`button ${ subpageState == SUBPAGE.SimulatedBracket ? "active" : "" }`} onClick={ () => setSubpageState(SUBPAGE.SimulatedBracket) }>Simulated Bracket</div>
-                        <div className="button" onClick={resetData}>Reset</div>
+                        <div className="button" onClick={flushDraft}>Flush Draft</div>
+                        <div className="button" onClick={resetData}>Reset Teams</div>
                     </div> }
                     { (state == PlayoffHelperState.LIVE_DRAFT) && <div className="header-buttons"> 
                         <div className={`button ${ subpageState == SUBPAGE.LiveSelection ? "active" : "" }`} onClick={ () => setSubpageState(SUBPAGE.LiveSelection) }>Live Selection</div>
                         <div className={`button ${ subpageState == SUBPAGE.DraftBoard ? "active" : "" }`} onClick={ () => setSubpageState(SUBPAGE.DraftBoard) }>Draft Board</div>
-                        <div className="button" onClick={resetData}>Reset</div>
+                        <div className="button" onClick={flushDraft}>Flush Draft</div>
+                        <div className="button" onClick={resetData}>Reset Teams</div>
                     </div> }
                 </div>
                 <div 
@@ -266,6 +284,7 @@ function RankingInput({ setSubpageState }) {
                     disabled={ playoffHelper.data.state == PlayoffHelperState.READY }
                 />
                 { useTBA ? <div>
+                    <h3>Automatic Rankings</h3>
                     <Input
                         id="event-key"
                         label="TBA event key"
@@ -311,9 +330,22 @@ function RankingInput({ setSubpageState }) {
                 </div> }
             </div>
 
-            { playoffHelper.data.state == PlayoffHelperState.READY && <p>
-                Ranking data is prepared and ready to use!
-            </p> }
+            { playoffHelper.data.state == PlayoffHelperState.READY && <div>
+                <h3>Loaded Draft Rankings</h3>
+                <div className="team-bubble-container">
+                    { 
+                        playoffHelper.data.teams.map((team, index) => 
+                            <div 
+                                className="team-bubble"
+                                key={index}
+                            >
+                                <div className="ranking-container">{index + 1}</div>
+                                <div className="number-container">{team.teamNumber}</div>
+                            </div>
+                        )
+                    }
+                </div>
+            </div>}
             <div className="submission-buttons">
                 { playoffHelper.data.state == PlayoffHelperState.INACTIVE && <>
                     <Button
