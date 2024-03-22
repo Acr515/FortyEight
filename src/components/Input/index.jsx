@@ -11,6 +11,7 @@ import Spinner from 'components/Spinner';
  * @param onInput A function that runs alongside the input's normal input event. The `e` variable is automatically used as a parameter, so keep this in mind
  * @param isCheckbox Whether to make the input a checkbox or not
  * @param isNumerical Whether to add arrows that count up/down or not
+ * @param {array} bounds If isNumerical is true, the first entry should be the lower boundary and the second entry should be the upper boundary
  * @param optionList Omit if not using an option list. Should be an array of objects containing "label" and "value" keys
  * @param marginBottom Defaults to 18. Pixel margin to add to bottom of container element
  * @param alignLabel Where to vertically align the label of the textbox. Accepts a string "top", "middle", or "bottom"
@@ -24,7 +25,7 @@ import Spinner from 'components/Spinner';
  * @param getExternalUpdate This function should return a value that will be used to set the value state of this input component
  * @param floodLabel Optional. When true, floods the available space with the label instead of the normal 50/50 width split
  */
-export default function Input({ label, prefill, id, onInput, isCheckbox, isNumerical, optionList, marginBottom, alignLabel = "middle", textArea = false, required = false, disabled = false, warning = false, style = {}, labelStyle = {}, externalUpdate = null, getExternalUpdate = null, floodLabel = false }) {
+export default function Input({ label, prefill, id, onInput, isCheckbox, isNumerical = false, bounds = null, optionList, marginBottom, alignLabel = "middle", textArea = false, required = false, disabled = false, warning = false, style = {}, labelStyle = {}, externalUpdate = null, getExternalUpdate = null, floodLabel = false }) {
     
     optionList = typeof optionList !== "undefined" ? optionList : false;
 
@@ -44,11 +45,13 @@ export default function Input({ label, prefill, id, onInput, isCheckbox, isNumer
     }
 
     const increment = () => {
-        setValue(Number(value) + 1);
+        if (bounds == null) setValue(Number(value) + 1);
+        else if (Number(value) < bounds[1]) setValue(Number(value) + 1);
     }
 
     const decrement = () => {
-        setValue(Number(value) - 1);
+        if (bounds == null) setValue(Number(value) - 1);
+        else if (Number(value) > bounds[0]) setValue(Number(value) - 1);
     }
 
     if (externalUpdate != null) useEffect(() => {

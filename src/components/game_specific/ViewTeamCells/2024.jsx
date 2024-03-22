@@ -36,6 +36,7 @@ export default function ViewTeamCells({team}) {
     // Count trap scores
     let trapScores = 0;
     team.data.forEach(match => trapScores += match.performance.endgame.trap );
+    trapScores = Math.round((trapScores / team.data.length) * 10) / 10;
 
     // Calculate climb rate
     let climbFails = 0, climbs = 0;
@@ -73,8 +74,8 @@ export default function ViewTeamCells({team}) {
                 <div className="info-label">Climb Success</div>
             </div>
             <div className="info-cell">
-                <div className="info-value">{trapScores}/{climbs}</div>
-                <div className="info-label">Trap Success</div>
+                <div className="info-value">{trapScores}</div>
+                <div className="info-label">Avg. Trap Scores</div>
             </div>
             <div className="info-cell">
                 <div className="info-value">{harmonizedClimbs}</div>

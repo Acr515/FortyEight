@@ -34,4 +34,14 @@ export default function performanceObject() {
  * A set of fields that are present on forms, but do not exist as keys of the `performanceObject`. This is good to use when the fields
  * of the game form undergo special calculations before being finalized.
  */
-export const SpecialFields = {}
+export const SpecialFields = {
+    endgame: {
+        harmonized: (performance, value) => {
+            if (value) {
+                performance.endgame.state = EndgameResult.HARMONIZED;
+            } else {
+                performance.endgame.state = EndgameResult.ONSTAGE;
+            }
+        }
+    }
+}
