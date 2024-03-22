@@ -128,6 +128,9 @@ const PlayoffHelperFunctions = {
         // Also do the same for RPI
         sortedTeams.sort((a, b) => b.rpi.RPI - a.rpi.RPI);
         sortedTeams.forEach((team, ranking) => { team.rpi.ranking = ranking + 1 });
+        // And do the same for average cycles
+        sortedTeams.sort((a, b) => b.cycleRate - a.cycleRate);
+        sortedTeams.forEach((team, ranking) => { team.cycleRateRanking = ranking + 1 });
 
         // Setup the draft and initial alliance captains
         playoffHelper.teams.sort((a, b) => a.qualRanking - b.qualRanking);
@@ -683,6 +686,7 @@ export class PlayoffTeam {
     bestCompositeScore = -1000;     // the best composite score from each WweightSet composite (for example, team is a 40 in WellRounded and a 50 in Defensive- this value will be 50)
     bestCompositeType = null;       // if this team has the best composite score available in a certain WeightSet group, the name of that group will populate here
     cycleRate = 0;                  // average number of game pieces scored during teleop
+    cycleRateRanking = -1;          // average number of game pieces scored during teleop
     pickGrade = null;               // estimated letter grade of how good this pick would be given the rest of the teams available
     simulatedWinRate = -1;          // win rate as determined by simulations- by default, 1.5 = 100%, 0.5 = 0%. See config object of playoff helper
     simulatedWinRateRank = 0;       // ranking against the picklist for the above attribute
@@ -773,7 +777,7 @@ export class PlayoffTeam {
             let cycles = 0;
             let teamData = getTeamData(this.teamNumber).data;
             teamData.forEach(match => cycles += ScoreCalculator.Teleop.getPieces(match));
-            this.cycleRate = Math.round( cycles / teamData.length * 1000 ) / 100
+            this.cycleRate = Math.round( cycles / teamData.length * 100 ) / 100
         }
 
         this.calculateRPI();

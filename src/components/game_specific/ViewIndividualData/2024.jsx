@@ -59,7 +59,7 @@ export default function ViewIndividualData({data}) {
                     )}
                     { (p.endgame.state != EndgameResult.NONE && p.endgame.state != EndgameResult.PARKED) && (
                         <div className="content-cell">
-                            <div className="cell-data">{p.endgame.trap ? "Yes" : "No"}</div>
+                            <div className="cell-data">{p.endgame.trap ? `Yes (${p.endgame.trap === true ? 1 : p.endgame.trap})` : "No"}</div>
                             <div className="cell-label">Trap score</div>
                         </div>
                     )}
