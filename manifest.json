@@ -23,7 +23,7 @@
             "type": "image/png"
         }
     ],
-    "start_url": "./",
+    "start_url": "/FortyEight/",
     "display": "standalone",
     "theme_color": "#4941B1",
     "background_color": "#fff"
