@@ -8,7 +8,7 @@ import { getOrdinalSuffix } from "util/getOrdinalSuffix";
  */
 export default function PlayoffHelperTeamCellSet({ team }) { 
 
-    const defenseScore = team.powerScores.WellRounded.Defense == 0 ? "--" : team.powerScores.WellRounded.Defense;
+    const defenseScore = team.powerScores.WellRounded.Defense == 0 ? "--" : team.powerScores.Defensive.Defense;
     const defenseRanking = team.powerScores.WellRounded.Defense == 0 ? "" : getOrdinalSuffix(team.powerScoreRankings.Defense);
 
     return (
@@ -19,6 +19,7 @@ export default function PlayoffHelperTeamCellSet({ team }) {
             <PlayoffHelperTeamCell value={team.powerScores.WellRounded.Amp} place={getOrdinalSuffix(team.powerScoreRankings.Amp)} label={"Amp Scoring"} />
             <PlayoffHelperTeamCell value={team.powerScores.WellRounded.Endgame} place={getOrdinalSuffix(team.powerScoreRankings.Endgame)} label={"Endgame"} />
             <PlayoffHelperTeamCell value={defenseScore} place={defenseRanking} label={"Defense"} />
+            <PlayoffHelperTeamCell value={team.cycleRate} place={getOrdinalSuffix(team.cycleRateRanking)} label={`Cycles / Game`} />
         </>
     )
 }

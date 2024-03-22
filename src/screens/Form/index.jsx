@@ -13,6 +13,7 @@ import { saveData } from 'data/saveLoadData';
 import performanceObject, { SpecialFields } from 'data/game_specific/performanceObject/GAME_YEAR';
 import FeedbackModalContext from 'context/FeedbackModalContext';
 import './style.scss';
+import Events from 'data/game_specific/eventCodes/2024';
 
 
 export default function Form() {
@@ -25,17 +26,31 @@ export default function Form() {
             edit.isEdit = true;
             edit.data = edit.data.match;
         }
-    } 
+    }
+    // Gets an event's name
+    const getEventName = (code) => {
+        if (code == "") return "Event name will show here";
+        for (let ev of Events) {
+            if (ev.code == code) return ev.name;
+        }
+        return "???";
+    };
+
 
     const location = useLocation();
     const navigate = useNavigate();
-    const teamNumberPrefill = location.state == null ? null : location.state.teamNumberPrefill == null ? null : location.state.teamNumberPrefill
+    const teamNumberPrefill = location.state == null ? null : location.state.teamNumberPrefill == null ? null : location.state.teamNumberPrefill;
     const [fullTeamName, setFullTeamName] = useState(teamNumberPrefill != null ? getTeamName(teamNumberPrefill) : "Team name will show here");
+    const [eventName, setEventName] = useState(edit.isEdit ? getEventName(edit.data.eventCode) : getEventName(localStorage.getItem("EventCodePrefill")));
     const modalFunctions = useContext(FeedbackModalContext);
 
 
-    const getFullTeamName = e => {
+    const setTeamNameState = e => {
         if (e.target.value !== "") setFullTeamName(getTeamName(e.target.value)); else setFullTeamName("Team name will show here");
+    };
+
+    const setEventNameState = e => {
+        if (e.target.value !== "") setEventName(getEventName(e.target.value)); else setEventName("Event name will show here");
     };
 
     const getValue = id => {
@@ -48,6 +63,10 @@ export default function Form() {
         document.querySelectorAll(".SCREEN._Form .input").forEach(elm => {
             if (elm.classList.contains("required") && elm.value == "") valid = false;
         });
+        if (Number(getValue("Form_base_matchNumber")) != getValue("Form_base_matchNumber")) {
+            modalFunctions.setModal("There was something wrong with the match number you provided. Please use a valid match number and try again.", true);
+            return;
+        }
         if (!valid) {
             modalFunctions.setModal("A required field was left blank. Please check your response and try again.", true);
             return;
@@ -123,12 +142,12 @@ export default function Form() {
                         label="Team #"
                         id="Form_base_teamNumber"
                         marginBottom={4}
-                        onInput={getFullTeamName}
+                        onInput={setTeamNameState}
                         required={true}
                         prefill={edit.isEdit ? edit.data.teamNumber : (teamNumberPrefill != null ? teamNumberPrefill : undefined)}
                         disabled={edit.isEdit}
                     />
-                    <span className="team-name">{fullTeamName}</span>
+                    <span className="readable-name">{fullTeamName}</span>
                     <Input
                         label="Match #"
                         id="Form_base_matchNumber"
@@ -138,9 +157,12 @@ export default function Form() {
                     <Input
                         label="Event Code"
                         id="Form_base_eventCode"
+                        marginBottom={4}
                         required={true}
+                        onInput={setEventNameState}
                         prefill={edit.isEdit ? edit.data.eventCode : localStorage.getItem("EventCodePrefill")}
                     />
+                    <span className="readable-name">{eventName}</span>
                     <Button
                         text="Submit"
                         action={submitForm}

@@ -120,7 +120,7 @@ export default function PlayoffHelperTeam({ team, isOnTheClock = false, captain 
 
     const teamNumber = team.teamNumber;
     const place = getOrdinalSuffix(team.qualRanking);
-    const record = `(${typeof team.getRecord !== 'undefined' ? team.getRecord() : ""})`;
+    const record = team.wins == -1 ? "" : `(${typeof team.getRecord !== 'undefined' ? team.getRecord() : ""})`;
     const partnerTeamNumbers = partners.map(p => p.teamNumber);
 
     return (

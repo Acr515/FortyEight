@@ -4,6 +4,7 @@ import weighTeam, { WeightSets } from "./game_specific/weighTeam/GAME_YEAR";
 import { getTeamData } from "./SearchData";
 import calculateRPI, { getRPIRating } from "./game_specific/calculateRPI/GAME_YEAR";
 import { WeightSetNames, Weights } from "./game_specific/weighTeam/GAME_YEAR";
+import ScoreCalculator from "./game_specific/ScoreCalculator/GAME_YEAR";
 import Simulator from "./game_specific/Simulator/_Universal";
 
 /**
@@ -68,6 +69,7 @@ const PlayoffHelperFunctions = {
             round: 1,
             alliance: 0
         };
+        playoffHelper.teams.forEach(team => PlayoffTeam.flush(team));
 
         phSetter(playoffHelper);
     },
@@ -105,11 +107,10 @@ const PlayoffHelperFunctions = {
         // Run calculations on playoff teams
         let emptyTeams = [];
         playoffHelper.teams.forEach(team => {
-            team.flush();
+            PlayoffTeam.flush(team);
             let returnValue = team.calculatePowerScores();
             if (returnValue !== null) emptyTeams.push(returnValue);
         });
-        console.log(emptyTeams)
         if (emptyTeams.length > 0) {
             // Throw error
             phSetter(playoffHelper);
@@ -127,6 +128,9 @@ const PlayoffHelperFunctions = {
         // Also do the same for RPI
         sortedTeams.sort((a, b) => b.rpi.RPI - a.rpi.RPI);
         sortedTeams.forEach((team, ranking) => { team.rpi.ranking = ranking + 1 });
+        // And do the same for average cycles
+        sortedTeams.sort((a, b) => b.cycleRate - a.cycleRate);
+        sortedTeams.forEach((team, ranking) => { team.cycleRateRanking = ranking + 1 });
 
         // Setup the draft and initial alliance captains
         playoffHelper.teams.sort((a, b) => a.qualRanking - b.qualRanking);
@@ -158,9 +162,18 @@ const PlayoffHelperFunctions = {
         if (playoffHelper.state == PlayoffHelperState.SIMULATED_DRAFT) playoffHelper.state = PlayoffHelperState.SIMULATED_PLAYOFFS;
 
         // Save to localStorage
-        localStorage.setItem("playoffHelper", JSON.stringify({ state: playoffHelper.state, teams: playoffHelper.teams, alliances: playoffHelper.alliances }));
+        PlayoffHelperFunctions.saveDraftResults(playoffHelper);
         
         phSetter(playoffHelper);
+    },
+
+    /**
+     * Saves playoff helper data to localStorage.
+     * @param {PlayoffHelperData} ph The state object containing the playoff helper data
+     */
+    saveDraftResults: (ph) => {
+        let playoffHelper = clonePlayoffHelper(ph);
+        localStorage.setItem("playoffHelper", JSON.stringify({ state: playoffHelper.state, teams: playoffHelper.teams, alliances: playoffHelper.alliances }));
     },
 
     /**
@@ -174,9 +187,15 @@ const PlayoffHelperFunctions = {
         let savedData = localStorage.getItem("playoffHelper");
         if (savedData != null) {
             savedData = JSON.parse(savedData);
-            playoffHelper.teams = savedData.teams;
             playoffHelper.alliances = savedData.alliances;
             playoffHelper.state = savedData.state;
+            let baseTeams = savedData.teams;
+
+            // Duplicate all teams, adding class methods back to their definitions
+            playoffHelper.teams = baseTeams.map(team => {
+                let baseTeam = new PlayoffTeam(-1, -1);
+                return Object.assign(Object.create(Object.getPrototypeOf(baseTeam)), team);
+            });
         }
 
         phSetter(playoffHelper);
@@ -206,6 +225,7 @@ const PlayoffHelperFunctions = {
             playoffHelper.config.fullTBAData = true;
             playoffHelper.state = PlayoffHelperState.READY;
 
+            PlayoffHelperFunctions.saveDraftResults(playoffHelper);
             phSetter(playoffHelper);
         }, failureCallback);
     },
@@ -227,6 +247,7 @@ const PlayoffHelperFunctions = {
         });
         playoffHelper.state = PlayoffHelperState.READY;
 
+        PlayoffHelperFunctions.saveDraftResults(playoffHelper);
         phSetter(playoffHelper);
     },
 
@@ -433,9 +454,16 @@ const PlayoffHelperFunctions = {
         let categories = [...Object.keys(WeightSets)];
         let bestTeams = {};
         categories.forEach(category => {
-            bestTeams[category] = picklist[0];
+            bestTeams[category] = null;
             picklist.forEach(team => {
-                if (team.powerScores[category].Composite > bestTeams[category].powerScores[category].Composite) bestTeams[category] = team;
+                if (bestTeams[category] == null || team.powerScores[category].Composite > bestTeams[category].powerScores[category].Composite) {
+                    // Make sure every team only gets one tag
+                    let teamExists = false;
+                    Object.keys(bestTeams).forEach(category => {
+                        if (bestTeams[category] != null && bestTeams[category].teamNumber == team.teamNumber) teamExists = true;
+                    });
+                    if (!teamExists) bestTeams[category] = team;
+                }
                 team.bestCompositeType = null;  // resetting this attribute
             });
         });
@@ -657,6 +685,8 @@ export class PlayoffTeam {
     powerScoreRankings = {};        // how the team ranks against the field in each weight category available
     bestCompositeScore = -1000;     // the best composite score from each WweightSet composite (for example, team is a 40 in WellRounded and a 50 in Defensive- this value will be 50)
     bestCompositeType = null;       // if this team has the best composite score available in a certain WeightSet group, the name of that group will populate here
+    cycleRate = 0;                  // average number of game pieces scored during teleop
+    cycleRateRanking = -1;          // average number of game pieces scored during teleop
     pickGrade = null;               // estimated letter grade of how good this pick would be given the rest of the teams available
     simulatedWinRate = -1;          // win rate as determined by simulations- by default, 1.5 = 100%, 0.5 = 0%. See config object of playoff helper
     simulatedWinRateRank = 0;       // ranking against the picklist for the above attribute
@@ -693,12 +723,31 @@ export class PlayoffTeam {
     }
 
     /**
-     * Sets all playoff selection related variables to their default values.
+     * Sets all playoff selection related variables to their default values when instances still have this function
      */
-    flush() {
+    flushSelf() {
         this.captain = false;
         this.selected = false;
         this.declined = false;
+        this.pickGrade = null;
+        this.simulatedWinRate = -1;
+        this.simulatedWinRateRank = 0;
+        this.uniqueStrengthAdded = -1;
+        this.uniqueStrengthAddedRank = 0; 
+    }
+
+    /**
+     * Sets all playoff selection related variables to their default values.
+     */
+    static flush(team) {
+        team.captain = false;
+        team.selected = false;
+        team.declined = false;
+        team.pickGrade = null;
+        team.simulatedWinRate = -1;
+        team.simulatedWinRateRank = 0;
+        team.uniqueStrengthAdded = -1;
+        team.uniqueStrengthAddedRank = 0; 
     }
 
     /**
@@ -718,17 +767,24 @@ export class PlayoffTeam {
                 this.powerScores.Defensive.Composite = 10;
 
                 this.bestCompositeScore = 10;
-                this.bestCompositeType = "WellRounded";
 
                 return null;
             } else {
                 return this.teamNumber; // incident will be logged and reported
             }
+        } else {
+            // Calculate cycle rate
+            let cycles = 0;
+            let teamData = getTeamData(this.teamNumber).data;
+            teamData.forEach(match => cycles += ScoreCalculator.Teleop.getPieces(match));
+            this.cycleRate = Math.round( cycles / teamData.length * 100 ) / 100
         }
 
         this.calculateRPI();
         Object.keys(WeightSets).forEach(setName => {
             let scores = weighTeam(getTeamData(this.teamNumber), WeightSets[setName]);
+            if (WeightSetNames[setName] == WeightSetNames.Defensive && scores.Defense == 0) scores.Composite = -100;
+
             this.powerScores[setName] = scores;
             if (scores.Composite > this.bestCompositeScore) {
                 this.bestCompositeScore = scores.Composite;

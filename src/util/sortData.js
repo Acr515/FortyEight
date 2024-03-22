@@ -52,7 +52,7 @@ export function sortTeamData(data, method) {
 /**
  * Sorts an array of teams. In most cases, this array will be TeamData, but you can use any you wish.
  * @param {Team[]} data The teams to be sorted
- * @param {Method} method The sort method (TeamNoAscending or TeamNoDescending are currently supported)
+ * @param {Method} method The sort method
  * @returns The newly sorted array. The array fed into the function is NOT modified.
  */
 export function sortTeams(data, method) {

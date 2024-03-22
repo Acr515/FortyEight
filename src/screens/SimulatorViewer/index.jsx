@@ -109,19 +109,31 @@ export default function SimulatorViewer() {
             let insight = sim[alliance.colorName].insights[insightKey];
             if (insightKey.includes("BelowThreshold")) {
                 // Get loss rate when scoring below a threshold
+                let useSpecialString = typeof insight.specialString !== 'undefined';
+                let displayString;
+                if (useSpecialString) displayString = insight.string; else displayString = `scoring below ${insight.threshold} ${insight.string == "charge station" ? "at the" : "during"} ${insight.string}`;
+
                 let rate = (insight.count - insight.wins) / insight.count;
                 if (insight.count > 0 && (alliance.colorName == winner.colorName || winner.winRate < 80)) {    // we don't really need to calculate this for a losing alliance when the matchup is lopsided
-                    alliance.insights.push(createInsightObject(rate, `scoring below ${insight.threshold} ${insight.string == "charge station" ? "at the" : "during"} ${insight.string}`, true));
+                    alliance.insights.push(createInsightObject(rate, displayString, true));
                 }
             } else if (insightKey.includes("AboveThreshold")) {
                 // Get win rate when scoring above a threshold
+                let useSpecialString = typeof insight.specialString !== 'undefined';
+                let displayString;
+                
+                if (useSpecialString) displayString = insight.string; else displayString = `scoring above ${insight.threshold} ${insight.string == "charge station" ? "at the" : "during"} ${insight.string}`;
                 let rate = insight.wins / insight.count;
-                if (insight.count > 0) alliance.insights.push(createInsightObject(rate, `scoring above ${insight.threshold} ${insight.string == "charge station" ? "at the" : "during"} ${insight.string}`));
+                if (insight.count > 0) alliance.insights.push(createInsightObject(rate, displayString));
 
             } else if (insightKey.includes("outscored")) {
                 // Get win rate when outscoring opponent
+                let useSpecialString = typeof insight.specialString !== 'undefined';
+                let displayString;
+                
+                if (useSpecialString) displayString = insight.string; else displayString = "outscoring their opponents during " + insight.string;
                 let rate = insight.wins / insight.count;
-                if (insight.count > 0) alliance.insights.push(createInsightObject(rate, "outscoring their opponents during " + insight.string));
+                if (insight.count > 0) alliance.insights.push(createInsightObject(rate, displayString));
             }
         });
         alliance.insights.sort((a, b) => b.rate - a.rate);

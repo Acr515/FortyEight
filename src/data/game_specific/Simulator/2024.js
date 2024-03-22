@@ -21,6 +21,7 @@ const SimulationInformation = {
     allianceInsights: {
         autoAboveThreshold: { threshold: 14, count: 0, wins: 0, string: "autonomous" },
         endgameAboveThreshold: { threshold: 10, count: 0, wins: 0, string: "endgame" },
+        trapAboveThreshold: { threshold: 1, count: 0, wins: 0, specialString: true, string: "successfully scoring in the trap" },
         outscoredTeleop: { count: 0, wins: 0, string: "teleop" },
         outscoredAuto: { count: 0, wins: 0, string: "autonomous" },
     },
@@ -216,16 +217,9 @@ const SimulationInformation = {
             result.endgame.state = mostCommonEndgame;
         }
         // Get trap scoring
-        if (result.endgame.state != EndgameResult.NONE) {
-            // Including the parked state in this because there's always a MINOR chance that the robot scores in the trap but fails to meet requirements for being on-stage
-            let trapScores = 0, trapOpportunities = 0;
-            team.data.forEach(match => {
-                trapScores += match.performance.endgame.trap;
-                trapOpportunities += ScoreCalculator.Endgame.getNumericalLevel(match) > 1;
-            });
-            result.endgame.trap = !useRandom ? (trapScores / team.data.length > .5) : rng() < (trapScores / trapOpportunities);
-            if (result.endgame.trap && result.endgame.state == EndgameResult.PARKED && rng() > 0.1) result.endgame.trap = false;   // giving a 10% to keep trap score outcome if parked
-        }
+        // Because teams are scoring multiple times in the trap, there needed to be a change in philosophy on how this is scored
+        let trapRange = getRange(team, "endgame", "trap");
+        result.endgame.trap = Math.round(!useRandom ? trapRange.avg : biasedRandom(trapRange.min, trapRange.max, trapRange[biasMethod], config.defaultInfluence));
 
 
         // Get defense tendencies
@@ -276,6 +270,23 @@ const SimulationInformation = {
             
             // If their harmony rate beats RNG, elevate them- otherwise, de-elevate other robot
             if (rng() < bestCandidate.endgame.harmonyRate) bestCandidate.endgame.state = EndgameResult.HARMONIZED; else performances[harmonyIndex].endgame.state = EndgameResult.ONSTAGE;
+        }
+
+        // Resolve number of trap scores
+        let trapCount = 0;
+        performances.forEach((p) => {
+            trapCount += p.endgame.trap;
+        });
+        if (trapCount > 3) {
+            // Too many trap scores, take away as many as needed
+            let teamIndex = 0;
+            while (trapCount > 3) {
+                if (performances[teamIndex].endgame.trap > 0) {
+                    performances[teamIndex].endgame.trap --;
+                    trapCount --;
+                }
+                if (teamIndex == 2) teamIndex = 0; else teamIndex ++;
+            }
         }
 
         // Simulate amplification bonuses
@@ -401,6 +412,14 @@ const SimulationInformation = {
         if (matchDetails[color].endgameScore > results[color].insights.endgameAboveThreshold.threshold) {
             results[color].insights.endgameAboveThreshold.count ++;
             if (matchDetails.winner.toLowerCase() == color) results[color].insights.endgameAboveThreshold.wins ++;
+        }
+
+        // Same as above, just specific to trap
+        let trapCount = 0;
+        matchDetails[color].teamPerformances.forEach((p) => { trapCount += p.endgame.trap });
+        if (trapCount > results[color].insights.trapAboveThreshold.threshold) {
+            results[color].insights.trapAboveThreshold.count ++;
+            if (matchDetails.winner.toLowerCase() == color) results[color].insights.trapAboveThreshold.wins ++;
         }
     },
 

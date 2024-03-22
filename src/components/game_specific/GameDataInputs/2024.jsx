@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Input from 'components/Input';
 import { EndgameResult } from 'data/game_specific/performanceObject/2024';
 
@@ -52,32 +52,57 @@ export const GameDataInputs = {
             prefill={edit.isEdit ? edit.data.performance.teleop.speaker : undefined}
         />
     </>,
-    EndgameSection: ({edit}) => <>
-        <Input
-            label="Climb"
-            id="Form_endgame_state"
-            optionList={[
-                { value: EndgameResult.NONE, label: EndgameResult.NONE },
-                { value: EndgameResult.PARKED, label: EndgameResult.PARKED },
-                { value: EndgameResult.ONSTAGE, label: EndgameResult.ONSTAGE },
-                { value: EndgameResult.HARMONIZED, label: EndgameResult.HARMONIZED },
-            ]}
-            required={true}
-            prefill={edit.isEdit ? edit.data.performance.endgame.state : undefined}
-        />
-        <Input
-            label="Scored note in trap?"
-            id="Form_endgame_trap"
-            isCheckbox={true}
-            prefill={edit.isEdit ? edit.data.performance.endgame.trap : undefined}
-        />
-        <Input
-            label="Tried to climb but failed?"
-            id="Form_endgame_failedAttempt"
-            isCheckbox={true}
-            prefill={edit.isEdit ? edit.data.performance.endgame.failedAttempt : undefined}
-        />
-    </>,
+    EndgameSection: ({edit}) => {
+        const [endgameState, setEndgameState] = useState(edit.isEdit ? (edit.data.performance.endgame.state == EndgameResult.HARMONIZED ? EndgameResult.ONSTAGE : edit.data.performance.endgame.state) : undefined);
+        const [trapNotes, setTrapNotes] = useState(edit.isEdit ? (edit.data.performance.endgame.trap === true ? 1 : edit.data.performance.endgame.trap) : 0);
+        const checkTrapNoteSetting = value => {
+            if (Number(value) != value) value = 0;
+            if (Number(value) < 0) value = 0;
+            if (Number(value) > 3) value = 3;
+            setTrapNotes(value);
+        };
+
+        return <>
+            <Input
+                label="Climb"
+                id="Form_endgame_state"
+                optionList={[
+                    { value: EndgameResult.NONE, label: EndgameResult.NONE },
+                    { value: EndgameResult.PARKED, label: EndgameResult.PARKED },
+                    { value: EndgameResult.ONSTAGE, label: EndgameResult.ONSTAGE },
+                ]}
+                onInput={e => setEndgameState(e.target.value)}
+                required={true}
+                prefill={endgameState}
+            />
+            {
+                endgameState == EndgameResult.ONSTAGE && (
+                    <Input
+                        label="Harmonized? (Climbed onto same chain as another robot)"
+                        id="Form_endgame_harmonized"
+                        isCheckbox
+                        prefill={edit.isEdit ? edit.data.performance.endgame.state == EndgameResult.HARMONIZED : undefined}
+                    />
+                )
+            }
+            <Input
+                label="Notes scored in trap"
+                id="Form_endgame_trap"
+                isNumerical
+                onInput={e => checkTrapNoteSetting(e.target.value)}
+                prefill={trapNotes}
+                externalUpdate={trapNotes}
+                getExternalUpdate={() => trapNotes}
+                bounds={[0, 3]}
+            />
+            <Input
+                label="Tried to climb but failed?"
+                id="Form_endgame_failedAttempt"
+                isCheckbox={true}
+                prefill={edit.isEdit ? edit.data.performance.endgame.failedAttempt : undefined}
+            />
+        </>
+    },
     NotesSection: ({edit}) => <>
         <Input
             label="This team missed a majority of the shots they took"
