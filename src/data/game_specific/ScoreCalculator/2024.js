@@ -17,10 +17,10 @@ const ScoreCalculator = {
         // Given a performance object, gets the score of all manual-defined "stage" points (climb, trap)
         getScore: data => {
             switch (data.performance.endgame.state) {
-                case EndgameResult.NONE: return 0 + (data.performance.endgame.trap ? 5 : 0);
-                case EndgameResult.PARKED: return 1 + (data.performance.endgame.trap ? 5 : 0);
-                case EndgameResult.ONSTAGE: return 3 + (data.performance.endgame.trap ? 5 : 0);
-                case EndgameResult.HARMONIZED: return 5 + (data.performance.endgame.trap ? 5 : 0);
+                case EndgameResult.NONE: return 0 + (data.performance.endgame.trap * 5);
+                case EndgameResult.PARKED: return 1 + (data.performance.endgame.trap * 5);
+                case EndgameResult.ONSTAGE: return 3 + (data.performance.endgame.trap * 5);
+                case EndgameResult.HARMONIZED: return 5 + (data.performance.endgame.trap * 5);
                 default: return 0;
             }
         },

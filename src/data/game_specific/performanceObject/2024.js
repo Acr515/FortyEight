@@ -21,7 +21,7 @@ export default function performanceObject() {
         endgame: {
             state: EndgameResult.NONE,
             failedAttempt: false,
-            trap: false
+            trap: 0
         },
         defense: {},
         notes: {
