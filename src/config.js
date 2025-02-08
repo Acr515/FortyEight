@@ -1,8 +1,8 @@
-export const VERSION_NAME = "2024.1.2";
+export const VERSION_NAME = "2025.0.0";
 
-export const VERSION_NUMBER = 2024.12;
+export const VERSION_NUMBER = 2025.00;
 
-export const PACKAGE_VERSION_NUMBER = "3.1.2";
+export const PACKAGE_VERSION_NUMBER = "4.0.0";
 
 export const TBA_KEY = "dX1DPbvtl0K3mmtRLUCnep8YnigOGsgOpW449DOBgxWD7fIL5kOzdPLFf7x1liKm";
 
