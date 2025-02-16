@@ -28,10 +28,12 @@ export default function performanceObject() {
         },
         endgame: {
             state: EndgameResult.NONE,
-            failedAttempt: false
+            failedAttempt: false,
         },
         defense: {},
-        notes: {}
+        notes: {
+            floorPickup: false,
+        }
     }
 }
 

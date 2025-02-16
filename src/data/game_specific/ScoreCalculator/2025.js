@@ -18,7 +18,9 @@ const ScoreCalculator = {
             return (
                 auto.coralL1 + auto.coralL2 + auto.coralL3 + auto.coralL4 + auto.algaeLow + auto.algaeHigh
             );
-        }
+        },
+        getAlgae: data => data.performance.auto.algaeLow + data.performance.auto.algaeHigh,
+        getCoral: data => data.performance.auto.coralL1 + data.performance.auto.coralL2 + data.performance.auto.coralL3 + data.performance.auto.coralL4,
     },
     Teleop: {
         getScore: data => {
@@ -34,6 +36,8 @@ const ScoreCalculator = {
                 teleop.coralL1 + teleop.coralL2 + teleop.coralL3 + teleop.coralL4 + teleop.algaeLow + teleop.algaeHigh
             );
         },
+        getAlgae: data => data.performance.teleop.algaeLow + data.performance.teleop.algaeHigh,
+        getCoral: data => data.performance.teleop.coralL1 + data.performance.teleop.coralL2 + data.performance.teleop.coralL3 + data.performance.teleop.coralL4,
     },
     Endgame: {
         // Given a performance object, gets the score
