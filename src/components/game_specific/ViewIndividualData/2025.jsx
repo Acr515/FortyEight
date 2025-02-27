@@ -61,12 +61,6 @@ export default function ViewIndividualData({data}) {
                             <div className="cell-label">Climb attempted</div>
                         </div>
                     )}
-                    { (p.endgame.state != EndgameResult.NONE && p.endgame.state != EndgameResult.PARKED) && (
-                        <div className="content-cell">
-                            <div className="cell-data">{p.endgame.trap ? `Yes (${p.endgame.trap === true ? 1 : p.endgame.trap})` : "No"}</div>
-                            <div className="cell-label">Trap score</div>
-                        </div>
-                    )}
                 </div>
             </div>
             <div className="data-row" style={{ marginBottom: 26, marginTop: 22 }}>

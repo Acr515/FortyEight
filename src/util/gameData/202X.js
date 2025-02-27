@@ -4,7 +4,12 @@
 const gameDataObject = {
     name: "TEST GAME",
     year: "202X",
-    league: "FRC"
+    league: "FRC",
+    baseRPAmounts: {
+        win: 2,
+        tie: 1,
+        loss: 0
+    }
 }
 
 export default gameDataObject;

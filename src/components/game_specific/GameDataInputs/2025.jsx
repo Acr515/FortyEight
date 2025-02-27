@@ -74,7 +74,7 @@ export const GameDataInputs = {
         />
         <Input
             label="Algae in Net (High)"
-            id="Formteleopo_algaeHigh"
+            id="Form_teleop_algaeHigh"
             isNumerical={true}
             prefill={edit.isEdit ? edit.data.performance.teleop.algaeHigh : undefined}
         />

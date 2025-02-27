@@ -159,11 +159,11 @@ const SimulationInformation = {
     /**
      * Runs BEFORE the match is decided and BEFORE the `postSimulationCalculations`, but AFTER
      * the performance objects for a match are generated.
-     * @param {*} color The alliance color
+     * @param {*} teams Array of Team objects
      * @param {*} performances An array of performance objects, agnostic to color
      * @param {*} gameStats The `gameStats` property of the `AllianceDetails` class
      */
-    preCompilationCalculations: (color, performances, gameStats) => {},
+    preCompilationCalculations: (teams, performances, gameStats) => {},
 
     /**
      * Given the performance object of a defender, removes game pieces from their score, assuming that their defense

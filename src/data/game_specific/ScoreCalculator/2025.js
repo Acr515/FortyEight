@@ -8,7 +8,7 @@ const ScoreCalculator = {
         getScore: data => {
             const auto = data.performance.auto;
             return (
-                (auto.coralL1 * 3) + (auto.coralL2 * 4) + (auto.coralL3 * 6) + (auto.coral4 * 7) +
+                (auto.coralL1 * 3) + (auto.coralL2 * 4) + (auto.coralL3 * 6) + (auto.coralL4 * 7) +
                 (auto.algaeLow * 6) + (auto.algaeHigh * 4) +
                 (auto.leave ? 3 : 0)
             );
@@ -26,12 +26,12 @@ const ScoreCalculator = {
         getScore: data => {
             const teleop = data.performance.teleop;
             return (
-                (teleop.coralL1 * 2) + (teleop.coralL2 * 3) + (teleop.coralL3 * 4) + (teleop.coral4 * 5) +
+                (teleop.coralL1 * 2) + (teleop.coralL2 * 3) + (teleop.coralL3 * 4) + (teleop.coralL4 * 5) +
                 (teleop.algaeLow * 6) + (teleop.algaeHigh * 4)
             );
         },
         getPieces: data => {
-            const teleop = data.performance.auto;
+            const teleop = data.performance.teleop;
             return (
                 teleop.coralL1 + teleop.coralL2 + teleop.coralL3 + teleop.coralL4 + teleop.algaeLow + teleop.algaeHigh
             );

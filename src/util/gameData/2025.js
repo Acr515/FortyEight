@@ -4,7 +4,16 @@
 const gameDataObject = {
     name: "REEFSCAPE",
     year: "2025",
-    league: "FRC"
+    league: "FRC",
+    config: {
+        bargeRPThreshold: 14,
+        coralRPThreshold: 5,
+        baseRPAmounts: {
+            win: 3,
+            tie: 1,
+            loss: 0
+        }
+    }
 }
 
 export default gameDataObject;
