@@ -11,7 +11,8 @@ const gameDataObject = {
         baseRPAmounts: {
             win: 3,
             tie: 1,
-            loss: 0
+            loss: 0,
+            max: 6
         }
     }
 }

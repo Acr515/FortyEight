@@ -67,5 +67,31 @@ export default function SimulatorRPGraphs_Universal({graphOptions, winner, loser
                 <p className="label">{graphOptions.loser2.label}</p>
             </div>
         </div>
+        { (typeof graphOptions.winner3 !== 'undefined' && typeof graphOptions.loser3 !== 'undefined') && <div className="doughnut-set">
+            <div className="single-doughnut-container">
+                <div className="small-doughnut">
+                    <Doughnut data={graphOptions.winner3.chartData} options={smallDoughnutOptions} style={{
+                        width: 86,
+                        height: 86
+                    }} />
+                    <span className="percentage" style={{color: winner.color}}>
+                        {graphOptions.winner3.value}%
+                    </span>
+                </div>
+                <p className="label">{graphOptions.winner3.label}</p>
+            </div>
+            <div className="single-doughnut-container">
+                <div className="small-doughnut">
+                    <Doughnut data={graphOptions.loser3.chartData} options={smallDoughnutOptions} style={{
+                        width: 86,
+                        height: 86
+                    }} />
+                    <span className="percentage" style={{color: loser.color}}>
+                        {graphOptions.loser3.value}%
+                    </span>
+                </div>
+                <p className="label">{graphOptions.loser3.label}</p>
+            </div>
+        </div> }
     </div>
 }

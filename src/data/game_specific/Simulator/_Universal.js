@@ -169,7 +169,7 @@ export default class Simulator {
         this.results.tieRate = ties / this.config.simulations;
         this.results.red.scoreRange.avg /= this.config.simulations;
         this.results.blue.scoreRange.avg /= this.config.simulations;
-        for (let i = 0; i <= 4; i ++) {
+        for (let i = 0; i < this.results.red.RPFreq.length; i ++) {
             this.results.red.RPFreq[i] = this.results.red.RPFreq[i] / this.config.simulations * 100;
             this.results.blue.RPFreq[i] = this.results.blue.RPFreq[i] / this.config.simulations * 100;
         }
@@ -363,5 +363,5 @@ const BaseAllianceSimulationResults = {
     winRate: 0,
     scoreRange: { min: 1000, max: -1000, avg: 0 },
     marginRange: { min: 1000, max: -1000, avg: 0 },
-    RPFreq: [0, 0, 0, 0, 0]
+    RPFreq: new Array(gameData.config.baseRPAmounts.max + 1).fill(0)
 };
