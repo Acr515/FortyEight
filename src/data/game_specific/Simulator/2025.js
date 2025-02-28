@@ -326,7 +326,7 @@ const SimulationInformation = {
          */
         const reassignCoral = (teamIndex, level) => {
             const otherLevels = [2, 1, 0].filter(val => val !== level);
-            const levelKeys = ['coralL4', 'coralL3', 'coralL2'];
+            const levelKeys = ['coralL2', 'coralL3', 'coralL4'];
             const p = performances[teamIndex];
             for (const checkingLevel of otherLevels) {
                 if (totalReefScored[checkingLevel] < 12 && canScoreAtLevel(teamIndex, checkingLevel + 2)) {
@@ -348,7 +348,7 @@ const SimulationInformation = {
                     // Need to reduce auton production because the row became full during auto (nice job)
                     for (let index = 0; index < 3; index ++) {
                         const p = performances[index];
-                        if (totalReefScored[coralIndex] > 12 && p.teleop[coralKey] > 0) {
+                        if (totalReefScored[coralIndex] > 12 && p.auto[coralKey] > 0) {
                             totalReefScored[coralIndex] --;
                             autoReefScored[coralIndex] --;
                             p.auto[coralKey] --;
