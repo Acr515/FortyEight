@@ -1,10 +1,10 @@
-import ScoreCalculator from "../ScoreCalculator/2024";
+import ScoreCalculator from "../ScoreCalculator/2025";
 
 // An object containing possible weighting factors and their front-facing names.
 export const Weights = {
     Autonomous: "Auto",
-    Speaker: "Speaker Scoring",
-    Amp: "Amp Scoring",
+    Coral: "Coral Scoring",
+    Algae: "Algae Scoring",
     Endgame: "Endgame",
     Defense: "Defense",
     Flags: "Flags",
@@ -15,31 +15,31 @@ export const Weights = {
  * for a team to be ranked "the best" in. Order by priority or importance
  */
 export const WeightSets = {
-    // Every year should have a `WellRounded` set, which uses a wholistic approach to analyze a team
+    // Every year must have a `WellRounded` set, which uses a wholistic approach to analyze a team
     WellRounded: {
         Autonomous: 2,
-        Speaker: 2.4,
-        Amp: 2.2,
+        Coral: 2.4,
+        Algae: 2.2,
         Endgame: 1.6,
         Defense: 1,
         Flags: 1
     },
-    // Composite score focuses on amp scoring ability
-    AmpScorer: {
+    // Composite score focuses on robot ability to support in areas besides coral
+    Supportive: {
         Autonomous: 1.25,
-        Speaker: 0,
-        Amp: 3,
-        Endgame: 0.25,
-        Defense: 0.25,
+        Coral: 0.75,
+        Algae: 2.5,
+        Endgame: 1.5,
+        Defense: 0.5,
         Flags: 1.75
     },
     // Composite score focuses on reliable defenders with good supporting traits
     Defensive: {
-        Autonomous: 1,
-        Speaker: 0.25,
-        Amp: 1.25,
+        Autonomous: 1.25,
+        Coral: 0.25,
+        Algae: 1,
         Endgame: 1.5,
-        Defense: 3,
+        Defense: 3.25,
         Flags: 2
     },
 };
@@ -49,7 +49,7 @@ export const WeightSets = {
  */
 export const WeightSetNames = {
     Defensive: "defensive",
-    AmpScorer: "amp-focused",
+    Supportive: "supportive",
     WellRounded: "well-rounded",
 }
 
@@ -69,11 +69,11 @@ export default function weighTeam(team, weights) {
         // Score the team's auto performance
         score.Autonomous += ScoreCalculator.Auto.getScore(match);
 
-        // Score the team's amp scoring performance
-        score.Amp += match.performance.auto.amp + match.performance.teleop.amp;
+        // Score the team's coral scoring performance
+        score.Coral += ScoreCalculator.Auto.getCoral(match) + ScoreCalculator.Teleop.getCoral(match);
 
         // Score the team's speaker scoring performance
-        score.Speaker += match.performance.auto.speaker + match.performance.teleop.speaker;
+        score.Algae += ScoreCalculator.Auto.getAlgae(match) + match.performance.teleop.algaeLow * 0.5 + match.performance.teleop.algaeHigh;
     
         // Score the team's endgame
         score.Endgame += ScoreCalculator.Endgame.getScore(match);
@@ -81,8 +81,9 @@ export default function weighTeam(team, weights) {
         // Compile a team's defensive tendencies and how good they were
         if (match.performance.defense.played) {
             score.Defense.instances ++;
-            if (match.performance.defense.rating == "Strong") score.Defense.compositeStrength ++;
-            if (match.performance.defense.rating == "OK") score.Defense.compositeStrength += 0.5;
+            if (match.performance.defense.rating == "Strong") score.Defense.compositeStrength += 1.1;
+            if (match.performance.defense.rating == "OK") score.Defense.compositeStrength += 0.6;
+            if (match.performance.defense.rating == "Poor") score.Defense.compositeStrength += 0.2;
         }
 
         // Compile a team's negative flags (penalties, break-downs)

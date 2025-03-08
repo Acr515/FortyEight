@@ -137,7 +137,7 @@ export const GameDataInputs = {
             prefill={edit.isEdit ? edit.data.performance.notes.misses : undefined}
         />
         <Input
-            label="This team picked notes up off the floor"
+            label="This team picked coral up off the floor"
             id="Form_notes_floorPickup"
             isCheckbox={true}
             prefill={edit.isEdit ? edit.data.performance.notes.floorPickup : undefined}

@@ -3,12 +3,15 @@ import { EndgameResult } from "data/game_specific/performanceObject/2025";
 import ScoreCalculator from "data/game_specific/ScoreCalculator/2025";
 import XImage from 'assets/images/x.png';
 import './style.scss';
+import './2025.scss';
 
 // Displays a breakdown of all given data in form
 export default function ViewIndividualData({data}) {
     const p = data.performance;
     const autoCoral = [p.auto.coralL1, p.auto.coralL2, p.auto.coralL3, p.auto.coralL4];
+    const didScoreAutoCoral = ScoreCalculator.Auto.getCoral(data) > 0;
     const teleopCoral = [p.teleop.coralL1, p.teleop.coralL2, p.teleop.coralL3, p.teleop.coralL4];
+    const didScoreTeleopCoral = ScoreCalculator.Teleop.getCoral(data) > 0;
 
     return (
         <div className="_ViewIndividualData">
@@ -26,7 +29,15 @@ export default function ViewIndividualData({data}) {
                         <div className="cell-label">Algae</div>
                     </div>
                     <div className="content-cell">
-                        <div className="cell-data">{ScoreCalculator.Auto.getCoral(data)}</div>
+                        <div className="cell-data">{(!didScoreAutoCoral ? <span>0</span> : (
+                            autoCoral.map((value, index) => {
+                                if (value <= 0) { return null; }
+                                return <>
+                                    <span className="cell-sub-data">{value}</span>
+                                    <span className="cell-sub-label">L{index + 1}</span>
+                                </>;
+                            })
+                        ))}</div>
                         <div className="cell-label">Coral</div>
                     </div>
                 </div>
@@ -41,7 +52,17 @@ export default function ViewIndividualData({data}) {
                         <div className="cell-label">Algae</div>
                     </div>
                     <div className="content-cell">
-                        <div className="cell-data">{ScoreCalculator.Teleop.getCoral(data)}</div>
+                        <div className="cell-data">
+                        <div className="cell-data">{(!didScoreTeleopCoral ? <span>0</span> : (
+                            teleopCoral.map((value, index) => {
+                                if (value <= 0) { return null; }
+                                return <>
+                                    <span className="cell-sub-data">{value}</span>
+                                    <span className="cell-sub-label">L{index + 1}</span>
+                                </>;
+                            })
+                        ))}</div>
+                        </div>
                         <div className="cell-label">Coral</div>
                     </div>
                 </div>
@@ -55,7 +76,7 @@ export default function ViewIndividualData({data}) {
                         <div className="cell-data">{p.endgame.state}</div>
                         <div className="cell-label">Result</div>
                     </div>
-                    { (p.endgame.state == EndgameResult.NONE || p.endgame.state == EndgameResult.PARKED) && (
+                    { (p.endgame.state == EndgameResult.NONE || p.endgame.state == EndgameResult.PARK) && (
                         <div className="content-cell">
                             <div className="cell-data">{p.endgame.failedAttempt ? "Yes" : "No"}</div>
                             <div className="cell-label">Climb attempted</div>

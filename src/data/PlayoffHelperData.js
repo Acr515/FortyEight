@@ -456,6 +456,7 @@ const PlayoffHelperFunctions = {
         categories.forEach(category => {
             bestTeams[category] = null;
             picklist.forEach(team => {
+                console.log(team)
                 if (bestTeams[category] == null || team.powerScores[category].Composite > bestTeams[category].powerScores[category].Composite) {
                     // Make sure every team only gets one tag
                     let teamExists = false;
@@ -765,6 +766,9 @@ export class PlayoffTeam {
                 
                 this.powerScores.Defensive = WeightSets.Defensive;
                 this.powerScores.Defensive.Composite = 10;
+
+                this.powerScores.Supportive = WeightSets.Supportive;
+                this.powerScores.Supportive.Composite = 10;
 
                 this.bestCompositeScore = 10;
 

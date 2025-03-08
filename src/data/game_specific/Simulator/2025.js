@@ -400,15 +400,30 @@ const SimulationInformation = {
         pieces = Math.ceil(pieces / 3);
 
         while (pieces > 0) {
-            if (performance.teleop.amp > 0) {
-                performance.teleop.amp --;
+            if (performance.teleop.algaeHigh > 0) {
+                performance.teleop.algaeHigh --;
                 pieces --;
             }
-            if (pieces > 0 && performance.teleop.speaker > 0) {
-                performance.teleop.speaker --;
+            if (pieces > 0 && performance.teleop.algaeLow > 0) {
+                performance.teleop.algaeLow --;
                 pieces --;
             }
-            if (performance.teleop.amp + performance.teleop.speaker <= 0) pieces = 0;
+            if (pieces > 0 && performance.teleop.coralL4 > 0) {
+                performance.teleop.coralL4 --;
+                pieces --;
+            }
+            if (pieces > 0 && performance.teleop.coralL3 > 0) {
+                performance.teleop.coralL3 --;
+                pieces --;
+            }
+            if (pieces > 0 && performance.teleop.coralL2 > 0) {
+                performance.teleop.coralL2 --;
+                pieces --;
+            }
+            if (pieces > 0 && performance.teleop.coralL1 > 0) {
+                performance.teleop.coralL1 --;
+                pieces --;
+            }
         }
     },
 
@@ -431,15 +446,28 @@ const SimulationInformation = {
 
         // Reduce points
         while (pieces > 0) {
-            if (performanceTarget.teleop.amp > 0) {
-                performanceTarget.teleop.amp --;
-                pieces --;
+            const piece = Math.round(rng() * 5);
+            switch (piece) {
+                case Pieces.AlgaeLow:
+                    performanceTarget.teleop.algaeLow --;
+                    break;
+                case Pieces.AlgaeHigh:
+                    performanceTarget.teleop.algaeHigh --;
+                    break;
+                case Pieces.CoralL1:
+                    performanceTarget.teleop.coralL1 --;
+                    break;
+                case Pieces.CoralL2:
+                    performanceTarget.teleop.coralL2 --;
+                    break;
+                case Pieces.CoralL3:
+                    performanceTarget.teleop.coralL3 --;
+                    break;
+                case Pieces.CoralL4:
+                    performanceTarget.teleop.coralL4 --;
+                    break;
             }
-            if (pieces > 0 && performanceTarget.teleop.speaker > 0) {
-                performanceTarget.teleop.speaker --;
-                pieces --;
-            }
-            if (performanceTarget.teleop.amp + performanceTarget.teleop.speaker <= 0) pieces = 0;
+            pieces --;
         }
     },
 
