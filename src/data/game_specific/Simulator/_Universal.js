@@ -3,6 +3,7 @@ import TeamData from "data/TeamData";
 import { getTeamData } from "data/SearchData";
 import ScoreCalculator from "data/game_specific/ScoreCalculator/GAME_YEAR";
 import SimulationInformation from './GAME_YEAR';
+import gameData from 'util/gameData/GAME_YEAR';
 
 /**
  * Simulates an FRC match with any 3 v 3 teams.
@@ -90,7 +91,7 @@ export default class Simulator {
          * @param {function} method A function to use as a source for data, such as via the ScoreCalculator, instead of key-subkey pairs. -1 when not provided
          * @returns A object with keys for min, max, avg, and lowFreq
          */
-        const getRange = (team, key, subkey, method = -1) => SimulationInformation.getRange(team, key, subkey, method);
+        const getRange = (team, key, subkey, method = null) => SimulationInformation.getRange(team, key, subkey, method);
 
         /**
          * Gets all the match information for a team's contribution. Accounts for breakdowns, penalties, etc. Also calculates
@@ -119,7 +120,7 @@ export default class Simulator {
                 getTeamContribution(this.blueTeams[1], true, this.config.biasMethod),
                 getTeamContribution(this.blueTeams[2], true, this.config.biasMethod),
             ];
-            let matchDetails = new MatchDetails(redPerformances, bluePerformances, this.config.applyDefense, rng);
+            let matchDetails = new MatchDetails(redPerformances, bluePerformances, this.redTeams, this.blueTeams, this.config.applyDefense, rng);
             if (matchDetails.winner == "Red") redWins ++;
             else if (matchDetails.winner == "Blue") blueWins ++;
             else ties ++;
@@ -168,7 +169,7 @@ export default class Simulator {
         this.results.tieRate = ties / this.config.simulations;
         this.results.red.scoreRange.avg /= this.config.simulations;
         this.results.blue.scoreRange.avg /= this.config.simulations;
-        for (let i = 0; i <= 4; i ++) {
+        for (let i = 0; i < this.results.red.RPFreq.length; i ++) {
             this.results.red.RPFreq[i] = this.results.red.RPFreq[i] / this.config.simulations * 100;
             this.results.blue.RPFreq[i] = this.results.blue.RPFreq[i] / this.config.simulations * 100;
         }
@@ -186,6 +187,8 @@ export default class Simulator {
                 getTeamContribution(this.blueTeams[1], false),
                 getTeamContribution(this.blueTeams[2], false),
             ], 
+            this.redTeams,
+            this.blueTeams,
             this.config.applyDefense,
             rng
         );
@@ -203,7 +206,16 @@ class MatchDetails {
     blue = {};
     winner;
 
-    constructor(redPerformances, bluePerformances, useDefense, rng) {
+    /**
+     * Creates a MatchDetails object, running post-match analysis during creation.
+     * @param {performanceObject[]} redPerformances Array of filled-out performance objects for the red alliance
+     * @param {performanceObject[]} bluePerformances Array of filled-out performance objects for the blue alliance
+     * @param {Team[]} redTeams Array of Team objects for the red alliance
+     * @param {Team[]} blueTeams Array of Team objects for the blue alliance
+     * @param {boolean} useDefense If true, simulates defense by picking robots from each alliance to target
+     * @param {function} rng The function which produces seeded random numbers
+     */
+    constructor(redPerformances, bluePerformances, redTeams, blueTeams, useDefense, rng) {
         this.red = new AllianceDetails(redPerformances, "Red", useDefense);
         this.blue = new AllianceDetails(bluePerformances, "Blue", useDefense);
 
@@ -246,20 +258,20 @@ class MatchDetails {
         }
 
         // Calculate final scores and RP totals
-        SimulationInformation.preCompilationCalculations("Red", this.red.teamPerformances, this.red.gameStats, rng);
-        SimulationInformation.preCompilationCalculations("Blue", this.blue.teamPerformances, this.blue.gameStats, rng);
-        this.red.getScores();
-        this.blue.getScores();
+        SimulationInformation.preCompilationCalculations(redTeams, this.red.teamPerformances, this.red.gameStats, rng);
+        SimulationInformation.preCompilationCalculations(blueTeams, this.blue.teamPerformances, this.blue.gameStats, rng);
+        this.red.getScores(this.blue);
+        this.blue.getScores(this.red);
         this.red.getRPs();
         this.blue.getRPs();
         if (typeof SimulationInformation.runRPAdjustments !== 'undefined') SimulationInformation.runRPAdjustments(this.red, this.blue); // implement this function if alliance RPs have ANY cross-dependency
         
         this.winner = this.getWinner();
-        if (this.winner == "Red") this.red.matchRP = 2;
-        else if (this.winner == "Blue") this.blue.matchRP = 2;
+        if (this.winner == "Red") this.red.matchRP = gameData.config.baseRPAmounts.win;
+        else if (this.winner == "Blue") this.blue.matchRP = gameData.config.baseRPAmounts.win;
         else {
-            this.red.matchRP = 1;
-            this.blue.matchRP = 1;
+            this.red.matchRP = gameData.config.baseRPAmounts.tie;
+            this.blue.matchRP = gameData.config.baseRPAmounts.tie;
         }
     }
 
@@ -324,13 +336,18 @@ class AllianceDetails {
         }
     }
 
-    getScores() {
+    /**
+     * Calculates and caches this alliance's score
+     * @param {*} opposingAlliance The opposing AllianceDetails object. It's passed here so that the
+     * simulation results aren't forced to cache the info
+     */
+    getScores(opposingAlliance) {
         this.teamPerformances.forEach(team => {
             this.autoScore += ScoreCalculator.Auto.getScore({ performance: team });
             this.teleopScore += ScoreCalculator.Teleop.getScore({ performance: team });
             this.endgameScore += ScoreCalculator.Endgame.getScore({ performance: team });
         });
-        if (typeof SimulationInformation.adjustScoring !== 'undefined') SimulationInformation.adjustScoring(this);  // apply predicted score boosting specific to game
+        if (typeof SimulationInformation.adjustScoring !== 'undefined') SimulationInformation.adjustScoring(this, opposingAlliance);  // apply predicted score boosting specific to game
         this.score = this.autoScore + this.teleopScore + this.endgameScore;
     }
 
@@ -346,5 +363,5 @@ const BaseAllianceSimulationResults = {
     winRate: 0,
     scoreRange: { min: 1000, max: -1000, avg: 0 },
     marginRange: { min: 1000, max: -1000, avg: 0 },
-    RPFreq: [0, 0, 0, 0, 0]
+    RPFreq: new Array(gameData.config.baseRPAmounts.max + 1).fill(0)
 };

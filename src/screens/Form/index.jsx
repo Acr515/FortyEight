@@ -12,8 +12,8 @@ import { findMatchDataByID, getTeamData, teamExists } from 'data/SearchData';
 import { saveData } from 'data/saveLoadData';
 import performanceObject, { SpecialFields } from 'data/game_specific/performanceObject/GAME_YEAR';
 import FeedbackModalContext from 'context/FeedbackModalContext';
+import Events from 'data/game_specific/eventCodes/GAME_YEAR';
 import './style.scss';
-import Events from 'data/game_specific/eventCodes/2024';
 
 
 export default function Form() {

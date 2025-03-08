@@ -10,6 +10,7 @@ import SimulatorInsightRowSet from "components/game_specific/SimulatorInsightRow
 import SimulatorMatchViewer from "components/game_specific/SimulatorMatchViewer/GAME_YEAR";
 import getTeamName from "data/getTeamName";
 import addLeadingZero from "util/addLeadingZero";
+import gameData from "util/gameData/GAME_YEAR";
 import "./style.scss";
 
 
@@ -74,7 +75,7 @@ export default function SimulatorViewer() {
 
     // Bar chart
     var rpData = {
-        labels: ["4RP", "3RP", "2RP", "1RP", "0RP"],
+        labels: new Array(gameData.config.baseRPAmounts.max + 1).fill('').map((_, ind) => {return `${gameData.config.baseRPAmounts.max - ind}RP`}),
         datasets: [
             {
                 label: winner.colorString,

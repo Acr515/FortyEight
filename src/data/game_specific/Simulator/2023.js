@@ -292,12 +292,12 @@ const SimulationInformation = {
     /**
      * Runs BEFORE the match is decided and BEFORE the `postSimulationCalculations`, but AFTER
      * the performance objects for a match are generated.
-     * @param {*} color The alliance color
+     * @param {*} teams Array of Team objects
      * @param {*} performances An array of performance objects, agnostic to color
      * @param {*} gameStats The `gameStats` property of the `AllianceDetails` class
      * @param {*} rng The seeded random generator
      */
-    preCompilationCalculations: (color, performances, gameStats, rng) => {
+    preCompilationCalculations: (teams, performances, gameStats, rng) => {
         // Calculate if scoring locations are depleted AND number of possible links
         let links = 0, midCubes = 0, midCones = 0, highCubes = 0, highCones = 0, totalLowPieces = 0;
         performances.forEach(p => {

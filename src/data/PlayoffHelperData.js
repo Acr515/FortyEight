@@ -456,6 +456,7 @@ const PlayoffHelperFunctions = {
         categories.forEach(category => {
             bestTeams[category] = null;
             picklist.forEach(team => {
+                console.log(team)
                 if (bestTeams[category] == null || team.powerScores[category].Composite > bestTeams[category].powerScores[category].Composite) {
                     // Make sure every team only gets one tag
                     let teamExists = false;
@@ -637,10 +638,10 @@ const PlayoffHelperFunctions = {
         ];
         for (let match of matches[1]) { await match.runSim(); }
 
-        // Round 3: W5 vs W6, L7 vs L8
+        // Round 3: W6 vs L7, W5 vs L8
         matches[2] = [
-            new PlayoffMatch( 9, matches[1][0].winningSeed, matches[1][1].winningSeed ), // Match 9 (Lower)
-            new PlayoffMatch( 10, matches[1][2].losingSeed, matches[1][3].losingSeed ), // Match 10 (Lower)
+            new PlayoffMatch( 9, matches[1][2].losingSeed, matches[1][1].winningSeed ), // Match 9 (Lower)
+            new PlayoffMatch( 10, matches[1][3].losingSeed, matches[1][0].winningSeed ), // Match 10 (Lower)
         ];
         for (let match of matches[2]) { await match.runSim(); }
 
@@ -765,6 +766,9 @@ export class PlayoffTeam {
                 
                 this.powerScores.Defensive = WeightSets.Defensive;
                 this.powerScores.Defensive.Composite = 10;
+
+                this.powerScores.Supportive = WeightSets.Supportive;
+                this.powerScores.Supportive.Composite = 10;
 
                 this.bestCompositeScore = 10;
 

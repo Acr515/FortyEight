@@ -247,12 +247,12 @@ const SimulationInformation = {
     /**
      * Runs BEFORE the match is decided and BEFORE the `postSimulationCalculations`, but AFTER
      * the performance objects for a match are generated.
-     * @param {*} color The alliance color (unused)
+     * @param {*} teams Array of Team objects
      * @param {*} performances An array of performance objects, agnostic to color
      * @param {*} gameStats The `gameStats` property of the `AllianceDetails` class
      * @param {*} rng The seeded random generator
      */
-    preCompilationCalculations: (color, performances, gameStats, rng) => {
+    preCompilationCalculations: (teams, performances, gameStats, rng) => {
         // Resolve harmonization
         let harmonizedTeams = 0, harmonyIndex = -1;
         performances.forEach((p, ind) => {
@@ -310,8 +310,9 @@ const SimulationInformation = {
      * all other adjustments are accounted for, but BEFORE a winner is determined.
      * Created for the purpose of boosting scores (for example, power ups), executed inside the `getScores` method of `AllianceDetails`.
      * @param {AllianceDetails} allianceDetails The `AllianceDetails` object
+     * @param {AllianceDetails} opposingAllianceDetails The other alliance's `AllianceDetails` object
      */
-    adjustScoring: (allianceDetails) => {
+    adjustScoring: (allianceDetails, opposingAllianceDetails) => {
         allianceDetails.teleopScore += allianceDetails.gameStats.amplifiedNotes * 3;    // bonus for amplified notes is +3 on top of the 2 points received already
     },
 
