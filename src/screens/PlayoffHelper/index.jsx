@@ -21,6 +21,7 @@ import { Method, sortTeams } from "util/sortData";
 import CheckImage from "assets/images/check.png";
 import XImage from 'assets/images/x.png';
 import DotsImage from 'assets/images/three-dots.png';
+import { Weights } from "data/game_specific/weighTeam/GAME_YEAR";
 import "./style.scss";
 
 const SUBPAGE = {
@@ -488,15 +489,74 @@ function LiveDraft({ subpageState }) {
 // Shows the draft board
 function DraftBoard() {
     const playoffHelper = useContext(PlayoffHelperContext);
-    const [sortMethod, setSortMethod] = useState(0);
+    const [sortMethod, setSortMethod] = useState('bestCompositeScore');
 
-    const updateSort = method => {
+    const mapFunction = (team, index) => {
+        if (team.captain || team.selected || team.declined) { return; }
+        return (
+            <div className='team-row' key={team.teamNumber}>
+                <div className='team-ranking'>{getOrdinalSuffix(index + 1)}</div>
+                <div className='team-number'>{(Math.round(team.teamNumber * 100)) / 100}</div>
+                <div className='score'>{(Math.round(team.bestCompositeScore * 100)) / 100}</div>
+                { Object.keys(Weights).map((weight) => {
+                    console.log(weight);
+                    return (
+                        <div
+                            className={`score`}
+                            key={weight}
+                        >
+                            { Math.round(team.powerScores.WellRounded[weight] * 100) / 100 }
+                        </div>
+                    );
+                }) }
+            </div>
+        );
+    };
 
+    const sortFunction = (teamA, teamB) => {
+        switch (sortMethod) {
+            case 'bestCompositeScore':
+                return teamB.bestCompositeScore - teamA.bestCompositeScore;
+            case 'cycleRate':
+                return teamB.cycleRate - teamA.cycleRate;
+            default:
+                return teamB.powerScores.WellRounded[sortMethod] - teamA.powerScores.WellRounded[sortMethod];
+        }
     };
 
     return (
         <div className="_DraftBoard">
-            <div className="under-construction">This feature is under construction.</div>
+            <div className="attributes">
+                <div className="attribute">Sort Rank</div>
+                <div className="attribute">Team #</div>
+                <div
+                    className={`sortable-attribute${sortMethod === 'bestCompositeScore' ? ' sorted' : ''}`}
+                    onClick={() => setSortMethod('bestCompositeScore')}
+                >
+                    Composite
+                </div>
+                <div
+                    className={`sortable-attribute${sortMethod === 'cycleRate' ? ' sorted' : ''}`}
+                    onClick={() => setSortMethod('cycleRate')}
+                >
+                    Cycles
+                </div>
+                { Object.keys(Weights).map((weight) => {
+                    console.log(weight);
+                    return (
+                        <div
+                            className={`sortable-attribute${sortMethod === weight ? ' sorted' : ''}`}
+                            onClick={() => setSortMethod(weight)}
+                            key={weight}
+                        >
+                            { Weights[weight] }
+                        </div>
+                    );
+                }) }
+            </div>
+            <div className="team-chart">
+                { playoffHelper.data.teams.sort(sortFunction).map(mapFunction) }
+            </div>
         </div>
     )
 }
