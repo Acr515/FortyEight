@@ -55,6 +55,37 @@
         }
     }
 
+    // Slider based rules
+    &.slider {
+        margin-top: 36px;
+        // Geez I did not design these components very well...!
+        margin-bottom: 36px !important;
+        .input-area {
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .text-input-wrapper {
+            max-width: 200px;
+            position: relative;
+            
+            &[data-suffix=percent]::after {
+                content: '%';
+                position: absolute;
+                top: 4px;
+                right: 0;
+                font-family: 'usual';
+                font-weight: 800;
+                opacity: 0.5;
+            }
+        }
+
+        .input[type=range] {
+            order: 0;
+            max-width: 200px;
+        }
+    }
+
     &.flood-label {
         label {
             flex-grow: 1;

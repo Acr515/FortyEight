@@ -1,7 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import Chevron from '../../assets/images/chevron.png';
-import './style.scss';
 import Spinner from 'components/Spinner';
+import './style.scss';
+
+/**
+ * @typedef {Object} SliderConfig
+ * @property {number} min
+ * @property {number} max
+ * @property {number} stops
+ * @property {string} suffix A keyword to describe the value being measured. Only supports 'percent' right now.
+ */
 
 /**
  * Creates an input box.
@@ -11,6 +18,7 @@ import Spinner from 'components/Spinner';
  * @param onInput A function that runs alongside the input's normal input event. The `e` variable is automatically used as a parameter, so keep this in mind
  * @param isCheckbox Whether to make the input a checkbox or not
  * @param isNumerical Whether to add arrows that count up/down or not
+ * @param {SliderConfig} slider Configuration object for slider inputs. 
  * @param {array} bounds If isNumerical is true, the first entry should be the lower boundary and the second entry should be the upper boundary
  * @param optionList Omit if not using an option list. Should be an array of objects containing "label" and "value" keys
  * @param marginBottom Defaults to 18. Pixel margin to add to bottom of container element
@@ -25,9 +33,9 @@ import Spinner from 'components/Spinner';
  * @param getExternalUpdate This function should return a value that will be used to set the value state of this input component
  * @param floodLabel Optional. When true, floods the available space with the label instead of the normal 50/50 width split
  */
-export default function Input({ label, prefill, id, onInput, isCheckbox, isNumerical = false, bounds = null, optionList, marginBottom, alignLabel = "middle", textArea = false, required = false, disabled = false, warning = false, style = {}, labelStyle = {}, externalUpdate = null, getExternalUpdate = null, floodLabel = false }) {
-    
-    optionList = typeof optionList !== "undefined" ? optionList : false;
+export default function Input({ label, prefill, id, onInput, isCheckbox, isNumerical = false, bounds = null, optionList = false, marginBottom, slider = false, alignLabel = "middle", textArea = false, required = false, disabled = false, warning = false, style = {}, labelStyle = {}, externalUpdate = null, getExternalUpdate = null, floodLabel = false }) {
+    /** @type {SliderConfig} */
+    const sliderConfig = slider;
 
     const [value, setValue] = useState(
         typeof prefill !== "undefined" ? prefill :
@@ -59,18 +67,41 @@ export default function Input({ label, prefill, id, onInput, isCheckbox, isNumer
     }, [externalUpdate])
     
     return (
-        <div className={`_Input ${floodLabel ? "flood-label" : ""}`} style={{ ...style, marginBottom: marginBottom || 18 }}>
+        <div className={`_Input${floodLabel ? " flood-label" : ""}${sliderConfig ? " slider" : ""}`} style={{ ...style, marginBottom: marginBottom || 18 }}>
             { typeof label !== 'undefined' && (
                 <label 
                     htmlFor={id}
-                    style={{ marginTop: alignLabel == "top" || alignLabel == "middle" ? "auto" : 0 , marginBottom: alignLabel == "bottom" || alignLabel == "middle" ? "auto" : 0, ...labelStyle }}
+                    style={{ marginTop: alignLabel == "bottom" || alignLabel == "middle" ? "auto" : 0 , marginBottom: alignLabel == "top" || alignLabel == "middle" ? "auto" : 0, ...labelStyle }}
                 >
                     {label}
                 </label>
             )}
-            <div className="input-area">
-                { !optionList ? (
-                    <input 
+            <div className='input-area'>
+                { !optionList ? <>
+                    { sliderConfig ? <>
+                        <input
+                            className="input"
+                            name={id}
+                            type='range'
+                            value={value}
+                            onInput={inputUpdated}
+                            disabled={disabled}
+                            min={sliderConfig.min}
+                            max={sliderConfig.max}
+                            step={(sliderConfig.max - sliderConfig.min) / sliderConfig.stops}
+                        />
+                        <div className="text-input-wrapper" data-suffix={sliderConfig.suffix ?? ''}>
+                            <input 
+                                className={"input text-box numerical required" + (warning ? " warning" : "")}
+                                id={id} 
+                                name={id}
+                                value={value}
+                                onInput={inputUpdated}
+                                required={required}
+                                disabled={disabled}
+                            />
+                        </div>
+                    </> : <input 
                         className={"input text-box" + (
                             (required ? " required" : "") +
                             (isNumerical ? " numerical" : "") +
@@ -85,8 +116,8 @@ export default function Input({ label, prefill, id, onInput, isCheckbox, isNumer
                         onInput={inputUpdated}
                         required={required}
                         disabled={disabled}
-                    />
-                ) : (
+                    /> }
+                </> : (
                     <select
                         className={"input text-box dropdown-box" + (required ? " required" : "")}
                         id={id}
