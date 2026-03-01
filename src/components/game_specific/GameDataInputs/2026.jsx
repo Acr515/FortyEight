@@ -23,7 +23,7 @@ export const GameDataInputs = {
             label="Cycles"
             id="Form_auto_cycles"
             isNumerical={true}
-            prefill={edit.isEdit ? edit.data.performance.auto.algaeLow : undefined}
+            prefill={edit.isEdit ? edit.data.performance.auto.cycles : undefined}
         />
         <Input
             label="Average fuel shot per cycle"
@@ -34,7 +34,7 @@ export const GameDataInputs = {
                 stops: 8,
             }}
             alignLabel='top'
-            prefill={edit.isEdit ? edit.data.performance.auto.algaeLow : 0}
+            prefill={edit.isEdit ? edit.data.performance.auto.fuel : 0}
         />
         <Input
             label="Average % accuracy per cycle"
@@ -46,7 +46,7 @@ export const GameDataInputs = {
                 suffix: 'percent',
             }}
             alignLabel='top'
-            prefill={edit.isEdit ? edit.data.performance.auto.algaeLow : 50}
+            prefill={edit.isEdit ? edit.data.performance.auto.accuracy : 50}
         />
         <Input
             label="Climbed to level 1?"
@@ -60,7 +60,7 @@ export const GameDataInputs = {
             label="Cycles"
             id="Form_teleop_cycles"
             isNumerical={true}
-            prefill={edit.isEdit ? edit.data.performance.auto.algaeLow : undefined}
+            prefill={edit.isEdit ? edit.data.performance.teleop.cycles : undefined}
         />
         <Input
             label="Average fuel shot per cycle"
@@ -71,7 +71,7 @@ export const GameDataInputs = {
                 stops: 8,
             }}
             alignLabel='top'
-            prefill={edit.isEdit ? edit.data.performance.auto.algaeLow : 0}
+            prefill={edit.isEdit ? edit.data.performance.teleop.fuel : 0}
         />
         <Input
             label="Average % accuracy per cycle"
@@ -83,11 +83,11 @@ export const GameDataInputs = {
                 suffix: 'percent',
             }}
             alignLabel='top'
-            prefill={edit.isEdit ? edit.data.performance.auto.algaeLow : 50}
+            prefill={edit.isEdit ? edit.data.performance.teleop.accuracy : 50}
         />
     </>,
     EndgameSection: ({edit}) => {
-        const [endgameState, setEndgameState] = useState(edit.isEdit ? (edit.data.performance.endgame.state == EndgameResult.HARMONIZED ? EndgameResult.ONSTAGE : edit.data.performance.endgame.state) : undefined);
+        const [endgameState, setEndgameState] = useState(edit.isEdit ? edit.data.performance.endgame.state : undefined);
 
         return <>
             <Input
@@ -112,5 +112,5 @@ export const GameDataInputs = {
         </>
     },
     NotesSection: () => null,
-    defenseFields: false,
+    defenseFields: true,
 };

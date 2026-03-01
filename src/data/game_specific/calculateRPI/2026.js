@@ -32,11 +32,11 @@ export function calculateSingleRPI(data, round) {
  * @returns A string containing the rating
  */
 export function getRPIRating(rpi) {
-    if (rpi <= 9) return "Very Poor";
-    else if (rpi <= 18) return "Poor";
-    else if (rpi <= 30) return "Average";
-    else if (rpi <= 44) return "Good";
-    else if (rpi <= 68) return "Very Good";
-    else if (rpi <= 90) return "Excellent";
+    if (rpi <= 16) return "Very Poor";
+    else if (rpi <= 30) return "Poor";
+    else if (rpi <= 68) return "Average";
+    else if (rpi <= 96) return "Good";
+    else if (rpi <= 122) return "Very Good";
+    else if (rpi <= 160) return "Excellent";
     else return "Godly";
 }

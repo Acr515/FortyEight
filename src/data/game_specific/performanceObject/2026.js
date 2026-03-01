@@ -13,7 +13,8 @@ export default function performanceObject() {
             cycles: 0,
             fuel: 0,
             accuracy: 0,
-            state: EndgameResult.NONE,
+            /** Boolean shorthand for LEVEL_1 */
+            state: false,
         },
         teleop: {
             cycles: 0,

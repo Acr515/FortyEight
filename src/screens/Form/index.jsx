@@ -85,7 +85,7 @@ export default function Form() {
 
         // Now assign data to form.performance, based on the year
         let performance = performanceObject();
-        const formElements = document.querySelectorAll(".SCREEN._Form .input");
+        const formElements = document.querySelectorAll(".SCREEN._Form .input:not(.ignore)");
 
         for (const elm of formElements) {
             if (typeof GameDataInputs.override !== 'undefined' && (GameDataInputs.override.keys.includes(elm.id)))

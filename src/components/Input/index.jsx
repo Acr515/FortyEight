@@ -80,7 +80,7 @@ export default function Input({ label, prefill, id, onInput, isCheckbox, isNumer
                 { !optionList ? <>
                     { sliderConfig ? <>
                         <input
-                            className="input"
+                            className="input ignore"
                             name={id}
                             type='range'
                             value={value}

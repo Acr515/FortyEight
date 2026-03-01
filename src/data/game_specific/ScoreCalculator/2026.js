@@ -8,15 +8,15 @@ const ScoreCalculator = {
         getScore: data => {
             const auto = data.performance.auto;
             return (
-                auto.cycles * auto.fuel * auto.accuracy +
-                (auto.state === EndgameResult.LEVEL_1 ? 15 : 0)
+                auto.cycles * auto.fuel * auto.accuracy * 0.01 +
+                (auto.state ? 15 : 0)
             );
         },
-        getPieces: data => data.performance.auto.cycles * data.performance.auto.fuel * data.performance.auto.accuracy,
+        getPieces: data => data.performance.auto.cycles * data.performance.auto.fuel * data.performance.auto.accuracy * 0.01,
     },
     Teleop: {
-        getScore: data => data.performance.teleop.cycles * data.performance.teleop.fuel * data.performance.teleop.accuracy,
-        getPieces: data => data.performance.teleop.cycles * data.performance.teleop.fuel * data.performance.teleop.accuracy,
+        getScore: data => data.performance.teleop.cycles * data.performance.teleop.fuel * data.performance.teleop.accuracy * 0.01,
+        getPieces: data => data.performance.teleop.cycles * data.performance.teleop.fuel * data.performance.teleop.accuracy * 0.01,
     },
     Endgame: {
         // Given a performance object, gets the score
