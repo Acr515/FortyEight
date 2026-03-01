@@ -15,6 +15,7 @@ import './style.scss';
  * @param label The label to display next to the text box. If a label is not given, then the label element is not rendered.
  * @param prefill What text/value to prefill the text box with  
  * @param id The ID assigned to the input element, as well as the `for` attribute of the label
+ * @param className Optional class to add to root element.
  * @param onInput A function that runs alongside the input's normal input event. The `e` variable is automatically used as a parameter, so keep this in mind
  * @param isCheckbox Whether to make the input a checkbox or not
  * @param isNumerical Whether to add arrows that count up/down or not
@@ -33,7 +34,7 @@ import './style.scss';
  * @param getExternalUpdate This function should return a value that will be used to set the value state of this input component
  * @param floodLabel Optional. When true, floods the available space with the label instead of the normal 50/50 width split
  */
-export default function Input({ label, prefill, id, onInput, isCheckbox, isNumerical = false, bounds = null, optionList = false, marginBottom, slider = false, alignLabel = "middle", textArea = false, required = false, disabled = false, warning = false, style = {}, labelStyle = {}, externalUpdate = null, getExternalUpdate = null, floodLabel = false }) {
+export default function Input({ label, prefill, id, className = '', onInput, isCheckbox, isNumerical = false, bounds = null, optionList = false, marginBottom, slider = false, alignLabel = "middle", textArea = false, required = false, disabled = false, warning = false, style = {}, labelStyle = {}, externalUpdate = null, getExternalUpdate = null, floodLabel = false }) {
     /** @type {SliderConfig} */
     const sliderConfig = slider;
 
@@ -67,7 +68,7 @@ export default function Input({ label, prefill, id, onInput, isCheckbox, isNumer
     }, [externalUpdate])
     
     return (
-        <div className={`_Input${floodLabel ? " flood-label" : ""}${sliderConfig ? " slider" : ""}`} style={{ ...style, marginBottom: marginBottom || 18 }}>
+        <div className={`_Input${floodLabel ? " flood-label" : ""}${sliderConfig ? " slider" : ""} ${className}`} style={{ ...style, marginBottom: marginBottom || 18 }}>
             { typeof label !== 'undefined' && (
                 <label 
                     htmlFor={id}
@@ -81,6 +82,7 @@ export default function Input({ label, prefill, id, onInput, isCheckbox, isNumer
                     { sliderConfig ? <>
                         <input
                             className="input ignore"
+                            list={`${id}_ticks`}
                             name={id}
                             type='range'
                             value={value}
@@ -90,6 +92,14 @@ export default function Input({ label, prefill, id, onInput, isCheckbox, isNumer
                             max={sliderConfig.max}
                             step={(sliderConfig.max - sliderConfig.min) / sliderConfig.stops}
                         />
+                        <div className="slider-tick-container">
+                            <div className="slider-tick-wrapper">
+                                { new Array(sliderConfig.stops + 1).fill(0)
+                                    .map((_, ind) => sliderConfig.min + (sliderConfig.max - sliderConfig.min) / sliderConfig.stops * ind)
+                                    .map(val => <span className="slider-tick" style={{'--position': `${val / sliderConfig.max * 100}%`}}></span>)
+                                }
+                            </div>
+                        </div>
                         <div className="text-input-wrapper" data-suffix={sliderConfig.suffix ?? ''}>
                             <input 
                                 className={"input text-box numerical required" + (warning ? " warning" : "")}
