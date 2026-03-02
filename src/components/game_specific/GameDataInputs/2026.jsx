@@ -67,8 +67,8 @@ export const GameDataInputs = {
             id="Form_teleop_fuel"
             slider={{
                 min: 0,
-                max: 40,
-                stops: 8,
+                max: 60,
+                stops: 12,
             }}
             alignLabel='top'
             prefill={edit.isEdit ? edit.data.performance.teleop.fuel : 0}
@@ -79,7 +79,7 @@ export const GameDataInputs = {
             slider={{
                 min: 0,
                 max: 100,
-                stops: 4,
+                stops: 8,
                 suffix: 'percent',
             }}
             alignLabel='top'
