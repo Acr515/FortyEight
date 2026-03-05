@@ -18,12 +18,12 @@ export default function ViewIndividualData({data}) {
                         <div className="cell-label">Cycles</div>
                     </div>
                     <div className="content-cell">
-                        <div className="cell-data">{p.auto.accuracy}%</div>
-                        <div className="cell-label">Accuracy</div>
-                    </div>
-                    <div className="content-cell">
                         <div className="cell-data">{p.auto.fuel}</div>
                         <div className="cell-label">Fuel/Cycle</div>
+                    </div>
+                    <div className="content-cell">
+                        <div className="cell-data">{p.auto.accuracy}%</div>
+                        <div className="cell-label">Accuracy</div>
                     </div>
                     <div className="content-cell">
                         <div className="cell-data">{Math.round(p.auto.cycles * p.auto.accuracy * p.auto.fuel * 0.1) / 10}</div>
@@ -45,12 +45,12 @@ export default function ViewIndividualData({data}) {
                         <div className="cell-label">Cycles</div>
                     </div>
                     <div className="content-cell">
-                        <div className="cell-data">{p.teleop.accuracy}%</div>
-                        <div className="cell-label">Accuracy</div>
-                    </div>
-                    <div className="content-cell">
                         <div className="cell-data">{p.teleop.fuel}</div>
                         <div className="cell-label">Fuel/Cycle</div>
+                    </div>
+                    <div className="content-cell">
+                        <div className="cell-data">{p.teleop.accuracy}%</div>
+                        <div className="cell-label">Accuracy</div>
                     </div>
                     <div className="content-cell">
                         <div className="cell-data">{Math.round(p.teleop.cycles * p.teleop.accuracy * p.teleop.fuel * 0.1) / 10}</div>
