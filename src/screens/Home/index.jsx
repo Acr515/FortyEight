@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import Input from 'components/Input';
 import Events from 'data/game_specific/eventCodes/GAME_YEAR';
 import { findEvent } from 'data/game_specific/eventCodes/_Universal';
+import GlobalSettingsInputs from 'components/game_specific/GlobalSettingsInputs';
+import gameDataObject from 'util/gameData/GAME_YEAR';
 import './style.scss';
 
 export default function Home() {
@@ -15,14 +17,15 @@ export default function Home() {
     const [eventName, setEventName] = useState("Type an event code to see its name here");
 
     const updateData = (newString, idString) => {
-        if (idString == "ScoutNamePrefill") setPrefillName(newString);
         if (idString == "EventCodePrefill") {
             setPrefillKey(newString);
             let event = findEvent(Events, newString);
             if (event == null) setEventName("???"); else setEventName(event.name + " | Week " + (event.week + 1));
         }
         localStorage.setItem(idString, newString);
-    }
+    };
+
+    const GameSpecificSettings = GlobalSettingsInputs[gameDataObject.year] ?? null;
 
     return (
         <div className="SCREEN _Home">
@@ -42,6 +45,10 @@ export default function Home() {
                 <div className="event-code-preview">
                     {eventName}
                 </div>
+                { GameSpecificSettings !== null && <>
+                    <h2>{gameDataObject.name} Specific Settings</h2>
+                    <GameSpecificSettings />
+                </>}
             </div>
         </div>
     );

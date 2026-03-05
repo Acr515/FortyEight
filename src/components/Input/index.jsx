@@ -96,7 +96,7 @@ export default function Input({ label, prefill, id, className = '', onInput, isC
                             <div className="slider-tick-wrapper">
                                 { new Array(sliderConfig.stops + 1).fill(0)
                                     .map((_, ind) => sliderConfig.min + (sliderConfig.max - sliderConfig.min) / sliderConfig.stops * ind)
-                                    .map(val => <span className="slider-tick" style={{'--position': `${val / sliderConfig.max * 100}%`}}></span>)
+                                    .map((val, ind) => <span key={ind} className="slider-tick" style={{'--position': `${val / sliderConfig.max * 100}%`}}></span>)
                                 }
                             </div>
                         </div>

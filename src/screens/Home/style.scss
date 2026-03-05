@@ -5,9 +5,15 @@
     padding: 80px 30px;
     text-align: center;
     box-sizing: border-box;
+    height: 100vh;
+    overflow-y: scroll;
 
     h1 {
         font-family: 'transandina';
+    }
+
+    h2 {
+        margin-top: 48px;
     }
 
     .prefill-form {

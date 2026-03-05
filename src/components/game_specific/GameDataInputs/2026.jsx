@@ -9,6 +9,8 @@ export const GameDataCategories = [
     "auto", "teleop", "endgame"
 ];
 
+const settings = JSON.parse(localStorage.getItem("InputSettings"));
+
 /**
  * A dictionary of form inputs that scouts fill with data. The HTML ID of each element is named very carefully:
  *  * The first phrase should be "Form_"
@@ -18,74 +20,80 @@ export const GameDataCategories = [
  * Additionally contains a boolean property `defenseFields` that decides whether or not the generic defense fields should appear.
  */
 export const GameDataInputs = {
-    AutonomousSection: ({edit}) => <>
-        <Input
-            label="Cycles"
-            id="Form_auto_cycles"
-            isNumerical={true}
-            prefill={edit.isEdit ? edit.data.performance.auto.cycles : undefined}
-        />
-        <Input
-            label="Average fuel shot per cycle"
-            id="Form_auto_fuel"
-            slider={{
-                min: 0,
-                max: 40,
-                stops: 8,
-            }}
-            alignLabel='top'
-            prefill={edit.isEdit ? edit.data.performance.auto.fuel : 0}
-        />
-        <Input
-            label="Average % accuracy per cycle"
-            id="Form_auto_accuracy"
-            slider={{
-                min: 0,
-                max: 100,
-                stops: 4,
-                suffix: 'percent',
-            }}
-            alignLabel='top'
-            prefill={edit.isEdit ? edit.data.performance.auto.accuracy : 50}
-        />
-        <Input
-            label="Climbed to level 1?"
-            id="Form_auto_state"
-            isCheckbox={true}
-            prefill={edit.isEdit ? edit.data.performance.auto.state : undefined}
-        />
-    </>,
-    TeleopSection: ({edit}) => <>
-        <Input
-            label="Cycles"
-            id="Form_teleop_cycles"
-            isNumerical={true}
-            prefill={edit.isEdit ? edit.data.performance.teleop.cycles : undefined}
-        />
-        <Input
-            label="Average fuel shot per cycle"
-            id="Form_teleop_fuel"
-            slider={{
-                min: 0,
-                max: 60,
-                stops: 12,
-            }}
-            alignLabel='top'
-            prefill={edit.isEdit ? edit.data.performance.teleop.fuel : 0}
-        />
-        <Input
-            label="Average % accuracy per cycle"
-            id="Form_teleop_accuracy"
-            slider={{
-                min: 0,
-                max: 100,
-                stops: 8,
-                suffix: 'percent',
-            }}
-            alignLabel='top'
-            prefill={edit.isEdit ? edit.data.performance.teleop.accuracy : 50}
-        />
-    </>,
+    AutonomousSection: ({edit}) => {
+        const settings = JSON.parse(localStorage.getItem("InputSettings"));
+        return <>
+            <Input
+                label="Cycles"
+                id="Form_auto_cycles"
+                isNumerical={true}
+                prefill={edit.isEdit ? edit.data.performance.auto.cycles : undefined}
+            />
+            <Input
+                label="Average fuel shot per cycle"
+                id="Form_auto_fuel"
+                slider={{
+                    min: 0,
+                    max: 40,
+                    stops: settings.stops.autoFuel,
+                }}
+                alignLabel='top'
+                prefill={edit.isEdit ? edit.data.performance.auto.fuel : 0}
+            />
+            <Input
+                label="Average % accuracy per cycle"
+                id="Form_auto_accuracy"
+                slider={{
+                    min: 0,
+                    max: 100,
+                    stops: settings.stops.autoAccuracy,
+                    suffix: 'percent',
+                }}
+                alignLabel='top'
+                prefill={edit.isEdit ? edit.data.performance.auto.accuracy : 50}
+            />
+            <Input
+                label="Climbed to level 1?"
+                id="Form_auto_state"
+                isCheckbox={true}
+                prefill={edit.isEdit ? edit.data.performance.auto.state : undefined}
+            />
+        </>
+    },
+    TeleopSection: ({edit}) => {
+        const settings = JSON.parse(localStorage.getItem("InputSettings"));
+        return <>
+            <Input
+                label="Cycles"
+                id="Form_teleop_cycles"
+                isNumerical={true}
+                prefill={edit.isEdit ? edit.data.performance.teleop.cycles : undefined}
+            />
+            <Input
+                label="Average fuel shot per cycle"
+                id="Form_teleop_fuel"
+                slider={{
+                    min: 0,
+                    max: 60,
+                    stops: settings.stops.teleopFuel,
+                }}
+                alignLabel='top'
+                prefill={edit.isEdit ? edit.data.performance.teleop.fuel : 0}
+            />
+            <Input
+                label="Average % accuracy per cycle"
+                id="Form_teleop_accuracy"
+                slider={{
+                    min: 0,
+                    max: 100,
+                    stops: settings.stops.teleopAccuracy,
+                    suffix: 'percent',
+                }}
+                alignLabel='top'
+                prefill={edit.isEdit ? edit.data.performance.teleop.accuracy : 50}
+            />
+        </>
+    },
     EndgameSection: ({edit}) => {
         const [endgameState, setEndgameState] = useState(edit.isEdit ? edit.data.performance.endgame.state : undefined);
 
