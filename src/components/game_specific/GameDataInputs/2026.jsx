@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Input from 'components/Input';
 import { EndgameResult } from 'data/game_specific/performanceObject/2026';
+import { defaultSettings, stopCountIsValid } from '../GlobalSettingsInputs/2026';
 
 /**
  * An array that stores all categories as strings that have data
@@ -9,7 +10,23 @@ export const GameDataCategories = [
     "auto", "teleop", "endgame"
 ];
 
-const settings = JSON.parse(localStorage.getItem("InputSettings"));
+// const adjustMax = (steps, max) => max + (max > 0 ? steps % max : 0); 
+const adjustMax = (steps, max) => max + (steps - max % steps) % steps
+
+const getSettings = () => {
+    const settings = JSON.parse(localStorage.getItem("InputSettings"));
+    if (!settings) return defaultSettings;
+
+    // Adjust inputs to sensible values
+    for (const key of Object.keys(settings.stops)) {
+        const val = settings.stops[key];
+        if (typeof val !== 'number' || !stopCountIsValid(val))
+            settings.stops[key] = defaultSettings.stops[key];
+    }
+
+    return settings;
+}
+
 
 /**
  * A dictionary of form inputs that scouts fill with data. The HTML ID of each element is named very carefully:
@@ -21,7 +38,7 @@ const settings = JSON.parse(localStorage.getItem("InputSettings"));
  */
 export const GameDataInputs = {
     AutonomousSection: ({edit}) => {
-        const settings = JSON.parse(localStorage.getItem("InputSettings"));
+        const settings = getSettings();
         return <>
             <Input
                 label="Cycles"
@@ -34,8 +51,8 @@ export const GameDataInputs = {
                 id="Form_auto_fuel"
                 slider={{
                     min: 0,
-                    max: 40,
-                    stops: settings.stops.autoFuel,
+                    max: adjustMax(settings.stops.autoFuel - 1, 40),
+                    stops: settings.stops.autoFuel - 1,
                 }}
                 alignLabel='top'
                 prefill={edit.isEdit ? edit.data.performance.auto.fuel : 0}
@@ -46,7 +63,7 @@ export const GameDataInputs = {
                 slider={{
                     min: 0,
                     max: 100,
-                    stops: settings.stops.autoAccuracy,
+                    stops: settings.stops.autoAccuracy - 1,
                     suffix: 'percent',
                 }}
                 alignLabel='top'
@@ -61,7 +78,7 @@ export const GameDataInputs = {
         </>
     },
     TeleopSection: ({edit}) => {
-        const settings = JSON.parse(localStorage.getItem("InputSettings"));
+        const settings = getSettings();
         return <>
             <Input
                 label="Cycles"
@@ -74,8 +91,8 @@ export const GameDataInputs = {
                 id="Form_teleop_fuel"
                 slider={{
                     min: 0,
-                    max: 60,
-                    stops: settings.stops.teleopFuel,
+                    max: adjustMax(settings.stops.teleopFuel - 1, 40),
+                    stops: settings.stops.teleopFuel - 1,
                 }}
                 alignLabel='top'
                 prefill={edit.isEdit ? edit.data.performance.teleop.fuel : 0}
@@ -86,7 +103,7 @@ export const GameDataInputs = {
                 slider={{
                     min: 0,
                     max: 100,
-                    stops: settings.stops.teleopAccuracy,
+                    stops: settings.stops.teleopAccuracy - 1,
                     suffix: 'percent',
                 }}
                 alignLabel='top'

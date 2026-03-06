@@ -17,6 +17,7 @@ export default function Home() {
     const [eventName, setEventName] = useState("Type an event code to see its name here");
 
     const updateData = (newString, idString) => {
+        if (idString == "ScoutNamePrefill") setPrefillName(newString);
         if (idString == "EventCodePrefill") {
             setPrefillKey(newString);
             let event = findEvent(Events, newString);

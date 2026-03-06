@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
 import Input from 'components/Input';
 
-const defaultSettings = {
+export const defaultSettings = {
     stops: {
-        autoFuel: "8",
-        autoAccuracy: "4", 
-        teleopFuel: "12",
-        teleopAccuracy: 8, 
+        autoFuel: 9,
+        autoAccuracy: 5, 
+        teleopFuel: 13,
+        teleopAccuracy: 9, 
     }
 };
+
+/** Common-sense validation */
+export const stopCountIsValid = (val) => Number(val) == val && val > 3 && val < 20;
 
 export default function GlobalSettingsInputs() {
     // Set up localStorage for event code and name
@@ -16,7 +19,7 @@ export default function GlobalSettingsInputs() {
 
     const initialSettings = JSON.parse(localStorage.getItem("InputSettings"));
     const [settings, setSettings] = useState(initialSettings);
-    const [separatePhases, setSeparatePhases] = useState(settings.stops.autoFuel !== settings.stops.teleopFuel && settings.stops.autoAccuracy !== settings.stops.teleopAccuracy)
+    const [separatePhases, setSeparatePhases] = useState(settings.stops.autoFuel !== settings.stops.teleopFuel || settings.stops.autoAccuracy !== settings.stops.teleopAccuracy)
 
     /**
      * Runs on every update of an input field. Saves the value of the input to `localStorage`.
@@ -53,21 +56,19 @@ export default function GlobalSettingsInputs() {
         setSeparatePhases(e.target.checked);
     };
 
-    /** Common-sense validation */
-    const isValid = (val) => Number(val) == val && val > 3 && val < 20;
 
     return <>
         <Input
             onInput={e => onUpdate(e.target.value, ["autoFuel", ...(!separatePhases ? ["teleopFuel"] : [])])}
             label={`# of stops along the ${separatePhases ? 'Auto ' : ''}Fuel slider`}
             prefill={initialSettings.stops.autoFuel}
-            warning={!isValid(settings.stops.autoFuel)}
+            warning={!stopCountIsValid(settings.stops.autoFuel)}
         />
         <Input
             onInput={e => onUpdate(e.target.value, ["autoAccuracy", ...(!separatePhases ? ["teleopAccuracy"] : [])])}
             label={`# of stops along the ${separatePhases ? 'Auto ' : ''}Accuracy slider`}
             prefill={initialSettings.stops.autoAccuracy}
-            warning={!isValid(settings.stops.autoAccuracy)}
+            warning={!stopCountIsValid(settings.stops.autoAccuracy)}
         />
         <Input
             onInput={onCheckUpdate}
@@ -80,13 +81,13 @@ export default function GlobalSettingsInputs() {
                 onInput={e => onUpdate(e.target.value, ["teleopFuel"])}
                 label={`# of stops along the Teleop Fuel slider`}
                 prefill={initialSettings.stops.teleopFuel}
-                warning={!isValid(settings.stops.teleopFuel)}
+                warning={!stopCountIsValid(settings.stops.teleopFuel)}
             />
             <Input
                 onInput={e => onUpdate(e.target.value, ["teleopAccuracy"])}
                 label={`# of stops along the Teleop Accuracy slider`}
                 prefill={initialSettings.stops.teleopAccuracy}
-                warning={!isValid(settings.stops.teleopAccuracy)}
+                warning={!stopCountIsValid(settings.stops.teleopAccuracy)}
             />
         </>}
     </>;
