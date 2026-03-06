@@ -105,7 +105,7 @@ export default function FRAME() {
                                     text="Manage"
                                     location={location}
                                 />
-                                { /* <NavigationGroup
+                                <NavigationGroup
                                     text="Analysis"
                                     links={[
                                             <NavigationLink
@@ -130,12 +130,11 @@ export default function FRAME() {
                                             key={3}
                                         />] : [])
                                     }
-                                /> */ }
+                                />
                             </div>
                             <div className="footer-content">
                                 <p>{`${gameData.name}`}</p>
                                 <p>v{VERSION_NAME}</p>
-                                <p>Preview Build</p>
                             </div>
                         </div>
                         <div id="drawer-opener" 
