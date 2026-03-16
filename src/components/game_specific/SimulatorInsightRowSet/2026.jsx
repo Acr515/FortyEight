@@ -24,7 +24,7 @@ export default function SimulatorInsightRowSet({sim, winner, loser}) {
 
     return <>
         <SimulatorInsightRow
-            label="Strongest Piece Scorer"
+            label="Strongest Fuel Scorer"
             winnerValue={winnerBestScorer}
             winnerColor={winner.color}
             loserValue={loserBestScorer}

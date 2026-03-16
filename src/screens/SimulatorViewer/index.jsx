@@ -100,7 +100,7 @@ export default function SimulatorViewer() {
         const createInsightObject = (rate, string, isLosingRate = false) => {
             return {
                 rate,
-                Element: <div className="individual-insight">
+                Element: <div className="individual-insight" key={`${rate}-${string.toLowerCase()}`}>
                     <span className={alliance.colorName + "-text alliance-name"}>{alliance.colorString} Alliance</span> {isLosingRate ? "lost" : "won"} <span className={alliance.colorName + "-text percentage"}>{Math.round(rate * 1000) / 10}%</span> of matches when {string}
                 </div>
             }

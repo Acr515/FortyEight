@@ -45,7 +45,6 @@ const SimulationInformation = {
     getRPs: (teamPerformances, gameStats) => {
         let totalFuel = 0, totalTower = 0;
         for (const team of teamPerformances) {
-            autoLeaves += team.auto.leave;
             totalFuel += ScoreCalculator.Auto.getPieces({ performance: team }) + ScoreCalculator.Teleop.getPieces({ performance: team });
             totalTower += (team.auto.state ? 15 : 0) + ScoreCalculator.Endgame.getScore({ performance: team });
         }
@@ -82,6 +81,13 @@ const SimulationInformation = {
         for (const match of team.data) {
             let score = scoreCalculatorMethod != null ? scoreCalculatorMethod(match) : match.performance[key][subkey];
             let negate = false;
+
+            // Don't sum accuracy/fuel of this match if no cycles were scored
+            if ((subkey == "accuracy" || subkey == "fuel") && match.performance[key].cycles <= 0) {
+                offset += 1;
+                continue;
+            }
+
             if (key == "endgame" && subkey == "state") {
                 score = ScoreCalculator.Endgame.getNumericalLevel(match);
                 if (!match.performance.endgame.failedAttempt && score == 0) {
@@ -113,10 +119,11 @@ const SimulationInformation = {
         );
         
         // Step 4: wrap up by generating the average
-        avg = avg / (team.data.length - offset);
+        const dividend = team.data.length - offset;
+        avg = dividend <= 0 ? 0 : avg / dividend;
         if (key == "endgame" && subkey == "state") avg = Math.max(Math.min(4, avg), 0);
 
-        return { min, max, avg, median, lowFreq };
+        return { min: min > max ? 0 : min, max, avg, median, lowFreq };
     },
 
     /**
@@ -345,9 +352,9 @@ const SimulationInformation = {
      */
     postSimulation: (results, config) => {
         const calculateAverages = (color) => {
-            results[color].autoRPRate /= config.simulations;
-            results[color].coralRPRate /= config.simulations;
-            results[color].bargeRPRate /= config.simulations;
+            results[color].energizedRPRate /= config.simulations;
+            results[color].superchargedRPRate /= config.simulations;
+            results[color].traversalRPRate /= config.simulations;
             results[color].averageCycles /= config.simulations;
             results[color].averageEndgame /= config.simulations;
             results[color].defensePiecesPrevented /= results[color].defenseOccurrences;

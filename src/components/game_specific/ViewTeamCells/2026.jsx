@@ -27,10 +27,10 @@ export default function ViewTeamCells({team}) {
             average.fuel += match.performance[phase].fuel;
         }
 
-        average.accuracy = Math.round(average.accuracy / average.fuel * 10) / 10;
+        average.accuracy = average.cycles > 0 ? Math.round(average.accuracy / average.fuel * 10) / 10 : '-';
         average.fuel = Math.round(average.fuel / team.data.length * 10) / 10;
         average.cycles = Math.round(average.cycles / team.data.length * 10) / 10;
-        average.fuelPerCycle = Math.round(average.fuel / average.cycles * 10) / 10;
+        average.fuelPerCycle = average.cycles > 0 ? Math.round(average.fuel / average.cycles * 10) / 10 : '-';
 
         return average;
     }
@@ -57,7 +57,7 @@ export default function ViewTeamCells({team}) {
                 <div className="info-label">Teleop Fuel/Cycle</div>
             </div>
             <div className="info-cell">
-                <div className="info-value">{teleop.accuracy}</div>
+                <div className="info-value">{teleop.accuracy}%</div>
                 <div className="info-label">Teleop Accuracy</div>
             </div>
             <div className="info-cell">
@@ -69,7 +69,7 @@ export default function ViewTeamCells({team}) {
                 <div className="info-label">Auto Fuel/Cycle</div>
             </div>
             <div className="info-cell">
-                <div className="info-value">{auto.accuracy}</div>
+                <div className="info-value">{auto.accuracy}%</div>
                 <div className="info-label">Auto Accuracy</div>
             </div>
             <div className="info-cell">

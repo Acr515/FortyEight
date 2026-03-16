@@ -25,6 +25,36 @@ export default function GraphTogglerSet({activeIndex, stateFuncs, teamNumber}) {
         [ 177, 65, 73 ]
     );
 
+    // Calculate fuel per cycle per game
+    let fuelData = data.map(({ performance }) => performance.auto.fuel + performance.teleop.fuel);
+    let fuelGraphInfo = new GraphInfo(
+        cycleData, matchLabels,
+        {
+            title: { text: "Match #" }
+        },
+        {
+            suggestedMin: 0,
+            suggestedMax: 32,
+            title: { text: "Fuel" }
+        },
+        [ 72, 184, 133 ]
+    );
+
+    // Calculate accuracy per game
+    let accuracyData = data.map(({ performance }) => performance.teleop.accuracy);
+    let accuracyGraphInfo = new GraphInfo(
+        cycleData, matchLabels,
+        {
+            title: { text: "Match #" }
+        },
+        {
+            suggestedMin: 0,
+            suggestedMax: 100,
+            title: { text: "Accuracy (%)" }
+        },
+        [ 51, 128, 204 ]
+    );
+
     return (
         <>
             <GraphTogglerSet_Universal
@@ -36,6 +66,20 @@ export default function GraphTogglerSet({activeIndex, stateFuncs, teamNumber}) {
                 graphInfo={cycleGraphInfo}
                 label="Cycles/game"
                 index={1}
+                activeIndex={activeIndex}
+                stateFuncs={stateFuncs}
+            />
+            <GraphToggler
+                graphInfo={fuelGraphInfo}
+                label="Fuel/cycle"
+                index={2}
+                activeIndex={activeIndex}
+                stateFuncs={stateFuncs}
+            />
+            <GraphToggler
+                graphInfo={accuracyGraphInfo}
+                label="Accuracy/game"
+                index={3}
                 activeIndex={activeIndex}
                 stateFuncs={stateFuncs}
             />

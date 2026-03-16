@@ -1,5 +1,6 @@
 import React, { useState, useContext } from "react";
 import FeedbackModalContext from "context/FeedbackModalContext";
+import gameDataObject from "util/gameData/2026";
 import './style.scss';
 
 /**
@@ -88,9 +89,9 @@ export default function SimulatorMatchViewer_Universal({sim}) {
                     <div className="rp-scores-row">
                         <div className="rps">
                             <div className="total-rp">{match.red.matchRP + match.red.gameStats.energizedRP + match.red.gameStats.superchargedRP + match.red.gameStats.traversalRP} RP</div>
-                            <div className={"rp-cell" + (match.red.gameStats.energizedRP ? " win" : "")}>ENERGIZED</div>
-                            <div className={"rp-cell" + (match.red.gameStats.superchargedRP ? " win" : "")}>SUPERCHARGED</div>
-                            <div className={"rp-cell" + (match.red.gameStats.traversalRP ? " win" : "")}>TRAVERSAL</div>
+                            <div className={"rp-cell" + (match.red.gameStats.energizedRP ? " win" : "")}>{gameDataObject.config.energizedRPThreshold} FUEL</div>
+                            <div className={"rp-cell" + (match.red.gameStats.superchargedRP ? " win" : "")}>{gameDataObject.config.superchargedRPThreshold} FUEL</div>
+                            <div className={"rp-cell" + (match.red.gameStats.traversalRP ? " win" : "")}>TRAVERSE</div>
                             <div className={"rp-cell" + (match.red.matchRP > 0 ? " win" : "")}>{match.red.score == match.blue.score ? "TIE" : "WIN"}</div>
                         </div>
                         <div className="scores">
@@ -125,9 +126,9 @@ export default function SimulatorMatchViewer_Universal({sim}) {
                         </div>
                         <div className="rps">
                             <div className="total-rp">{match.blue.matchRP + match.blue.gameStats.energizedRP + match.blue.gameStats.superchargedRP + match.blue.gameStats.traversalRP} RP</div>
-                            <div className={"rp-cell" + (match.blue.gameStats.energizedRP ? " win" : "")}>ENERGIZED</div>
-                            <div className={"rp-cell" + (match.blue.gameStats.superchargedRP ? " win" : "")}>SUPERCHARGED</div>
-                            <div className={"rp-cell" + (match.blue.gameStats.traversalRP ? " win" : "")}>TRAVERSAL</div>
+                            <div className={"rp-cell" + (match.blue.gameStats.energizedRP ? " win" : "")}>{gameDataObject.config.energizedRPThreshold} FUEL</div>
+                            <div className={"rp-cell" + (match.blue.gameStats.superchargedRP ? " win" : "")}>{gameDataObject.config.superchargedRPThreshold} FUEL</div>
+                            <div className={"rp-cell" + (match.blue.gameStats.traversalRP ? " win" : "")}>TRAVERSE</div>
                             <div className={"rp-cell" + (match.blue.matchRP > 0 ? " win" : "")}>{match.red.score == match.blue.score ? "TIE" : "WIN"}</div>
                         </div>
                     </div>
