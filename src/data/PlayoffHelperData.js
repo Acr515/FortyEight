@@ -456,7 +456,6 @@ const PlayoffHelperFunctions = {
         categories.forEach(category => {
             bestTeams[category] = null;
             picklist.forEach(team => {
-                console.log(team)
                 if (bestTeams[category] == null || team.powerScores[category].Composite > bestTeams[category].powerScores[category].Composite) {
                     // Make sure every team only gets one tag
                     let teamExists = false;
@@ -467,8 +466,12 @@ const PlayoffHelperFunctions = {
                 }
                 team.bestCompositeType = null;  // resetting this attribute
             });
+            console.log(picklist);
         });
-        Object.keys(bestTeams).forEach(category => bestTeams[category].bestCompositeType = WeightSetNames[category]);
+        // TODO: This throws when there are an equal number of teams to number of composite score types
+        Object.keys(bestTeams).forEach(category => {
+            if (bestTeams[category] !== null) bestTeams[category].bestCompositeType = WeightSetNames[category];
+        });
 
         // Apply simulated percentages to picklist robots, only in round 2 and if flag is true
         if (ph.draftState.round == 2 && useSimulation) {

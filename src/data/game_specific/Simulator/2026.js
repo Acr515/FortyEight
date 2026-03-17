@@ -20,7 +20,7 @@ const SimulationInformation = {
      * Injected into the simulator alliance objects under the key `insights` and is used accordingly in the Insights section
      */
     allianceInsights: {
-        autoAboveThreshold: { threshold: 30, count: 0, wins: 0, string: "autonomous" },
+        autoAboveThreshold: { threshold: 35, count: 0, wins: 0, string: "autonomous" },
         endgameAboveThreshold: { threshold: gameDataObject.config.bargeRPThreshold, count: 0, wins: 0, string: "endgame" },
         outscoredTeleop: { count: 0, wins: 0, string: "teleop" },
         outscoredAuto: { count: 0, wins: 0, string: "autonomous" },
@@ -88,14 +88,9 @@ const SimulationInformation = {
                 continue;
             }
 
-            if (key == "endgame" && subkey == "state") {
+            if (key == "endgame" && subkey == "state")
                 score = ScoreCalculator.Endgame.getNumericalLevel(match);
-                if (!match.performance.endgame.failedAttempt && score == 0) {
-                    // Don't hold this robot at fault for not attempting to climb
-                    //offset += .8;
-                    //negate = true;
-                }
-            }
+
             min = Math.min(score, min);
             max = Math.max(score, max);
             if (!negate) {
@@ -123,7 +118,7 @@ const SimulationInformation = {
         avg = dividend <= 0 ? 0 : avg / dividend;
         if (key == "endgame" && subkey == "state") avg = Math.max(Math.min(4, avg), 0);
 
-        return { min: min > max ? 0 : min, max, avg, median, lowFreq };
+        return { min: min > max ? 0 : min, max, avg, median: medianArray.length === 0 ? 0 : median, lowFreq };
     },
 
     /**
@@ -231,10 +226,8 @@ const SimulationInformation = {
      * @param {performanceObject} performance The `performanceObject` of the defender
      */
     deductDefenderScore: (performance) => {
-        let pieces = ScoreCalculator.Teleop.getPieces({ performance });
-        pieces = Math.ceil(pieces / 3);
-
-        // TODO: Implement
+        // For better accuracy, this ought to determine a new range based on the team's history of matches where they played defense. This isn't bad in a pinch though
+        performance.teleop.cycles = Math.min(performance.teleop.cycles, Math.ceil(performance.teleop.cycles / 3));
     },
 
     /**
@@ -244,43 +237,23 @@ const SimulationInformation = {
      * @param {function} rng The random number generator
      */
     applyDefense: (performanceDefender, performanceTarget, rng) => {
-        // TODO: Implement
-        /*
         // Determine the quality of defense
-        let basePieces = ScoreCalculator.Teleop.getPieces({ performance: performanceTarget });
-        let pieces = basePieces;
-        let reductionRate = 0.05;
-        if (performanceDefender.defense.rating == "OK") reductionRate = 0.35;
-        if (performanceDefender.defense.rating == "Strong") reductionRate = 0.65;
-        reductionRate = Math.max(0, reductionRate + (rng() * 0.4 - 0.2));  // +/- 20% from base rate
-        pieces = Math.round(pieces * reductionRate);
-        performanceDefender.defense.prevented = pieces;
-
+        let accuracyReduction = 1, cycleReductionRate = 1;
+        if (performanceDefender.defense.rating == "OK") {
+            accuracyReduction = 0.9;    // Accuracy 90% of base
+            cycleReductionRate = 1 - (rng() * 0.1); // 90%-100% of predicted cycles; little chance to reduce # of opponent cycles
+        }
+        if (performanceDefender.defense.rating == "Strong") {
+            accuracyReduction = 0.65;    // Accuracy 65% of base
+            cycleReductionRate = 0.9 - (rng() * 0.15); // 75%-90% of predicted cycles; good chance to reduce # of opponent cycles
+        }
+        accuracyReduction = Math.max(0, accuracyReduction + (rng() * 0.2 - 0.1));  // +/- 10% from base rate
+        
         // Reduce points
-        while (pieces > 0) {
-            const piece = Math.round(rng() * 5);
-            switch (piece) {
-                case Pieces.AlgaeLow:
-                    performanceTarget.teleop.algaeLow --;
-                    break;
-                case Pieces.AlgaeHigh:
-                    performanceTarget.teleop.algaeHigh --;
-                    break;
-                case Pieces.CoralL1:
-                    performanceTarget.teleop.coralL1 --;
-                    break;
-                case Pieces.CoralL2:
-                    performanceTarget.teleop.coralL2 --;
-                    break;
-                case Pieces.CoralL3:
-                    performanceTarget.teleop.coralL3 --;
-                    break;
-                case Pieces.CoralL4:
-                    performanceTarget.teleop.coralL4 --;
-                    break;
-            }
-            pieces --;
-        }*/
+        performanceTarget.teleop.accuracy *= accuracyReduction;
+        performanceTarget.teleop.cycles = Math.round(performanceTarget.teleop.cycles * cycleReductionRate);
+
+        performanceDefender.defense.prevented = performanceTarget.teleop.accuracy * 0.01 * performanceTarget.teleop.fuel * performanceTarget.teleop.cycles;
     },
 
     /**

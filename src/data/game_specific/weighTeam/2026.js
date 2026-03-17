@@ -19,28 +19,28 @@ export const WeightSets = {
     WellRounded: {
         Autonomous: 1.5,
         Cycles: 0.5,
-        Accuracy: 1,
+        Accuracy: 0.2,
         Tower: 1.25,
-        Defense: 1,
-        Flags: 1
+        Defense: 2,
+        Flags: 2
     },
     // Composite score focuses on autonomous performance with good supporting traits
     Autonomous: {
-        Autonomous: 3.5,
-        Cycles: 1.5,
-        Accuracy: 2,
-        Tower: 2,
-        Defense: 0.125,
-        Flags: 1.5
+        Autonomous: 2,
+        Cycles: 0.25,
+        Accuracy: 0.3,
+        Tower: 1.75,
+        Defense: 0.25,
+        Flags: 3
     },
     // Composite score focuses on reliable defenders with good supporting traits
     Defensive: {
-        Autonomous: 1.5,
-        Cycles: 0.25,
-        Accuracy: 0.5,
+        Autonomous: 1,
+        Cycles: 0,
+        Accuracy: 0.1,
         Tower: 1,
-        Defense: 3.5,
-        Flags: 2.25
+        Defense: 2,
+        Flags: 3
     },
 };
 
@@ -49,7 +49,7 @@ export const WeightSets = {
  */
 export const WeightSetNames = {
     Defensive: "defensive",
-    Autonomous: "autonomous",
+    Autonomous: "autonomous + support",
     WellRounded: "well-rounded",
 }
 
