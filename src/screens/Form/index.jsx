@@ -85,7 +85,12 @@ export default function Form() {
 
         // Now assign data to form.performance, based on the year
         let performance = performanceObject();
-        document.querySelectorAll(".SCREEN._Form .input").forEach(elm => {
+        const formElements = document.querySelectorAll(".SCREEN._Form .input:not(.ignore)");
+
+        for (const elm of formElements) {
+            if (typeof GameDataInputs.override !== 'undefined' && (GameDataInputs.override.keys.includes(elm.id)))
+                continue;
+
             let name = elm.id.split("_");
             if (name[1] != "base") {
 
@@ -103,7 +108,9 @@ export default function Form() {
                     SpecialFields[name[1]][name[2]](performance, value);
                 } else performance[name[1]][name[2]] = value;
             }
-        });
+        }
+        if (typeof GameDataInputs.override !== 'undefined')
+            GameDataInputs.override.iterator(form.performance);
         form.performance = performance;
 
         if (edit.isEdit) {

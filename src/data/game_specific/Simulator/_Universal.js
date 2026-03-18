@@ -244,9 +244,10 @@ class MatchDetails {
             }
 
             if (blueDefender != null) {
-                // Pick out a blue scorer to defend against
+                // Pick out a red scorer to defend against
                 let redScorer = null, redScore = -10;
-                bluePerformances.forEach(team => {
+                // Let it be known to time, and whoever reads this, that for probably 4 years I had this function picking THE WRONG TEAMS, sampling bluePerformances instead of red and essentially having a robot defend a teammate. RIP
+                redPerformances.forEach(team => {
                     let score = ScoreCalculator.Teleop.getScore({ performance: team });
                     if (score > redScore) {
                         redScore = score;

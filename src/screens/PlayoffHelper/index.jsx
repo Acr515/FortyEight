@@ -499,7 +499,6 @@ function DraftBoard() {
                 <div className='team-number'>{(Math.round(team.teamNumber * 100)) / 100}</div>
                 <div className='score'>{(Math.round(team.bestCompositeScore * 100)) / 100}</div>
                 { Object.keys(Weights).map((weight) => {
-                    console.log(weight);
                     return (
                         <div
                             className={`score`}
@@ -535,14 +534,13 @@ function DraftBoard() {
                 >
                     Composite
                 </div>
-                <div
+                { /* DISABLED FOR 2026 SEASON <div
                     className={`sortable-attribute${sortMethod === 'cycleRate' ? ' sorted' : ''}`}
                     onClick={() => setSortMethod('cycleRate')}
                 >
                     Cycles
-                </div>
+                </div> */ }
                 { Object.keys(Weights).map((weight) => {
-                    console.log(weight);
                     return (
                         <div
                             className={`sortable-attribute${sortMethod === weight ? ' sorted' : ''}`}
