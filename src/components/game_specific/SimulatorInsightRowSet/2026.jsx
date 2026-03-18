@@ -37,7 +37,6 @@ export default function SimulatorInsightRowSet({sim, winner, loser}) {
             winnerColor={winner.color}
             loserValue={`${Math.round(sim[loser.colorName].insights.outscoredAuto.count / sim.simulations * 1000) / 10}%`}
             loserColor={loser.color}
-            hyperlinkTeams
         />
         <SimulatorInsightRow
             label="Average Fuel Defended"
@@ -45,7 +44,6 @@ export default function SimulatorInsightRowSet({sim, winner, loser}) {
             winnerColor={winner.color}
             loserValue={isNaN(sim[loser.colorName].defensePiecesPrevented) ? '-' : sim[loser.colorName].defensePiecesPrevented.toFixed(1)}
             loserColor={loser.color}
-            hyperlinkTeams
         />
     </>
 }
